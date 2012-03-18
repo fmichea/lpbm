@@ -39,3 +39,13 @@ class Article(object):
         s = os.stat(filename)
         self.crt_date = datetime.datetime.fromtimestamp(s.st_ctime)
         self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
+
+class ArticlesManager(object):
+    def __init__(self):
+        self.articles = []
+
+        for root, dirs, files in os.walk(lpbm.constants.ROOT_ARTICLES):
+            for filename in files:
+                if not filename.endswith('.markdown'):
+                    continue
+                self.articles.append(Article(os.path.join(root, filename)))
