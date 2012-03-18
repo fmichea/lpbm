@@ -17,6 +17,27 @@ Features (expected)
 * Simple menu management.
 * User contributed pages, to build a simple website with the blog.
 
+Usage
+-----
+
+### Articles
+
+Articles are represented by *.markdown* files. The header of the file can
+contain informations such as authors and categories. Syntax is as follow:
+
+    author: login1
+    [author: login2] ...
+    category: Master1|Sub Category1
+    [category: Master2|Sub Category2] ...
+
+    Article Title
+    =============
+
+    Article content...
+
+Each author and category must be on their own lines, authors first. Ne new line
+between authors and categories.
+
 Authors
 -------
 
