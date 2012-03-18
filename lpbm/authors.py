@@ -53,7 +53,7 @@ class Author(object):
         self.bio = ''.join(lines[2:])
 
 
-class AuthorManager(object):
+class AuthorsManager(object):
     def __init__(self):
         self.authors = dict()
 

@@ -10,8 +10,8 @@ import os
 import lpbm.constants
 
 class Article(object):
-    def __init__(self, filename):
-        self.authors, self.categories, index = [], [], 0
+    def __init__(self, filename, aut_mgr):
+        self.authors, self.categories, self.aut_mgr, index = [], [], aut_mgr, 0
 
         with open(filename) as f:
             article = f.readlines()
@@ -21,6 +21,7 @@ class Article(object):
         match = frmt.match(article[index])
         while match is not None:
             self.authors.append(match.group(1))
+            self.aut_mgr.add_author(match.group(1))
             index += 1
             match = frmt.match(article[index])
 
@@ -41,11 +42,11 @@ class Article(object):
         self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
 
 class ArticlesManager(object):
-    def __init__(self):
+    def __init__(self, am):
         self.articles = []
 
         for root, dirs, files in os.walk(lpbm.constants.ROOT_ARTICLES):
             for filename in files:
                 if not filename.endswith('.markdown'):
                     continue
-                self.articles.append(Article(os.path.join(root, filename)))
+                self.articles.append(Article(os.path.join(root, filename), am))
