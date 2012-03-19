@@ -53,3 +53,9 @@ class ArticlesManager(object):
                 self.articles.append(
                     Article(os.path.join(root, filename), aut_mgr, cat_mgr)
                 )
+
+    def get_articles(self):
+        self.articles = sorted(self.articles,
+            cmp=lambda x, y: cmp(x.mod_date, y.crt_date)
+        )
+        return self.articles
