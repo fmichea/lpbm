@@ -2,6 +2,7 @@
 # Author: Franck Michea < franck,michea@gmail.com >
 
 import os
+import scss
 import string
 
 import lpbm.constants
@@ -50,7 +51,20 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
         )
         f.write(tmp)
 
+    f.write(get_template('footer.html').safe_substitute())
+
     f.close()
 
+def render_stylesheets():
+    f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css'), 'w')
+    for root, dirs, files in os.walk(lpbm.constants.ROOT_STYLESHEETS):
+        for filename in files:
+            if not filename.endswith('.scss'):
+                continue
+            f.write(scss.parser.load(os.path.join(root, filename)))
+    f.close()
+    return os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css')
+
 def render(art_mgr, aut_mgr, cat_mgr):
+    render_stylesheets()
     render_main_page(art_mgr, aut_mgr, cat_mgr)
