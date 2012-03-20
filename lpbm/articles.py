@@ -3,6 +3,7 @@
 
 # Python standart modules imports.
 import datetime
+import markdown
 import re
 import os
 
@@ -59,6 +60,9 @@ class Article(object):
         s = os.stat(filename)
         self.crt_date = datetime.datetime.fromtimestamp(s.st_ctime)
         self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
+
+    def get_content(self):
+        return markdown.markdown(self.content)
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):

@@ -1,11 +1,11 @@
 # templates.py - Render the blog with templates defined here.
 # Author: Franck Michea < franck,michea@gmail.com >
 
-import markdown
 import os
 import string
 
 import lpbm.constants
+import lpbm.config
 
 def get_template(filename):
     with open(os.path.join(lpbm.constants.ROOT_TEMPLATES, filename)) as f:
@@ -13,6 +13,13 @@ def get_template(filename):
 
 def render_main_page(art_mgr, aut_mgr, cat_mgr):
     f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'), 'w')
+
+    # Render the header.
+    config = lpbm.config.Config()
+    f.write(get_template('header.html').safe_substitute(
+        title = config.title,
+        subtitle = config.subtitle,
+    ))
 
     # Render all articles.
     for article in art_mgr.get_articles():
@@ -28,7 +35,7 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
 
         tmp = get_template('articles/body.html').safe_substitute(
             pk = article.pk,
-            content = str(markdown.markdown(article.content)),
+            content = article.get_content(),
             authors = ', '.join(authors),
             crt_date = article.crt_date.strftime(lpbm.constants.FRMT_DATE),
             mod_date = article.mod_date.strftime(lpbm.constants.FRMT_DATE),
