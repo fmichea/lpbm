@@ -6,6 +6,7 @@ import string
 
 import lpbm.constants
 import lpbm.config
+import lpbm.menu
 
 def get_template(filename):
     with open(os.path.join(lpbm.constants.ROOT_TEMPLATES, filename)) as f:
@@ -19,6 +20,12 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
     f.write(get_template('header.html').safe_substitute(
         title = config.title,
         subtitle = config.subtitle,
+    ))
+
+    # Render the menu.
+    menu_obj = lpbm.menu.Menu(cat_mgr, aut_mgr)
+    f.write(get_template('menu.html').safe_substitute(
+        categories = menu_obj.get_categories()
     ))
 
     # Render all articles.
