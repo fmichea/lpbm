@@ -27,6 +27,7 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
             authors.append(tmp[:-1])
 
         tmp = get_template('articles/body.html').safe_substitute(
+            pk = article.pk,
             content = str(markdown.markdown(article.content)),
             authors = ', '.join(authors),
             crt_date = article.crt_date.strftime(lpbm.constants.FRMT_DATE),
