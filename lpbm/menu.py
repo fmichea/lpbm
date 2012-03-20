@@ -8,6 +8,20 @@ class Menu(object):
         self.cat_mgr = cat_mgr
         self.aut_mgr = aut_mgr
 
+    def get_authors(self):
+        authors = sorted(self.aut_mgr.authors.values(),
+            cmp=lambda a, b: cmp(a.name, b.name)
+        )
+        res = ''
+        for author in authors:
+            res += '\t<li><a href="#{}">{}</a> <a href="mailto:{}"'.format(
+                author.login, author.name, author.email
+            )
+            res += 'class="mail">[V]</a></li>\n'
+        if res != '':
+            res = '<div id="authors"><strong>Authors</strong>\n<ul>\n%s</ul>\n</div>' % res
+        return res
+
     def get_categories(self):
         def browse_categories(cat, indent=0):
             tmp = ''

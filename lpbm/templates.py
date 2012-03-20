@@ -25,6 +25,7 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
     # Render the menu.
     menu_obj = lpbm.menu.Menu(cat_mgr, aut_mgr)
     f.write(get_template('menu.html').safe_substitute(
+        authors = menu_obj.get_authors(),
         categories = menu_obj.get_categories()
     ))
 
