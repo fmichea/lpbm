@@ -6,6 +6,7 @@ import datetime
 import markdown
 import re
 import os
+import codecs
 
 # Internal modules imports.
 import lpbm.constants
@@ -24,8 +25,8 @@ class Article(object):
         self.filename = 0
         self.authors, self.categories, self.aut_mgr, index = [], [], aut_mgr, 0
 
-        with open(filename) as f:
-            article = f.readlines()
+        f = codecs.open(filename, 'r', 'utf-8')
+        article = f.readlines()
 
         # Finding if the article has an id.
         match = re.match('^id: ([0-9]+)$', article[index])

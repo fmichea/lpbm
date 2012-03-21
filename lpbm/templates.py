@@ -4,6 +4,7 @@
 import os
 import string
 import subprocess
+import codecs
 
 import lpbm.constants
 import lpbm.config
@@ -14,7 +15,8 @@ def get_template(filename):
         return string.Template('\n'.join(f.readlines()))
 
 def render_main_page(art_mgr, aut_mgr, cat_mgr):
-    f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'), 'w')
+    f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'),
+                    'w', 'utf-8')
 
     # Render the header.
     config = lpbm.config.Config()
@@ -31,6 +33,8 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
         authors = menu_obj.get_authors(),
         categories = menu_obj.get_categories()
     ))
+
+    f.write('<ul id="articles">\n')
 
     # Render all articles.
     for article in art_mgr.get_articles():
@@ -53,10 +57,8 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
         )
         f.write(tmp)
 
-    f.write('</div>')
+    f.write('</ul></div>\n')
     f.write(get_template('footer.html').safe_substitute())
-
-    f.close()
 
 def render_stylesheets():
     f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css'), 'w')
