@@ -26,7 +26,7 @@ class Article(object):
         self.authors, self.categories, self.aut_mgr, index = [], [], aut_mgr, 0
 
         f = codecs.open(filename, 'r', 'utf-8')
-        article = f.readlines()
+        article = map(lambda a: a[:-1] if a[-1] == '\n' else a, f.readlines())
 
         # Finding if the article has an id.
         match = re.match('^id: ([0-9]+)$', article[index])
@@ -55,7 +55,7 @@ class Article(object):
             match = frmt.match(article[index])
 
         # The rest is the article.
-        self.content = ''.join(article[index:])
+        self.content = '\n'.join(article[index:])
 
         # Getting some time informations.
         s = os.stat(filename)
