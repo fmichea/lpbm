@@ -1,5 +1,6 @@
 // main.scss - +
 
+@import url("pygments.css");
 @import url("http://fonts.googleapis.com/css?family=Oswald");
 @import url("http://fonts.googleapis.com/css?family=Droid+Sans:regular,italic,bold,bolditalic");
 
@@ -36,9 +37,12 @@ $color_bkg_all          : #646464;
 $color_bkg_body         : white;
 $color_bkg_main_title   : #2f3134; // dark grey
 $color_bkg_footer       : #2f3134;
+$color_bkg_code         : #f0f0f0;
 $color_border_body      : #404246;
 $color_border_header    : #404246;
 $color_border_titles    : #404246;
+$color_border_menu      : #dadce1;
+$color_border_code      : #a0a0a0;
 $color_links            : #19b7de; // clear blue
 $color_mail             : #2f3134;
 $color_main_subtitle    : #ececec; // light grey
@@ -126,13 +130,6 @@ a {
     padding: 0px 15px;
 }
 
-#menu {
-    width: $menu_width - 20px; // Reminder: Fix second rule too.
-    padding: 10px;
-    float: right;
-    border-left: 1px solid #dadce1;
-}
-
 .mail {
     font-size: 7px;
     color: $color_mail;
@@ -166,6 +163,11 @@ ul#articles {
 }
 
 ul#menu {
+    width: $menu_width - 20px; // Reminder: Fix second rule too.
+    padding: 10px;
+    float: right;
+    border-left: 1px solid $color_border_menu;
+
     strong {
         display: block;
         margin-bottom: 4px;
@@ -192,4 +194,21 @@ ul#menu {
     text-align: center;
     padding: 4px 15px;
     border-radius: 0px 0px 5px 5px;
+}
+
+.codehilitetable {
+    background-color: $color_bkg_code;
+    border: 3px double $color_border_code;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    width: 100%;
+    font-size: $font_size - 1px;
+
+    td {
+        padding: 4px;
+    }
+
+    .linenos {
+        border-right: 1px solid $color_border_code;
+    }
 }

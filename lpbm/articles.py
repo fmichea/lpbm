@@ -63,7 +63,9 @@ class Article(object):
         self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
 
     def get_content(self):
-        return markdown.markdown(self.content)
+        return markdown.markdown(self.content,
+            ['codehilite(force_linenos=True)']
+        )
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):

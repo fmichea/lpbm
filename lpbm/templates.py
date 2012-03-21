@@ -74,7 +74,11 @@ def render_stylesheets():
             if p.returncode == 0:
                 f.write(out)
     f.close()
-    return os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css')
+
+    # Pygments stylesheet.
+    subprocess.call('pygmentize -S default -f html > %s' % (
+        os.path.join(lpbm.constants.ROOT_OUTPUT, 'pygments.css')
+    ), shell=True)
 
 def render(art_mgr, aut_mgr, cat_mgr):
     render_stylesheets()
