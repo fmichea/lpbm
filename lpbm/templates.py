@@ -2,8 +2,8 @@
 # Author: Franck Michea < franck,michea@gmail.com >
 
 import os
-from scss import parser
 import string
+import subprocess
 
 import lpbm.constants
 import lpbm.config
@@ -22,6 +22,8 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
         title = config.title,
         subtitle = config.subtitle,
     ))
+
+    f.write('<div id="main_body">\n')
 
     # Render the menu.
     menu_obj = lpbm.menu.Menu(cat_mgr, aut_mgr)
@@ -51,6 +53,7 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
         )
         f.write(tmp)
 
+    f.write('</div>')
     f.write(get_template('footer.html').safe_substitute())
 
     f.close()
@@ -61,7 +64,11 @@ def render_stylesheets():
         for filename in files:
             if not filename.endswith('.scss'):
                 continue
-            f.write(parser.load(os.path.join(root, filename)))
+            path = os.path.join(root, filename)
+            p = subprocess.Popen(['sass', path], stdout=subprocess.PIPE)
+            out, err = p.communicate()
+            if p.returncode == 0:
+                f.write(out)
     f.close()
     return os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css')
 
