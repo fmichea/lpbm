@@ -1,0 +1,195 @@
+// main.scss - +
+
+@import url("http://fonts.googleapis.com/css?family=Oswald");
+@import url("http://fonts.googleapis.com/css?family=Droid+Sans:regular,italic,bold,bolditalic");
+
+// ************************
+// ***** Global reset *****
+// ************************
+
+// Based upon 'reset.css' in the Yahoo! User Interface Library:
+// http://developer.yahoo.com/yui
+
+*, html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form,
+label, fieldset, input, p, blockquote, th, td { margin:0; padding:0 }
+table { border-collapse:collapse; border-spacing:0 }
+fieldset, img { border:0 }
+address, caption, cite, code, dfn, em, strong, th, var { font-style:normal;
+font-weight:normal }
+ol, ul, li { list-style:none }
+caption, th { text-align:left }
+h1, h2, h3, h4, h5, h6 { font-size:100%; font-weight:normal }
+q:before, q:after { content:''}
+
+/* Global reset-RESET */
+/* The below restores some sensible defaults */
+strong { font-weight:bold }
+em { font-style:italic }
+a img { border:none } /* Gets rid of IE's blue borders */
+
+// *********************
+// ***** Variables *****
+// *********************
+
+// Color
+$color_bkg_all          : #646464;
+$color_bkg_body         : white;
+$color_bkg_main_title   : #2f3134; // dark grey
+$color_bkg_footer       : #2f3134;
+$color_border_body      : #404246;
+$color_border_header    : #404246;
+$color_border_titles    : #404246;
+$color_links            : #19b7de; // clear blue
+$color_mail             : #2f3134;
+$color_main_subtitle    : #ececec; // light grey
+$color_main_title       : white;
+$color_text             : #626262; // clear grey
+$color_text_infos       : #878f9a;
+$color_text_title       : #44464a;
+$color_text_footer      : white;
+
+// Sizes
+$font_size      : 12px;
+$margin         : 10px;
+$width          : 800px;
+$menu_width     : 150px;
+
+// *****************
+// ***** Rules *****
+// *****************
+
+body {
+    font : {
+        family: "Droid Sans", Arial, serif;
+        size: $font_size;
+    }
+    color: $color_text;
+    background-color: $color_bkg_all;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Oswald", Arial, serif;
+    margin-bottom: $margin;
+}
+
+h1 { font-size: $font_size + 16px; }
+h2 { font-size: $font_size + 10px; }
+h3 { font-size: $font_size + 6px; }
+h4 { font-size: $font_size + 2px; }
+h5 { font-size: $font_size; }
+
+a {
+    text-decoration: none;
+    color: $color_links;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.cAlign {
+    width: $width;
+    margin: 0 auto;
+    border-left: 1px solid $color_border_body;
+    border-right: 1px solid $color_border_body;
+}
+
+.cleaner { clear: both; }
+
+#header {
+    margin: 0 auto;
+    background-color: $color_bkg_main_title;
+    border-bottom: 1px solid $color_border_header;
+
+    h1, h2 {
+        @extend .cAlign;
+    }
+
+    h1 {
+        color: $color_main_title;
+        padding: 0px 15px;
+        vertical-align: middle;
+        height: $font_size + 16px + 8px;
+    }
+
+    h2 {
+        color: $color_main_subtitle;
+        padding: 2px 15px;
+        font-size: $font_size;
+        vertical-align: middle;
+    }
+}
+
+#main_body {
+    @extend .cAlign;
+    background-color: $color_bkg_body;
+    padding: 0px 15px;
+}
+
+#menu {
+    width: $menu_width - 20px; // Reminder: Fix second rule too.
+    padding: 10px;
+    float: right;
+    border-left: 1px solid #dadce1;
+}
+
+.mail {
+    font-size: 7px;
+    color: $color_mail;
+    vertical-align: 40%;
+}
+
+ul#articles {
+    margin-right: $menu_width;
+
+    h1 {
+        color: $color_text_title;
+        border-bottom: 3px double $color_border_titles;
+    }
+
+    > li {
+        padding: 10px;
+    }
+
+    p {
+        margin-bottom: 5px;
+    }
+
+    .infos {
+        font : {
+            style: italic;
+            size: 11px;
+        }
+        text-align: right;
+        color: $color_text_infos;
+    }
+}
+
+ul#menu {
+    strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    > li {
+        padding: 5px;
+
+        ul {
+            list-style-type: circle;
+
+            li {
+                padding: 1px 10px;
+            }
+        }
+    }
+}
+
+#footer {
+    @extend .cAlign;
+    background-color: $color_bkg_footer;
+    color: $color_text_footer;
+    font-size: $font_size - 1px;
+    text-align: center;
+    padding: 4px 15px;
+    border-radius: 0px 0px 5px 5px;
+}

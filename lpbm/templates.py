@@ -58,7 +58,9 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
         f.write(tmp)
 
     f.write('</ul></div>\n')
-    f.write(get_template('footer.html').safe_substitute())
+    f.write(get_template('footer.html').safe_substitute(
+        footer = config.footer,
+    ))
 
 def render_stylesheets():
     f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css'), 'w')
