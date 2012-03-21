@@ -15,7 +15,10 @@ class Config(object):
 
         # Get title of the blog.
         try: self.title = re.match('^title: (.+)$', lines[0]).group(1)
-        except IndexError: self.title = 'No Title Defined'
+        except (IndexError, AttributeError): self.title = 'No Title Defined'
 
         try: self.subtitle = re.match('^subtitle: (.+)$', lines[1]).group(1)
-        except IndexError: self.subtitle = ''
+        except (IndexError, AttributeError): self.subtitle = 'Subtitle'
+
+        try: self.footer = re.match('^footer: (.+)$', lines[2]).group(1)
+        except (IndexError, AttributeError): self.footer = 'Footer'
