@@ -2,7 +2,7 @@
 # Author: Franck Michea < franck,michea@gmail.com >
 
 import os
-import scss
+from scss import parser
 import string
 
 import lpbm.constants
@@ -61,7 +61,7 @@ def render_stylesheets():
         for filename in files:
             if not filename.endswith('.scss'):
                 continue
-            f.write(scss.parser.load(os.path.join(root, filename)))
+            f.write(parser.load(os.path.join(root, filename)))
     f.close()
     return os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css')
 
