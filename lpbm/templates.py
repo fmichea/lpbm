@@ -14,15 +14,23 @@ def get_template(filename):
     with open(os.path.join(lpbm.constants.ROOT_TEMPLATES, filename)) as f:
         return string.Template('\n'.join(f.readlines()))
 
-def render_main_page(art_mgr, aut_mgr, cat_mgr):
+def render_main_page(art_mgr, aut_mgr, cat_mgr, stylesheets):
     f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'),
                     'w', 'utf-8')
 
     # Render the header.
+    res_stl = []
+    tmp = '<link media="screen" type="text/css" href="{}" rel="stylesheet">'
+    for stl in stylesheets:
+        res_stl.append(tmp.format(
+            stl.replace(lpbm.constants.ROOT_MEDIA, '/media')
+        ))
+
     config = lpbm.config.Config()
     f.write(get_template('header.html').safe_substitute(
         title = config.title,
         subtitle = config.subtitle,
+        css_files = '\n'.join(res_stl),
     ))
 
     f.write('<div id="main_body">\n')
@@ -63,23 +71,29 @@ def render_main_page(art_mgr, aut_mgr, cat_mgr):
     ))
 
 def render_stylesheets():
-    f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'main.css'), 'w')
+    res = []
+
     for root, dirs, files in os.walk(lpbm.constants.ROOT_STYLESHEETS):
         for filename in files:
             if not filename.endswith('.scss'):
                 continue
+            out_path = os.path.join(root, (filename[:-5] + '.css'))
+            f = open(out_path, 'w')
             path = os.path.join(root, filename)
             p = subprocess.Popen(['sass', path], stdout=subprocess.PIPE)
             out, err = p.communicate()
             if p.returncode == 0:
+                res.append(out_path)
                 f.write(out)
-    f.close()
+            f.close()
 
     # Pygments stylesheet.
-    subprocess.call('pygmentize -S default -f html > %s' % (
-        os.path.join(lpbm.constants.ROOT_OUTPUT, 'pygments.css')
-    ), shell=True)
+    path = os.path.join(lpbm.constants.ROOT_STYLESHEETS, 'pygments.css')
+    subprocess.call('pygmentize -S default -f html > %s' % path, shell=True)
+    res.append(path)
+
+    return res
 
 def render(art_mgr, aut_mgr, cat_mgr):
-    render_stylesheets()
-    render_main_page(art_mgr, aut_mgr, cat_mgr)
+    stylesheets = render_stylesheets()
+    render_main_page(art_mgr, aut_mgr, cat_mgr, stylesheets)
