@@ -14,7 +14,7 @@ class Menu(object):
         )
         res = ''
         for author in authors:
-            res += '\t<li><a href="#{}">{}</a> <a href="mailto:{}"'.format(
+            res += '\t<li><a href="/authors/{}.html">{}</a> <a href="mailto:{}"'.format(
                 author.login, author.name, author.email
             )
             res += 'class="mail">[V]</a></li>\n'

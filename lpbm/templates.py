@@ -28,28 +28,32 @@ class Layout(object):
                 stl.replace(lpbm.constants.ROOT_MEDIA, '/media')
             ))
 
-    def output(self, filename, articles, page_title='Index'):
-        f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, filename),
-                        'w', 'utf-8')
-
+    def output_begin(self, fd, page_title):
         # Render the header.
-        f.write(get_template('header.html').safe_substitute(
+        fd.write(get_template('header.html').safe_substitute(
             page_title = page_title,
             title = self.config.title,
             subtitle = self.config.subtitle,
             css_files = '\n'.join(self.stylesheets),
         ))
-
-        f.write('<div id="main_body">\n')
-
+        fd.write('<div id="main_body">\n')
         # Render the menu.
-        f.write(get_template('menu.html').safe_substitute(
+        fd.write(get_template('menu.html').safe_substitute(
             authors = self.menu.get_authors(),
             categories = self.menu.get_categories()
         ))
+        fd.write('<ul id="articles">\n')
 
-        f.write('<ul id="articles">\n')
+    def output_end(self, fd):
+        fd.write('</ul><div class="cleaner"></div></div>\n')
+        fd.write(get_template('footer.html').safe_substitute(
+            footer = self.config.footer,
+        ))
 
+    def output_articles(self, filename, articles, page_title='Index'):
+        f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, filename),
+                        'w', 'utf-8')
+        self.output_begin(f, page_title)
         # Render all articles.
         for article in articles:
             authors = []
@@ -61,7 +65,6 @@ class Layout(object):
                     email = author.email,
                 )
                 authors.append(tmp[:-1])
-
             tmp = get_template('articles/body.html').safe_substitute(
                 pk = article.pk,
                 content = article.get_content(),
@@ -70,11 +73,20 @@ class Layout(object):
                 mod_date = article.mod_date.strftime(lpbm.constants.FRMT_DATE),
             )
             f.write(tmp)
+        self.output_end(f)
 
-        f.write('</ul><div class="cleaner"></div></div>\n')
-        f.write(get_template('footer.html').safe_substitute(
-            footer = self.config.footer,
+    def output_author(self, author):
+        f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors',
+                        '%s.html' % author.login), 'w', 'utf-8')
+        self.output_begin(f, 'Author - %s (%s)' % (author.name, author.login))
+        # Render the author
+        f.write(get_template('authors/body.html').safe_substitute(
+            login = author.login,
+            name = author.name,
+            email = author.email,
+            desc = author.get_description(),
         ))
+        self.output_end(f)
 
 def render_stylesheets():
     res = []
@@ -110,10 +122,14 @@ def render(art_mgr, aut_mgr, cat_mgr):
     create_dir_absent(lpbm.constants.ROOT_OUTPUT)
 
     layout.set_stylesheets(render_stylesheets())
-    layout.output('index.html', art_mgr.get_articles())
+    layout.output_articles('index.html', art_mgr.get_articles())
 
     create_dir_absent(os.path.join(lpbm.constants.ROOT_OUTPUT, 'articles'))
 
     for article in art_mgr.get_articles():
-        layout.output(os.path.join('articles', '%d.html' % article.pk),
+        layout.output_articles(os.path.join('articles', '%d.html' % article.pk),
                       [article], ('Article - %s' % article.title))
+
+    create_dir_absent(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))
+    for author in aut_mgr.get_authors():
+        layout.output_author(author)

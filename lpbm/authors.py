@@ -2,6 +2,8 @@
 
 import os
 import re
+import markdown
+import codecs
 
 import lpbm.constants
 
@@ -30,8 +32,8 @@ class Author(object):
         author_file = os.path.join(lpbm.constants.ROOT_AUTHORS,
                                    '%s.markdown' % login)
         try:
-            with open(author_file) as f:
-                lines = f.readlines()
+            f = codecs.open(author_file, 'r', 'utf-8')
+            lines = f.readlines()
         except IOError:
             raise AuthorUndefinedError(login)
 
@@ -52,6 +54,11 @@ class Author(object):
 
         self.bio = ''.join(lines[2:])
 
+    def get_description(self):
+        if self.bio == '':
+            self.bio = 'No Description Available\n=======\nWe are sorry, but no description'
+            self.bio += ' is available for this author.'
+        return markdown.markdown(self.bio)
 
 class AuthorsManager(object):
     def __init__(self):
@@ -60,3 +67,6 @@ class AuthorsManager(object):
     def add_author(self, login):
         if login not in self.authors:
             self.authors[login] = Author(login)
+
+    def get_authors(self):
+        return self.authors.values()
