@@ -1,14 +1,15 @@
 # templates.py - Render the blog with templates defined here.
 # Author: Franck Michea < franck,michea@gmail.com >
 
+import codecs
 import os
 import string
 import subprocess
-import codecs
 
-import lpbm.constants
 import lpbm.config
+import lpbm.constants
 import lpbm.menu
+import lpbm.stylesheets
 
 def get_template(filename):
     with open(os.path.join(lpbm.constants.ROOT_TEMPLATES, filename)) as f:
@@ -25,7 +26,7 @@ class Layout(object):
         a = '<link media="screen" type="text/css" href="{}" rel="stylesheet">'
         for stl in stylesheets:
             self.stylesheets.append(a.format(
-                stl.replace(lpbm.constants.ROOT_MEDIA, '/media')
+                stl.replace(lpbm.constants.ROOT_OUTPUT_STYLESHEETS, '/stylesheets')
             ))
 
     def output_begin(self, fd, page_title):
@@ -88,30 +89,6 @@ class Layout(object):
         ))
         self.output_end(f)
 
-def render_stylesheets():
-    res = []
-
-    for root, dirs, files in os.walk(lpbm.constants.ROOT_STYLESHEETS):
-        for filename in files:
-            if not filename.endswith('.scss'):
-                continue
-            out_path = os.path.join(root, (filename[:-5] + '.css'))
-            f = open(out_path, 'w')
-            path = os.path.join(root, filename)
-            p = subprocess.Popen(['sass', path], stdout=subprocess.PIPE)
-            out, err = p.communicate()
-            if p.returncode == 0:
-                res.append(out_path)
-                f.write(out)
-            f.close()
-
-    # Pygments stylesheet.
-    path = os.path.join(lpbm.constants.ROOT_STYLESHEETS, 'pygments.css')
-    subprocess.call('pygmentize -S default -f html > %s' % path, shell=True)
-    res.append(path)
-
-    return res
-
 def create_dir_absent(path):
     if not os.path.isdir(path):
         os.mkdir(path, 0755)
@@ -121,14 +98,14 @@ def render(art_mgr, aut_mgr, cat_mgr):
 
     create_dir_absent(lpbm.constants.ROOT_OUTPUT)
 
-    layout.set_stylesheets(render_stylesheets())
+    layout.set_stylesheets(lpbm.stylesheets.StylesheetsManager().stylesheets)
     layout.output_articles('index.html', art_mgr.get_articles())
 
     create_dir_absent(os.path.join(lpbm.constants.ROOT_OUTPUT, 'articles'))
 
     for article in art_mgr.get_articles():
         layout.output_articles(os.path.join('articles', '%d.html' % article.pk),
-                      [article], ('Article - %s' % article.title))
+                               [article], ('Article - %s' % article.title))
 
     create_dir_absent(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))
     for author in aut_mgr.get_authors():

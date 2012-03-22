@@ -76,7 +76,7 @@ class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):
         self.articles = dict()
 
-        for root, dirs, files in os.walk(lpbm.constants.ROOT_ARTICLES):
+        for root, dirs, files in os.walk(lpbm.constants.ROOT_SRC_ARTICLES):
             for filename in files:
                 if not filename.endswith('.markdown'):
                     continue

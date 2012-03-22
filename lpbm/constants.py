@@ -14,11 +14,15 @@ FRMT_DATE = '%B %d, %Y at %H:%M'
 ROOT = os.path.realpath(os.path.join(
     os.path.dirname(__file__), '..'
 ))
-ROOT_SOURCES = os.path.join(ROOT, 'sources')
-ROOT_AUTHORS = os.path.join(ROOT_SOURCES, 'authors')
-ROOT_ARTICLES = os.path.join(ROOT_SOURCES, 'articles')
 ROOT_TEMPLATES = os.path.join(ROOT, 'templates')
+ROOT_STYLESHEETS = os.path.join(ROOT, 'stylesheets')
+
+# Sources (added by user).
+ROOT_SOURCES = os.path.join(ROOT, 'sources')
+ROOT_SRC_AUTHORS = os.path.join(ROOT_SOURCES, 'authors')
+ROOT_SRC_ARTICLES = os.path.join(ROOT_SOURCES, 'articles')
+ROOT_SRC_STYLESHEETS = os.path.join(ROOT_SOURCES, 'stylesheets')
+
+# Output directories (created by the script)
 ROOT_OUTPUT = os.path.join(ROOT, 'result')
-ROOT_MEDIA = os.path.join(ROOT, 'media')
-ROOT_STYLESHEETS = os.path.join(ROOT_MEDIA, 'stylesheets')
-ROOT_JAVASCRIPT = os.path.join(ROOT_MEDIA, 'javascript')
+ROOT_OUTPUT_STYLESHEETS = os.path.join(ROOT_OUTPUT, 'stylesheets')

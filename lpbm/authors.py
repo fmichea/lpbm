@@ -29,7 +29,7 @@ class Author(object):
     def __init__(self, login):
         self.login = login
 
-        author_file = os.path.join(lpbm.constants.ROOT_AUTHORS,
+        author_file = os.path.join(lpbm.constants.ROOT_SRC_AUTHORS,
                                    '%s.markdown' % login)
         try:
             f = codecs.open(author_file, 'r', 'utf-8')
