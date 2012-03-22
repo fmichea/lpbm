@@ -10,6 +10,7 @@ import lpbm.config
 import lpbm.constants
 import lpbm.menu
 import lpbm.stylesheets
+import lpbm.tools
 
 def get_template(filename):
     with open(os.path.join(lpbm.constants.ROOT_TEMPLATES, filename)) as f:
@@ -89,24 +90,20 @@ class Layout(object):
         ))
         self.output_end(f)
 
-def create_dir_absent(path):
-    if not os.path.isdir(path):
-        os.mkdir(path, 0755)
-
 def render(art_mgr, aut_mgr, cat_mgr):
     layout = Layout(art_mgr, aut_mgr, cat_mgr)
 
-    create_dir_absent(lpbm.constants.ROOT_OUTPUT)
+    lpbm.tools.mkdir_p(lpbm.constants.ROOT_OUTPUT)
 
     layout.set_stylesheets(lpbm.stylesheets.StylesheetsManager().stylesheets)
     layout.output_articles('index.html', art_mgr.get_articles())
 
-    create_dir_absent(os.path.join(lpbm.constants.ROOT_OUTPUT, 'articles'))
+    lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'articles'))
 
     for article in art_mgr.get_articles():
         layout.output_articles(os.path.join('articles', '%d.html' % article.pk),
                                [article], ('Article - %s' % article.title))
 
-    create_dir_absent(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))
+    lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))
     for author in aut_mgr.get_authors():
         layout.output_author(author)
