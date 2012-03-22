@@ -5,26 +5,52 @@ This project aims to provide an easy way to generate static blog and personnal
 website using python scripts. Every page of the site is written using markdown,
 to help formatting easily text.
 
-Features (expected)
--------------------
+In this READ, you will see SOURCES several times. By default it is in sources/
+from the root of your clone, but you can change it in lpbm/constansts. Actually
+you can change a lot of paths in this file.
 
-* Archives.
+Features
+--------
+
+### Available
+
 * Articles created with a unique *.markdown* file.
+  * Unlimited authors and categories.
+  * A permalink is based on article id (fixed if not changed).
 * Author management based on logins.
-* Internationalization.
-* Simple category management.
+  * Biographical pages availble.
 * Simple code embedding (using pygments).
 * Simple menu management.
+  * Menu is generated using informations available in articles.
+
+### Expected (TODO)
+
+* Atom/RSS
+* Archives.
+* Internationalization.
+* Simple category management.
 * User contributed pages, to build a simple website with the blog.
 
 Usage
 -----
 
+### Configuration
+
+Configuration can be set in the files SOURCES/config. It can contain blog
+title, subtitle and footer (in this order). Syntax is s follow:
+
+    [title: My blog title]
+    [subtitle: My blog subtitle]
+    [footer: My blog footer]
+
+Keep line empty if you don't want to set a variable.
+
 ### Articles
 
 Articles are represented by *.markdown* files. The header of the file can
-contain informations such as authors and categories. Syntax is as follow:
+contain informations such as id, authors and categories. Syntax is as follow:
 
+    [id: 1337]
     author: login1
     [author: login2] ...
     category: Master1|Sub Category1
@@ -35,15 +61,37 @@ contain informations such as authors and categories. Syntax is as follow:
 
     Article content...
 
-Each author and category must be on their own lines, authors first. Ne new line
+*pk* has a special meaning. When it is absent, article will be ignored, else it
+will be used in permalink and for ordering articles (from highest to lower).
+Each author and category must be on their own lines, authors first. No new line
 between authors and categories.
 
-Authors
--------
+### Authors
+
+You can set some variables to authors, like his name, email or bio. A file to
+describe an author should be placed in SOURCES/authors/*login*.html with
+*login* replaced correctly. Syntax is as follow:
+
+    name: Your Name Here
+    email: your.email@example.com
+
+    [bio (markdown)]
+
+Other information
+-----------------
+
+### Authors
 
 * [Franck Michea](http://blog.kushou.eu)
 
-Useful Links
-------------
+### Useful Links
 
 * [Markdown Syntax](http://daringfireball.net/projects/markdown/syntax)
+* [Code Embedding](http://packages.python.org/Markdown/extensions/code_hilite.html)
+
+### Dependencies
+
+These programs are executed by the script.
+
+* **sass**: SCSS to CSS Translator in ruby.
+* **pygmentize**: Gets pygment's stylesheet.
