@@ -56,6 +56,11 @@ class Article(object):
 
         # The rest is the article.
         self.content = '\n'.join(article[index:])
+        self.title = []
+        while re.match('^====*', article[index]) is None:
+            self.title.append(article[index])
+            index += 1
+        self.title = ' '.join(self.title)
 
         # Getting some time informations.
         s = os.stat(filename)
