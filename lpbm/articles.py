@@ -56,11 +56,18 @@ class Article(object):
 
         # The rest is the article.
         self.content = '\n'.join(article[index:])
-        self.title = []
+        self.title_parts = []
         while re.match('^====*', article[index]) is None:
-            self.title.append(article[index])
+            self.title_parts.append(article[index])
             index += 1
-        self.title = ' '.join(self.title)
+        self.title = ' '.join(self.title_parts)
+
+        # Generate a slug to use in the URL
+        self.slug = '-'.join(s.lower() for s in self.title_parts if s)
+        self.slug = self.slug.replace(' ', '-')
+        self.slug = ''.join(c for c in self.slug
+                              if c in lpbm.constants.SLUG_CHARS)
+        self.slug = self.slug[:lpbm.constants.SLUG_SIZE]
 
         # Getting some time informations.
         s = os.stat(filename)
@@ -71,6 +78,9 @@ class Article(object):
         return markdown.markdown(self.content,
             ['codehilite(force_linenos=True)']
         )
+
+    def get_url(self):
+        return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):

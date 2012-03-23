@@ -2,6 +2,7 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 
 import os
+import string
 
 # Formats used to check values.
 FRMT_CATEGORY = '[a-zA-Z\| ]+'
@@ -9,6 +10,10 @@ FRMT_EMAIL = '[a-z\.A-Z0-9]+@[a-zA-Z0-9\.]+'
 FRMT_LOGIN = '[a-zA-Z][a-zA-Z0-9]*'
 FRMT_NAME = '[a-zA-Z ]+'
 FRMT_DATE = '%B %d, %Y at %H:%M'
+
+# Article slug configuration
+SLUG_CHARS = string.lowercase + string.digits + '-'
+SLUG_SIZE = 50
 
 # Paths to find everything.
 ROOT = os.path.realpath(os.path.join(
