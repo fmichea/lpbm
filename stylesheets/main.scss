@@ -140,6 +140,7 @@ a {
 }
 
 ul#articles {
+    padding: 10px 0;
     margin-right: $menu_width;
 
     h1 {
@@ -152,7 +153,8 @@ ul#articles {
     }
 
     > li {
-        padding: 10px;
+        padding-left: 10px;
+        padding-right: 25px;
     }
 
     .infos {
@@ -215,16 +217,30 @@ ul#menu {
         margin-bottom: 4px;
     }
 
-    > li {
-        padding: 5px;
-
-        ul {
-            list-style-type: circle;
+    #categories {
+        > ul {
+            padding-left: 10px;
 
             li {
-                padding: 1px 10px;
+                padding: 2px 0px;
+                margin-left: 10px;
+            }
+
+            > li {
+                list-style-type: circle;
+                > ul > li {
+                    list-style-type: disc;
+
+                    > ul > li {
+                        list-style-type: square;
+                    }
+                }
             }
         }
+    }
+
+    li {
+        padding: 5px;
     }
 }
 

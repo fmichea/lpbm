@@ -3,6 +3,7 @@
 class Category(object):
     def __init__(self, name):
         self.name = name
+        self.articles = []
         self.sub = dict()
 
     def add_subcategory(self, cat):

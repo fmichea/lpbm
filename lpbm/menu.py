@@ -29,7 +29,8 @@ class Menu(object):
                 tmp += browse_categories(sub, indent + 1)
             if tmp != '':
                 tmp = '<ul>\n%s\n</ul>' % tmp
-            return '{i}<li><a href="#">{title}</a>\n{sub}\n{i}</li>'.format(
+            #return '{i}<li><a href="#">{title}</a>\n{sub}\n{i}</li>'.format(
+            return '{i}<li>{title}\n{sub}\n{i}</li>'.format(
                 i = '\t' * indent, title = cat.name,
                 sub = '\n'.join(map(
                     lambda a: '%s%s' % ((indent + 1) * '\t', a),
@@ -40,8 +41,8 @@ class Menu(object):
         # Categories.
         res = browse_categories(self.cat_mgr)
         tmp = res.splitlines()
-        tmp[0] = '<div id="categories"><strong>{}</strong>\n<ul>'.format(
+        tmp[0] = '<div id="categories"><strong>{}</strong>\n'.format(
             self.cat_mgr.name
         )
-        tmp[-1] = '</ul>\n</div>'
+        tmp[-1] = '\n</div>'
         return ('\n'.join(tmp))
