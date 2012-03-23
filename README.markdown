@@ -50,7 +50,7 @@ Keep line empty if you don't want to set a variable.
 Articles are represented by *.markdown* files. The header of the file can
 contain informations such as id, authors and categories. Syntax is as follow:
 
-    [id: 1337]
+    id: 1337
     author: login1
     [author: login2] ...
     category: Master1|Sub Category1
@@ -61,7 +61,7 @@ contain informations such as id, authors and categories. Syntax is as follow:
 
     Article content...
 
-*pk* has a special meaning. When it is absent, article will be ignored, else it
+*id* has a special meaning. When it is absent, article will be ignored, else it
 will be used in permalink and for ordering articles (from highest to lower).
 Each author and category must be on their own lines, authors first. No new line
 between authors and categories.
@@ -69,7 +69,7 @@ between authors and categories.
 ### Authors
 
 You can set some variables to authors, like his name, email or bio. A file to
-describe an author should be placed in SOURCES/authors/*login*.html with
+describe an author should be placed in SOURCES/authors/*login*.markdown with
 *login* replaced correctly. Syntax is as follow:
 
     name: Your Name Here
