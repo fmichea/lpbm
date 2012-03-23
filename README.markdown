@@ -17,6 +17,7 @@ Features
 * Articles created with a unique *.markdown* file.
   * Unlimited authors and categories.
   * A permalink is based on article id (fixed if not changed).
+* RSS Feed generated at /rssfeed.xml
 * Author management based on logins.
   * Biographical pages availble.
 * Simple code embedding (using pygments).
@@ -25,7 +26,6 @@ Features
 
 ### Expected (TODO)
 
-* Atom/RSS
 * Archives.
 * Internationalization.
 * Simple category management.
@@ -93,7 +93,7 @@ Other information
 
 Library used:
 
-* **PyRSS2Gen**: RSS Generator. (http://www.dalkescientific.com/Python/PyRSS2Gen.html)
+* **PyRSS2Gen**: RSS Generator. ([http://www.dalkescientific.com/Python/PyRSS2Gen.html](http://www.dalkescientific.com/Python/PyRSS2Gen.html))
 
 These programs are executed by the script.
 
