@@ -91,6 +91,10 @@ Other information
 
 ### Dependencies
 
+Library used:
+
+* **PyRSS2Gen**: RSS Generator. (http://www.dalkescientific.com/Python/PyRSS2Gen.html)
+
 These programs are executed by the script.
 
 * **sass**: SCSS to CSS Translator in ruby.
