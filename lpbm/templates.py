@@ -69,6 +69,7 @@ class Layout(object):
                 authors.append(tmp[:-1])
             tmp = get_template('articles/body.html').safe_substitute(
                 pk = article.pk,
+                url = article.get_url(),
                 content = article.get_content(),
                 authors = ', '.join(authors),
                 crt_date = article.crt_date.strftime(lpbm.constants.FRMT_DATE),
@@ -101,8 +102,8 @@ def render(art_mgr, aut_mgr, cat_mgr):
     lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'articles'))
 
     for article in art_mgr.get_articles():
-        layout.output_articles(os.path.join('articles', '%d.html' % article.pk),
-                               [article], ('Article - %s' % article.title))
+        layout.output_articles(article.get_url(), [article],
+                               ('Article - %s' % article.title))
 
     lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))
     for author in aut_mgr.get_authors():
