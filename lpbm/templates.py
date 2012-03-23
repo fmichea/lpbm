@@ -1,5 +1,6 @@
 # templates.py - Render the blog with templates defined here.
 # Author: Franck Michea < franck,michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 import codecs
 import os

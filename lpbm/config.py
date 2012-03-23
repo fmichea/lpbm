@@ -1,5 +1,6 @@
 # config.py - Loads configuration.
 # Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 import re
 import os

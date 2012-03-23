@@ -1,5 +1,6 @@
 # rss.py - RSS generator.
 # Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 import datetime
 import os

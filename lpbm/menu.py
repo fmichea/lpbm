@@ -1,5 +1,6 @@
 # menu.py - Generates a simple menu with categories, authors and archives.
 # Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 import lpbm.constants
 

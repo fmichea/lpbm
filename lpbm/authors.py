@@ -1,4 +1,6 @@
 # author.py - Author model and manager.
+# Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 import os
 import re

@@ -1,5 +1,6 @@
 # article.py - Article model.
 # Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 # Python standart modules imports.
 import datetime

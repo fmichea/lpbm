@@ -1,4 +1,6 @@
 # categories.py - Category and category manager.
+# Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 class Category(object):
     def __init__(self, name):
