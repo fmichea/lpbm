@@ -102,7 +102,7 @@ def render(art_mgr, aut_mgr, cat_mgr):
     lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'articles'))
 
     for article in art_mgr.get_articles():
-        layout.output_articles(article.get_url(), [article],
+        layout.output_articles(article.get_filename(), [article],
                                ('Article - %s' % article.title))
 
     lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))

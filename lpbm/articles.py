@@ -79,8 +79,11 @@ class Article(object):
             ['codehilite(force_linenos=True)']
         )
 
+    def get_filename(self):
+        return os.path.join('articles', '%d.html' % self.pk)
+
     def get_url(self):
-        return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
+        return '%s?%s' % (self.get_filename(), self.slug)
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):
