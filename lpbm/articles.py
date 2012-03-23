@@ -88,4 +88,4 @@ class ArticlesManager(object):
                         self.articles[a.pk] = a
 
     def get_articles(self):
-        return list(reversed(self.articles.values()))
+        return sorted(self.articles.values(), cmp=lambda a, b: -cmp(a.pk, b.pk))
