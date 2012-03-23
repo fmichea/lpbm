@@ -53,9 +53,11 @@ $color_text_title       : #44464a;
 $color_text_footer      : white;
 
 // Sizes
+$code_width     : 630px;
 $font_size      : 12px;
 $margin         : 10px;
-$width          : 800px;
+$min_width      : 800px;
+$max_width      : 1024px;
 $menu_width     : 150px;
 
 // *****************
@@ -92,7 +94,8 @@ a {
 }
 
 .cAlign {
-    width: $width;
+    min-width: $min_width;
+    max-width: $max_width;
     margin: 0 auto;
     border-left: 1px solid $color_border_body;
     border-right: 1px solid $color_border_body;
@@ -144,12 +147,12 @@ ul#articles {
         border-bottom: 3px double $color_border_titles;
     }
 
-    > li {
-        padding: 10px;
+    p {
+        margin-bottom: $margin;
     }
 
-    p {
-        margin-bottom: 5px;
+    > li {
+        padding: 10px;
     }
 
     .infos {
@@ -159,6 +162,45 @@ ul#articles {
         }
         text-align: right;
         color: $color_text_infos;
+    }
+
+    li > blockquote {
+        border: 1px solid #2a762a;
+        border-left: 3px solid #2a762a;
+        max-width: 80%;
+        margin: 0 auto;
+        margin-bottom: $margin;
+    }
+
+    blockquote {
+        p {
+            margin: 0;
+        }
+
+        border-left: 3px solid #2a762a;
+        background-color: #8cbc8c;
+        color: #005000;
+        padding: 2px 5px;
+        margin-bottom: 3px;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+        margin: 0 auto;
+        margin-top: 10px;
+        margin-bottom: $margin;
+    }
+
+    ul {
+        display: block;
+        margin-left: $margin + 10px;
+        margin-bottom: $margin;
+
+        li {
+            list-style-type: circle;
+            margin-bottom: 2px;
+        }
     }
 }
 
@@ -201,7 +243,7 @@ ul#menu {
     border: 3px double $color_border_code;
     margin: 0 auto;
     margin-bottom: 10px;
-    width: 100%;
+    width: $code_width;
     font-size: $font_size - 1px;
 
     td {
