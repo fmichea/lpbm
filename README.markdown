@@ -15,14 +15,14 @@ Features
 ### Available
 
 * Articles created with a unique *.markdown* file.
-  * Unlimited authors and categories.
-  * A permalink is based on article id (fixed if not changed).
+    * Unlimited authors and categories.
+    * A permalink is based on article id (fixed if not changed).
 * RSS Feed generated at /rssfeed.xml
 * Author management based on logins.
-  * Biographical pages availble.
+    * Biographical pages availble.
 * Simple code embedding (using pygments).
 * Simple menu management.
-  * Menu is generated using informations available in articles.
+    * Menu is generated using informations available in articles.
 
 ### Expected (TODO)
 
@@ -82,7 +82,8 @@ Other information
 
 ### Authors
 
-* [Franck Michea](http://blog.kushou.eu)
+* [Pierre Bourdon](http://blog.delroth.net/)
+* [Franck Michea](http://blog.kushou.eu/)
 
 ### Useful Links
 
