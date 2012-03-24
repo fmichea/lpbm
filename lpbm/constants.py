@@ -6,7 +6,7 @@ import os
 import string
 
 # Formats used to check values.
-FRMT_CATEGORY = '[a-zA-Z\| ]+'
+FRMT_CATEGORY = '[a-zA-Z0-9\| ]+'
 FRMT_EMAIL = '[a-z\.A-Z0-9]+@[a-zA-Z0-9\.]+'
 FRMT_LOGIN = '[a-zA-Z][a-zA-Z0-9]*'
 FRMT_NAME = '[a-zA-Z ]+'
