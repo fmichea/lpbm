@@ -56,6 +56,7 @@ contain informations such as id, authors and categories. Syntax is as follow:
     category: Master1|Sub Category1
     [category: Master2|Sub Category2] ...
     title: Article Title
+    [slug: slug]
 
     Article content...
 
@@ -63,6 +64,9 @@ contain informations such as id, authors and categories. Syntax is as follow:
 will be used in permalink and for ordering articles (from highest to lower).
 Each author and category must be on their own lines, authors first. No new line
 between authors and categories.
+
+*slug* is there if you want to change the title of your article without
+breaking permalinks.
 
 ### Authors
 

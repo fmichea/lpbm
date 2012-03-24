@@ -57,19 +57,24 @@ class Article(object):
 
         # Parsing the title.
         match = re.match('^title: (.+)$', article[index])
-        if match is None:
-            self.title = 'FIXME: No Title.'
+        if match is None: self.title = 'FIXME: No Title.'
+        else:
+            self.title = match.group(1)
             index += 1
-        else: self.title = match.group(1)
-
-        # The rest is the article.
-        self.content = '\n'.join(article[index:])
 
         # Generate a slug to use in the URL
-        self.slug = self.title.replace(' ', '-')
+        match = re.match('^slug: (.+)$', article[index])
+        if match is not None:
+            self.slug = match.group(1)
+            index += 1
+        else: self.slug = self.title
+        self.slug = self.slug.lower().replace(' ', '-')
         self.slug = ''.join(c for c in self.slug
                               if c in lpbm.constants.SLUG_CHARS)
         self.slug = self.slug[:lpbm.constants.SLUG_SIZE]
+
+        # The rest is the article.
+        self.content = '\n'.join(article[index:])
 
         # Getting some time informations.
         s = os.stat(filename)
@@ -82,10 +87,10 @@ class Article(object):
         )
 
     def get_filename(self):
-        return os.path.join('articles', '%d.html' % self.pk)
+        return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
 
     def get_url(self):
-        return '%s?%s' % (self.get_filename(), self.slug)
+        return self.get_filename()
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):
