@@ -55,17 +55,18 @@ class Article(object):
             index += 1
             match = frmt.match(article[index])
 
+        # Parsing the title.
+        match = re.match('^title: (.+)$', article[index])
+        if match is None:
+            self.title = 'FIXME: No Title.'
+            index += 1
+        else: self.title = match.group(1)
+
         # The rest is the article.
         self.content = '\n'.join(article[index:])
-        self.title_parts = []
-        while re.match('^====*', article[index]) is None:
-            self.title_parts.append(article[index])
-            index += 1
-        self.title = ' '.join(self.title_parts)
 
         # Generate a slug to use in the URL
-        self.slug = '-'.join(s.lower() for s in self.title_parts if s)
-        self.slug = self.slug.replace(' ', '-')
+        self.slug = self.title.replace(' ', '-')
         self.slug = ''.join(c for c in self.slug
                               if c in lpbm.constants.SLUG_CHARS)
         self.slug = self.slug[:lpbm.constants.SLUG_SIZE]

@@ -55,9 +55,7 @@ contain informations such as id, authors and categories. Syntax is as follow:
     [author: login2] ...
     category: Master1|Sub Category1
     [category: Master2|Sub Category2] ...
-
-    Article Title
-    =============
+    title: Article Title
 
     Article content...
 
