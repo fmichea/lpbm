@@ -71,6 +71,7 @@ class Layout(object):
             tmp = get_template('articles/body.html').safe_substitute(
                 pk = article.pk,
                 url = article.get_url(),
+                title = article.title,
                 content = article.get_content(),
                 authors = ', '.join(authors),
                 crt_date = article.crt_date.strftime(lpbm.constants.FRMT_DATE),
