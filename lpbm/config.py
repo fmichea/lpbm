@@ -24,5 +24,8 @@ class Config(object):
         try: self.footer = re.match('^footer: (.+)$', lines[2]).group(1)
         except (IndexError, AttributeError): self.footer = 'Footer'
 
-        try: self.disqus_id = re.match('^disqus_id: (.+)$', lines[3]).group(1)
+        try: self.url = re.match('^url: (.+)$', lines[3]).group(1)
+        except (IndexError, AttributeError): self.url = 'http://localhost/'
+
+        try: self.disqus_id = re.match('^disqus_id: (.+)$', lines[4]).group(1)
         except (IndexError, AttributeError): self.disqus_id = None
