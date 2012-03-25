@@ -15,10 +15,9 @@ class Menu(object):
         )
         res = ''
         for author in authors:
-            res += '\t<li><a href="/authors/{}.html">{}</a> <a href="mailto:{}"'.format(
-                author.login, author.name, author.email
+            res += '\t<li><a href="mailto:{}">{}</a></li>'.format(
+                author.email, author.name
             )
-            res += 'class="mail">[V]</a></li>\n'
         if res != '':
             res = '<div id="authors"><strong>Authors</strong>\n<ul>\n%s</ul>\n</div>' % res
         return res

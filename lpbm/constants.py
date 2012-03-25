@@ -22,13 +22,16 @@ ROOT = os.path.realpath(os.path.join(
 ))
 ROOT_TEMPLATES = os.path.join(ROOT, 'templates')
 ROOT_STYLESHEETS = os.path.join(ROOT, 'stylesheets')
+ROOT_IMAGES = os.path.join(ROOT, 'images')
 
 # Sources (added by user).
 ROOT_SOURCES = os.path.join(ROOT, 'sources')
 ROOT_SRC_AUTHORS = os.path.join(ROOT_SOURCES, 'authors')
 ROOT_SRC_ARTICLES = os.path.join(ROOT_SOURCES, 'articles')
 ROOT_SRC_STYLESHEETS = os.path.join(ROOT_SOURCES, 'stylesheets')
+ROOT_SRC_IMAGES = os.path.join(ROOT_SOURCES, 'images')
 
 # Output directories (created by the script)
 ROOT_OUTPUT = os.path.join(ROOT, 'result')
 ROOT_OUTPUT_STYLESHEETS = os.path.join(ROOT_OUTPUT, 'stylesheets')
+ROOT_OUTPUT_IMAGES = os.path.join(ROOT_OUTPUT, 'images')

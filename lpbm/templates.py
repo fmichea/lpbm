@@ -56,7 +56,7 @@ class Layout(object):
     def output_articles(self, filename, articles, page_title='Index'):
         f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, filename),
                         'w', 'utf-8')
-        self.output_begin(f, page_title)
+        self.output_begin(f, "%s: %s" % (self.config.title, page_title))
         # Render all articles.
         for article in articles:
             authors = []

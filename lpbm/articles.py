@@ -62,6 +62,20 @@ class Article(object):
             self.title = match.group(1)
             index += 1
 
+        # Getting some time informations.
+        s = os.stat(filename)
+        self.crt_date = datetime.datetime.fromtimestamp(s.st_ctime)
+        self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
+
+        # Parsing the pubdate.
+        match = re.match('^pubdate: (.+)$', article[index])
+        if match is not None:
+            self.crt_date = datetime.datetime.strptime(
+                match.group(1),
+                "%Y-%m-%dT%H:%M:%S"
+            )
+            index += 1
+
         # Generate a slug to use in the URL
         match = re.match('^slug: (.+)$', article[index])
         if match is not None:
@@ -75,11 +89,6 @@ class Article(object):
 
         # The rest is the article.
         self.content = '\n'.join(article[index:])
-
-        # Getting some time informations.
-        s = os.stat(filename)
-        self.crt_date = datetime.datetime.fromtimestamp(s.st_ctime)
-        self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
 
     def get_content(self):
         return markdown.markdown(self.content,
