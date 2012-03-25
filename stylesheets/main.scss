@@ -58,7 +58,7 @@ $font_size      : 12px;
 $margin         : 10px;
 $min_width      : 800px;
 $max_width      : 1024px;
-$menu_width     : 150px;
+$menu_width     : 200px;
 
 // *****************
 // ***** Rules *****
@@ -142,6 +142,7 @@ a {
 ul#articles {
     padding: 10px 0;
     margin-right: $menu_width;
+    border-right: 1px solid $color_border_menu;
 
     h1 {
         color: $color_text_title;
@@ -184,6 +185,10 @@ ul#articles {
         color: #005000;
         padding: 2px 5px;
         margin-bottom: 3px;
+
+        a {
+            color: #000f00;
+        }
     }
 
     img {
@@ -200,7 +205,7 @@ ul#articles {
         margin-bottom: $margin;
 
         li {
-            list-style-type: circle;
+            list-style-type: disc;
             margin-bottom: 2px;
         }
     }
@@ -210,7 +215,6 @@ ul#menu {
     width: $menu_width - 20px; // Reminder: Fix second rule too.
     padding: 10px;
     float: right;
-    border-left: 1px solid $color_border_menu;
 
     strong {
         display: block;
