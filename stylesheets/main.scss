@@ -270,3 +270,12 @@ ul#menu {
         border-right: 1px solid $color_border_code;
     }
 }
+
+a.rss {
+    display: block;
+    background: url("/images/feed-icon-28x28.png") no-repeat left center;
+    padding-left: 36px;
+    padding-top: 16px;
+    height: 30px;
+    font-weight: bold;
+}
