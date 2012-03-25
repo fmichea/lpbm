@@ -25,7 +25,8 @@ def clean_tree():
 def build_blog(ct_mgr, aut_mgr, art_mgr):
     lpbm.templates.render(art_mgr, aut_mgr, cat_mgr)
 
-    shutil.rmtree(lpbm.constants.ROOT_OUTPUT_IMAGES)
+    if os.path.isdir(lpbm.constants.ROOT_OUTPUT_IMAGES):
+        shutil.rmtree(lpbm.constants.ROOT_OUTPUT_IMAGES)
     shutil.copytree(lpbm.constants.ROOT_IMAGES,
                     lpbm.constants.ROOT_OUTPUT_IMAGES)
 
