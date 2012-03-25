@@ -9,6 +9,11 @@ In this READ, you will see SOURCES several times. By default it is in sources/
 from the root of your clone, but you can change it in lpbm/constansts. Actually
 you can change a lot of paths in this file.
 
+By the way, this project is still under heavy developpement, and a lot of
+things aren't fixed yet (meaning config file can change rapidly and often, for
+example). Don't use it right now if you are not willing to spend some time fix
+things between updates.
+
 Features
 --------
 
