@@ -53,7 +53,7 @@ class Layout(object):
             footer = self.config.footer,
         ))
 
-    def output_articles(self, filename, articles, page_title='Index'):
+    def output_articles(self, filename, articles, page_title='Index', cmt=False):
         f = codecs.open(os.path.join(lpbm.constants.ROOT_OUTPUT, filename),
                         'w', 'utf-8')
         self.output_begin(f, "%s: %s" % (self.config.title, page_title))
@@ -78,6 +78,14 @@ class Layout(object):
                 mod_date = article.mod_date.strftime(lpbm.constants.FRMT_DATE),
             )
             f.write(tmp)
+
+            if cmt and self.config.disqus_id:
+                tmp = get_template('articles/comments.html').safe_substitute(
+                    pk = article.pk,
+                    url = article.get_url(),
+                    disqus_id = self.config.disqus_id
+                )
+                f.write(tmp)
         self.output_end(f)
 
     def output_author(self, author):
@@ -105,7 +113,7 @@ def render(art_mgr, aut_mgr, cat_mgr):
 
     for article in art_mgr.get_articles():
         layout.output_articles(article.get_filename(), [article],
-                               ('Article - %s' % article.title))
+                               ('Article - %s' % article.title), cmt=True)
 
     lpbm.tools.mkdir_p(os.path.join(lpbm.constants.ROOT_OUTPUT, 'authors'))
     for author in aut_mgr.get_authors():
