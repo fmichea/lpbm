@@ -259,19 +259,34 @@ ul#menu {
 }
 
 .codehilitetable {
+    font-size: $font_size - 1px;
     background-color: $color_bkg_code;
     border: 3px double $color_border_code;
     margin: 0 auto;
     margin-bottom: 10px;
     width: $code_width;
-    font-size: $font_size - 1px;
+
+    div.codehilite {
+        width: $code_width;
+        overflow: auto;
+    }
+
+    .codehilite > pre {
+        width: 100%;
+    }
 
     td {
         padding: 4px;
     }
 
-    .linenos {
+    td.code {
+        width: auto;
+    }
+
+    td.linenos {
         border-right: 1px solid $color_border_code;
+        width: 12px;
+        text-align: right;
     }
 }
 
