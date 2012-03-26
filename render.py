@@ -27,8 +27,14 @@ def build_blog(ct_mgr, aut_mgr, art_mgr):
 
     if os.path.isdir(lpbm.constants.ROOT_OUTPUT_IMAGES):
         shutil.rmtree(lpbm.constants.ROOT_OUTPUT_IMAGES)
-    shutil.copytree(lpbm.constants.ROOT_IMAGES,
-                    lpbm.constants.ROOT_OUTPUT_IMAGES)
+    os.makedirs(lpbm.constants.ROOT_OUTPUT_IMAGES)
+
+    # Copy images using os.system, like a man.
+    os.system("cp -R '%s'/* '%s'/* '%s' >/dev/null 2>&1" % (
+        lpbm.constants.ROOT_IMAGES,
+        lpbm.constants.ROOT_SRC_IMAGES,
+        lpbm.constants.ROOT_OUTPUT_IMAGES
+    ))
 
 def build_rss(cat_mgr, aut_mgr, art_mgr):
     lpbm.rss.render(art_mgr, aut_mgr, cat_mgr)
