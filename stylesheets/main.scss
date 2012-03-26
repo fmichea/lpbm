@@ -209,6 +209,11 @@ ul#articles {
             margin-bottom: 2px;
         }
     }
+
+    // Small hack for Disqus
+    div#disqus_thread li {
+        list-style-type: none;
+    }
 }
 
 ul#menu {
