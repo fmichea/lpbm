@@ -71,6 +71,7 @@ class Layout(object):
             tmp = get_template('articles/body.html').safe_substitute(
                 pk = article.pk,
                 url = article.get_url(),
+                full_url = "%s%s" % (self.config.url, article.get_url()),
                 title = article.title,
                 content = article.get_content(),
                 authors = ', '.join(authors),

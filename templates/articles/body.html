@@ -1,6 +1,22 @@
 <li id="$pk">
     <a href="/$url"><h1>$title</h1></a>
-    <p class="infos">Written by $authors<br/>$crt_date</p>
+    <div class="infos"><p>Written by $authors<br/>$crt_date</p></div>
     <p>$content</p>
-    <p class="infos"><a href="/$url">Permalink & comments</a></p>
+    <div class="infos">
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="$full_url" data-via="lse_epita">Tweet</a>
+        <script>
+            !function(d,s,id){
+                var js,fjs=d.getElementsByTagName(s)[0];
+                if(!d.getElementById(id)){
+                    js=d.createElement(s);
+                    js.id=id;
+                    js.src="//platform.twitter.com/widgets.js";
+                    fjs.parentNode.insertBefore(js,fjs);
+                    }
+                }(document,"script","twitter-wjs");
+        </script>
+        <div class="comments-link">
+            <a href="/$url">Permalink & comments</a>
+        </div>
+    </div>
 </li>
