@@ -8,6 +8,7 @@ import markdown
 import re
 import os
 import codecs
+import jinja2
 
 # Internal modules imports.
 import lpbm.constants
@@ -99,7 +100,20 @@ class Article(object):
         return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
 
     def get_url(self):
-        return self.get_filename()
+        return ('/%s' % self.get_filename())
+
+    def get_authors(self):
+        template = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            lpbm.constants.ROOT_TEMPLATES
+        )).get_template(os.path.join('authors', 'link.html'))
+        return ', '.join([
+            template.render({'author': self.aut_mgr.authors[author]})
+            for author in self.authors
+        ])
+
+    def get_date(self):
+        return self.crt_date.strftime(lpbm.constants.FRMT_DATE)
+
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):
@@ -118,3 +132,13 @@ class ArticlesManager(object):
 
     def get_articles(self):
         return sorted(self.articles.values(), cmp=lambda a, b: -cmp(a.pk, b.pk))
+
+    def render(self, template):
+        template.init_template('articles', 'base.html')
+
+        # Render all articles
+        for article in self.articles.values():
+            template.render(article.get_filename(), {
+                'articles': [article],
+                'comments_enabled': True,
+            })

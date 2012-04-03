@@ -6,8 +6,8 @@ import os
 import shutil
 
 def mkdir_p(path):
-    if not os.path.isdir(path):
-        os.makedirs(path)
+    try: os.makedirs(path)
+    except OSError: pass
 
 def cp(src, dst):
     shutil.copyfile(src, dst)

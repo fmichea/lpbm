@@ -104,6 +104,7 @@ Other information
 Library used:
 
 * **PyRSS2Gen**: RSS Generator. ([http://www.dalkescientific.com/Python/PyRSS2Gen.html](http://www.dalkescientific.com/Python/PyRSS2Gen.html))
+* **Jinja2**: Template engine. ([http://jinja.pocoo.org/](http://jinja.pocoo.org/))
 
 These programs are executed by the script.
 

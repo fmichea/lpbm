@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="{{ lang|default('en') }}">
+    <head>
+        <meta charset="utf-8">
+        <title>{{ page_title|default('LPBM') }}</title>
+
+        {% for css_file in stylesheet_mgr.stylesheets %}
+        <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
+        {% endfor %}
+    </head>
+    <body>
+
+<div id="header">
+    <a href="/"><h1>{{ config.title }}</h1></a>
+    {% if config.subtitle %}
+    <h2>{{ config.subtitle }}</h2>
+    {% endif %}
+</div>
+
+<div id="main_body">
+    <ul id="menu">
+        {# Displays a list of the categories in the menu. #}
+        <li><div id="categories"><strong>Categories</strong>
+            <ul>
+                {% set categories=category_mgr %}
+                {% for cat in categories recursive %}
+                <li>{{ cat.name }}
+                    {% if cat.sub %}
+                    <ul>{{ loop(cat.sub.values()) }}</ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div></li>
+
+        {# Displays a list of the authors in the menu. #}
+        <li><div id="authors"><strong>Authors</strong>
+            <ul>
+                {% for author in author_mgr|list %}
+                <li>{% include "authors/link.html" %}</li>
+                {% endfor %}
+            </ul>
+        </div></li>
+    </ul>
+
+    <ul id="articles">
+    {% block body %}<li>Page is empty</li>{% endblock %}
+    </ul>
+
+    <div class="cleaner"></div>
+</div>
+
+<p id="footer">
+    {{ config.footer }}
+</p>
+
+    </body>
+</html>

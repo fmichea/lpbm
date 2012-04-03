@@ -15,6 +15,10 @@ class Category(object):
             self.sub[cat[0]] = Category(cat[0])
         self.sub[cat[0]].add_subcategory(cat[1:])
 
+    def __iter__(self):
+        return iter(self.sub.values())
+
+
 class CategoryManager(Category):
     def parse_category(self, cat):
         self.add_subcategory(cat.split('|'))

@@ -28,6 +28,8 @@ class StylesheetsManager(object):
         self.stylesheets = []
         self.stylesheets.extend(self.render_scss())
         self.stylesheets.extend(self.render_pygments_style())
+        self.stylesheets = [ss.replace(lpbm.constants.ROOT_OUTPUT, '')
+                            for ss in self.stylesheets]
 
     def render_scss(self):
         res = []
