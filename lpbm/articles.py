@@ -140,6 +140,7 @@ class ArticlesManager(object):
         # Render all articles
         for article in self.articles.values():
             template.render(article.get_filename(), {
+                'page_title': article.title,
                 'articles': [article],
                 'comments_enabled': True,
             })

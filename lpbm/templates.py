@@ -54,5 +54,6 @@ def render(article_mgr, author_mgr, category_mgr):
     lpbm.paginate.Paginate(template, article_mgr).render()
 
     # Index is actually first page.
-    os.symlink(os.path.join(lpbm.constants.ROOT_OUTPUT, 'pages/1.html'),
-               os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'))
+    try: os.symlink(os.path.join(lpbm.constants.ROOT_OUTPUT, 'pages/1.html'),
+                    os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'))
+    except OSError: pass

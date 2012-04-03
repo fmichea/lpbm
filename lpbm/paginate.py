@@ -38,6 +38,7 @@ class Paginate(object):
         self.template.init_template('articles', 'base.html')
         for page in pages:
             self.template.render('pages/%d.html' % page, {
+                'page_title': 'Index' if page == 1 else 'Page %d' % page,
                 'articles': self.articles[
                     (page - 1) * lpbm.constants.ART_BY_PAGE:
                     page * lpbm.constants.ART_BY_PAGE
