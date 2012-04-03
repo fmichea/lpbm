@@ -44,7 +44,9 @@
     </ul>
 
     <ul id="articles">
+    {% include "paginate.html" %}
     {% block body %}<li>Page is empty</li>{% endblock %}
+    {% include "paginate.html" %}
     </ul>
 
     <div class="cleaner"></div>

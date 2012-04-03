@@ -3,12 +3,13 @@
 # License: New BSD License (See LICENSE)
 
 # Python standart modules imports.
-import datetime
-import markdown
-import re
-import os
 import codecs
+import datetime
 import jinja2
+import markdown
+import math
+import os
+import re
 
 # Internal modules imports.
 import lpbm.constants

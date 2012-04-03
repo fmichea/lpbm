@@ -35,3 +35,7 @@ ROOT_SRC_IMAGES = os.path.join(ROOT_SOURCES, 'images')
 ROOT_OUTPUT = os.path.join(ROOT, 'result')
 ROOT_OUTPUT_STYLESHEETS = os.path.join(ROOT_OUTPUT, 'stylesheets')
 ROOT_OUTPUT_IMAGES = os.path.join(ROOT_OUTPUT, 'images')
+
+# Paginate
+WIDTH_PAGINATE = 5
+ART_BY_PAGE = 5

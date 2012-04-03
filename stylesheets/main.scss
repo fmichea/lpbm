@@ -304,3 +304,25 @@ a.rss {
     height: 30px;
     font-weight: bold;
 }
+
+.paginate {
+    height: $font_size + 5px;
+
+    ul {
+        float: right;
+
+        li {
+            border: 1px solid $color_border_code;
+            background-color: $color_bkg_code;
+            padding: 3px 5px;
+            margin-right: 5px;
+            list-style-type: none !important;
+            float: left;
+        }
+
+        .cur_page {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+    }
+}

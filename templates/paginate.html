@@ -1,0 +1,22 @@
+{% if paginate %}
+<li class="paginate">
+    <ul>
+        {% if cur_page != first_page %}
+        <li><a href="/pages/{{ first_page }}.html">&laquo; First</a></li>
+        {% endif %}
+
+        {% for page in pages %}
+        <li>
+            <a href="/pages/{{ page }}.html"
+            {% if page == cur_page %}class="cur_page"{% endif %}
+            >{{ page }}</a>
+        </li>
+        {% endfor %}
+
+        {% if cur_page != last_page %}
+        <li><a href="/pages/{{ last_page }}.html">Last &raquo;</a></li>
+        {% endif %}
+    </ul>
+    <div class="cleaner"></div>
+</li>
+{% endif %}

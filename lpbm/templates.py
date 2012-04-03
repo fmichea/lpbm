@@ -3,12 +3,12 @@
 # License: New BSD License (See LICENSE)
 
 import codecs
-import os
 import jinja2
+import os
 
 import lpbm.config
 import lpbm.constants
-import lpbm.menu
+import lpbm.paginate
 import lpbm.stylesheets
 import lpbm.tools
 
@@ -47,9 +47,12 @@ def render(article_mgr, author_mgr, category_mgr):
     lpbm.tools.mkdir_p(lpbm.constants.ROOT_OUTPUT)
     template = Template(author_mgr, category_mgr)
 
-    # Index, with all articles.
-    template.init_template('articles', 'base.html')
-    template.render('index.html', {'articles': article_mgr.get_articles()})
-
     # One page by article.
     article_mgr.render(template)
+
+    # Paginate
+    lpbm.paginate.Paginate(template, article_mgr).render()
+
+    # Index is actually first page.
+    os.symlink(os.path.join(lpbm.constants.ROOT_OUTPUT, 'pages/1.html'),
+               os.path.join(lpbm.constants.ROOT_OUTPUT, 'index.html'))
