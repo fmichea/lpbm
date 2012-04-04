@@ -7,6 +7,8 @@
         {% for css_file in stylesheet_mgr.stylesheets %}
         <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
         {% endfor %}
+
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ config.url|default('/') }}rssfeed.xml" />
     </head>
     <body>
 
@@ -53,7 +55,7 @@
 </div>
 
 <p id="footer">
-    {{ config.footer }}
+    {{ config.footer }} {% if config.footer %}&mdash;{% endif %} <a href="{{ config.url|default('/') }}rssfeed.xml">RSS Feed</a>
 </p>
 
     </body>
