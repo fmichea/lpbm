@@ -158,13 +158,27 @@ ul#articles {
         padding-right: 25px;
     }
 
-    .infos {
+    div.infos {
         font : {
             style: italic;
             size: 11px;
         }
         text-align: right;
         color: $color_text_infos;
+
+        p {
+            margin-bottom: 0;
+        }
+
+        .twitter-share-button {
+            display: inline-block;
+        }
+
+        div.comments-link {
+            display: inline-block;
+            vertical-align: top;
+            padding-top: 4px;
+        }
     }
 
     li > blockquote {

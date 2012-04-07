@@ -49,6 +49,7 @@ title, subtitle and footer (in this order). Syntax is s follow:
     [footer: My blog footer]
     [url: http://blog.example.com/]
     [disqus_id: id]
+    [twitter_id: id]
 
 Keep line empty if you don't want to set a variable.
 

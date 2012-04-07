@@ -6,7 +6,25 @@
     <a href="{{ article.get_url() }}"><h1>{{ article.title }}</h1></a>
     <p class="infos">Written by {{ article.get_authors() }}<br/>{{ article.get_date() }}</p>
     <p>{{ article.get_content() }}</p>
-    <p class="infos"><a href="{{ article.get_url() }}">Permalink & comments</a></p>
+    <div class="infos">
+        {% if config.twitter_id %}
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ config.url }}{{ article.get_filename() }}" data-via="{{ config.twitter_id }}">Tweet</a>
+        <script>
+            !function(d,s,id){
+                var js,fjs=d.getElementsByTagName(s)[0];
+                if(!d.getElementById(id)){
+                    js=d.createElement(s);
+                    js.id=id;
+                    js.src="//platform.twitter.com/widgets.js";
+                    fjs.parentNode.insertBefore(js,fjs);
+                    }
+                }(document,"script","twitter-wjs");
+        </script>
+        {% endif %}
+        <div class="comments-link">
+            <a href="{{ article.get_url() }}">Permalink & comments</a>
+        </div>
+    </p>
 
     {% if comments_enabled and config.url and config.disqus_id %}
     <div id="disqus_thread"></div>
