@@ -49,6 +49,7 @@ title, subtitle and footer (in this order). Syntax is s follow:
     [footer: My blog footer]
     [url: http://blog.example.com/]
     [disqus_id: id]
+    [twitter_id: id]
 
 Keep line empty if you don't want to set a variable.
 
@@ -104,6 +105,7 @@ Other information
 Library used:
 
 * **PyRSS2Gen**: RSS Generator. ([http://www.dalkescientific.com/Python/PyRSS2Gen.html](http://www.dalkescientific.com/Python/PyRSS2Gen.html))
+* **Jinja2**: Template engine. ([http://jinja.pocoo.org/](http://jinja.pocoo.org/))
 
 These programs are executed by the script.
 

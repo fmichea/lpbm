@@ -29,3 +29,6 @@ class Config(object):
 
         try: self.disqus_id = re.match('^disqus_id: (.+)$', lines[4]).group(1)
         except (IndexError, AttributeError): self.disqus_id = None
+
+        try: self.twitter_id = re.match('^twitter_id: (.+)$', lines[5]).group(1)
+        except (IndexError, AttributeError): self.twitter_id = None

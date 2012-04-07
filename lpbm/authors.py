@@ -54,13 +54,6 @@ class Author(object):
                 self.email = None
         except IndexError: pass
 
-        self.bio = ''.join(lines[2:])
-
-    def get_description(self):
-        if self.bio == '':
-            self.bio = 'No Description Available\n=======\nWe are sorry, but no description'
-            self.bio += ' is available for this author.'
-        return markdown.markdown(self.bio)
 
 class AuthorsManager(object):
     def __init__(self):
@@ -70,5 +63,5 @@ class AuthorsManager(object):
         if login not in self.authors:
             self.authors[login] = Author(login)
 
-    def get_authors(self):
-        return self.authors.values()
+    def __iter__(self):
+        return iter(self.authors.values())

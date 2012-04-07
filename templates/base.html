@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="{{ lang|default('en') }}">
+    <head>
+        <meta charset="utf-8">
+        <title>{{ page_title|default('Index') }} - {{ config.title }}</title>
+
+        {% for css_file in stylesheet_mgr.stylesheets %}
+        <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
+        {% endfor %}
+
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ config.url|default('/') }}rssfeed.xml" />
+    </head>
+    <body>
+
+<div id="header">
+    <a href="/"><h1>{{ config.title }}</h1></a>
+    {% if config.subtitle %}
+    <h2>{{ config.subtitle }}</h2>
+    {% endif %}
+</div>
+
+<div id="main_body">
+    <ul id="menu">
+        {# Optionnal header #}
+        {% if menu_header %}
+        <li>{{ menu_header }}</li>
+        {% endif %}
+
+        {# Displays a list of the categories in the menu. #}
+        <li><div id="categories"><strong>Categories</strong>
+            <ul>
+                {% set categories=category_mgr %}
+                {% for cat in categories recursive %}
+                <li>{{ cat.name }}
+                    {% if cat.sub %}
+                    <ul>{{ loop(cat.sub.values()) }}</ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div></li>
+
+        {# Displays a list of the authors in the menu. #}
+        <li><div id="authors"><strong>Authors</strong>
+            <ul>
+                {% for author in author_mgr|list %}
+                <li>{% include "authors/link.html" %}</li>
+                {% endfor %}
+            </ul>
+        </div></li>
+    </ul>
+
+    <ul id="articles">
+    {% include "paginate.html" %}
+    {% block body %}<li>Page is empty</li>{% endblock %}
+    {% include "paginate.html" %}
+    </ul>
+
+    <div class="cleaner"></div>
+</div>
+
+<p id="footer">
+    {{ config.footer }} {% if config.footer %}&mdash;{% endif %} <a href="{{ config.url|default('/') }}rssfeed.xml">RSS Feed</a>
+</p>
+
+    </body>
+</html>
