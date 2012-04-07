@@ -5,6 +5,7 @@
 import codecs
 import jinja2
 import os
+import markdown
 
 import lpbm.config
 import lpbm.constants
@@ -24,6 +25,13 @@ class Template(object):
             lpbm.constants.ROOT_TEMPLATES
         ))
 
+        # Menu header (optionnal)
+        menu_file = os.path.join(lpbm.constants.ROOT_SOURCES, 'menu.markdown')
+        if os.path.isfile(menu_file):
+            f = codecs.open(menu_file, 'r', 'utf-8')
+            self.menu_header = markdown.markdown(f.read())
+        else: self.menu_header = None
+
     def init_template(self, *template):
         self.template = self.env.get_template(os.path.join(*template))
 
@@ -36,6 +44,7 @@ class Template(object):
             'author_mgr': self.author_mgr,
             'category_mgr': self.category_mgr,
             'stylesheet_mgr': self.stylesheet_mgr,
+            'menu_header': self.menu_header,
         })
         output_path = os.path.join(lpbm.constants.ROOT_OUTPUT, output_file)
         lpbm.tools.mkdir_p(os.path.dirname(output_path))

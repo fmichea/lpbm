@@ -21,6 +21,11 @@
 
 <div id="main_body">
     <ul id="menu">
+        {# Optionnal header #}
+        {% if menu_header %}
+        <li>{{ menu_header }}</li>
+        {% endif %}
+
         {# Displays a list of the categories in the menu. #}
         <li><div id="categories"><strong>Categories</strong>
             <ul>
