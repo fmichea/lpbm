@@ -4,7 +4,7 @@
 {% for article in articles %}
 <li id="{{ article.pk }}">
     <a href="{{ article.get_url() }}"><h1>{{ article.title }}</h1></a>
-    <p class="infos">Written by {{ article.get_authors() }}<br/>{{ article.get_date() }}</p>
+    <div class="infos"><p>Written by {{ article.get_authors() }}<br/>{{ article.get_date() }}</p></div>
     <p>{{ article.get_content() }}</p>
     <div class="infos">
         {% if config.twitter_id %}
