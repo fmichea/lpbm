@@ -17,8 +17,6 @@ things between updates.
 Features
 --------
 
-### Available
-
 * Articles created with a unique *.markdown* file.
     * Unlimited authors and categories.
     * A permalink is based on article id (fixed if not changed).
@@ -28,13 +26,7 @@ Features
 * Simple code embedding (using pygments).
 * Simple menu management.
     * Menu is generated using informations available in articles.
-
-### Expected (TODO)
-
-* Archives.
-* Internationalization.
-* Simple category management.
-* User contributed pages, to build a simple website with the blog.
+* Paginate.
 
 Usage
 -----
@@ -94,6 +86,10 @@ Other information
 
 * [Pierre Bourdon](http://blog.delroth.net/)
 * [Franck Michea](http://blog.kushou.eu/)
+
+### LPBM generates this blog:
+
+* [LSE Blog](http://blog.lse.epita.fr/)
 
 ### Useful Links
 
