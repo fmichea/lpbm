@@ -10,17 +10,30 @@ import lpbm.config
 import lpbm.constants
 
 CONFIG = lpbm.config.Config()
+AUTHOR_MGR = None
 
 def rss_item(article):
+    # Generating author list.
+    tmp = []
+    for author_login in article.authors:
+        author = AUTHOR_MGR.authors[author_login]
+        tmp.append('%s (%s)' % (author.email, author.name))
+    authors = ', '.join(tmp)
+
+    # The article.
     return PyRSS2Gen.RSSItem(
         title = article.title,
-        link = '%s%s' % (CONFIG.url, article.get_url()),
-        guid = '%s%s' % (CONFIG.url, article.get_url()),
+        link = '%s%s' % (CONFIG.url, article.get_filename()),
+        author = authors,
+        guid = str(article.pk),
         description = article.get_content(),
-        pubDate = article.mod_date,
+        pubDate = article.crt_date,
     )
 
 def render(art_mgr, aut_mgr, cat_mgr):
+    global AUTHOR_MGR
+    AUTHOR_MGR = aut_mgr
+
     rss = PyRSS2Gen.RSS2(
         title = CONFIG.title,
         link = CONFIG.url,
