@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/env python2
 # render.py - Render the complete website.
 # Author: Franck Michea < franck.michea@gmail.com >
 
