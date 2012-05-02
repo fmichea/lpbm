@@ -9,7 +9,7 @@ import string
 FRMT_CATEGORY = '[a-zA-Z0-9\| ]+'
 FRMT_EMAIL = '[a-z\.A-Z0-9]+@[a-zA-Z0-9\.]+'
 FRMT_LOGIN = '[a-zA-Z][a-zA-Z0-9]*'
-FRMT_NAME = '[a-zA-Z ]+'
+FRMT_NAME = '[a-zA-Z -]+'
 FRMT_DATE = '%B %d, %Y at %H:%M'
 
 # Article slug configuration
