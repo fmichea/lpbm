@@ -60,7 +60,10 @@ def render(article_mgr, author_mgr, category_mgr):
     article_mgr.render(template)
 
     # Paginate
-    lpbm.paginate.Paginate(template, article_mgr).render()
+    lpbm.paginate.Paginate(template, article_mgr.get_articles(),
+                           'articles/base.html', 'pages').render()
+
+    category_mgr.render(template)
 
     # Index is actually first page.
     try: os.symlink('pages/1.html',

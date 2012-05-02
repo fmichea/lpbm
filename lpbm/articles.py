@@ -53,7 +53,7 @@ class Article(object):
         match = frmt.match(article[index])
         while match is not None:
             self.categories.append(match.group(1))
-            cat_mgr.parse_category(match.group(1))
+            cat_mgr.parse_category(match.group(1)).articles.append(self)
             index += 1
             match = frmt.match(article[index])
 
@@ -115,6 +115,9 @@ class Article(object):
     def get_date(self):
         return self.crt_date.strftime(lpbm.constants.FRMT_DATE)
 
+    def __cmp__(self, other):
+        return -cmp(self.pk, other.pk)
+
 
 class ArticlesManager(object):
     def __init__(self, aut_mgr, cat_mgr):
@@ -132,7 +135,7 @@ class ArticlesManager(object):
                         self.articles[a.pk] = a
 
     def get_articles(self):
-        return sorted(self.articles.values(), cmp=lambda a, b: -cmp(a.pk, b.pk))
+        return sorted(self.articles.values())
 
     def render(self, template):
         template.init_template('articles', 'base.html')

@@ -31,7 +31,7 @@
             <ul>
                 {% set categories=category_mgr %}
                 {% for cat in categories recursive %}
-                <li>{{ cat.name }}
+                <li><a href="{{ cat.url }}">{{ cat.name }}</a>
                     {% if cat.sub %}
                     <ul>{{ loop(cat.sub.values()) }}</ul>
                     {% endif %}
