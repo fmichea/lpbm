@@ -41,7 +41,8 @@ class Category(object):
         return self.sub[cat[0]].add_subcategory(cat[1:])
 
     def __iter__(self):
-        return iter(self.sub.values())
+        return iter(sorted(self.sub.values(),
+                           cmp=lambda a, b: cmp(a.name, b.name)))
 
 
     def render(self, template):
