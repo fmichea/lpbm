@@ -18,9 +18,9 @@ class ArticleSameIdError(Exception):
     def __init__(self, art1, art2):
         self.art1, self.art2 = art1, art2
 
-    def __repr__(self):
+    def __str__(self):
         return 'Articles `%s\' and `%s\' have the same id defined.' % (
-            self.art1.filename, self.art2.filename
+            self.art1.title, self.art2.title
         )
 
 class Article(object):
@@ -130,7 +130,7 @@ class ArticlesManager(object):
                 a = Article(os.path.join(root, filename), aut_mgr, cat_mgr)
                 if a.pk is not None:
                     if a.pk in self.articles:
-                        raise ArticleSameId(self.articles[a.pk], a)
+                        raise ArticleSameIdError(self.articles[a.pk], a)
                     else:
                         self.articles[a.pk] = a
 
