@@ -39,10 +39,7 @@ def render(art_mgr, aut_mgr, cat_mgr):
         link = CONFIG.url,
         description = CONFIG.subtitle,
         lastBuildDate = datetime.datetime.now(),
-
-        # HACK
-        items = map(rss_item,
-                    [a for a in art_mgr.get_articles()[:5] if a.pk >= 9])
+        items = map(rss_item, art_mgr.get_articles()[:CONFIG.rss_articles])
     )
     f = open(os.path.join(lpbm.constants.ROOT_OUTPUT, 'rssfeed.xml'), 'w')
     rss.write_xml(f)

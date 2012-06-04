@@ -32,3 +32,6 @@ class Config(object):
 
         try: self.twitter_id = re.match('^twitter_id: (.+)$', lines[5]).group(1)
         except (IndexError, AttributeError): self.twitter_id = None
+
+        try: self.rss_articles = int(re.match('^rss_articles: (\d+)$', lines[6]).group(1))
+        except (IndexError, AttributeError): self.rss_articles = 10

@@ -42,6 +42,7 @@ title, subtitle and footer (in this order). Syntax is s follow:
     [url: http://blog.example.com/]
     [disqus_id: id]
     [twitter_id: id]
+    [rss_articles: nb_articles_in_rss]
 
 Keep line empty if you don't want to set a variable.
 
