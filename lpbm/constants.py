@@ -13,7 +13,7 @@ FRMT_NAME = '[a-zA-Z -]+'
 FRMT_DATE = '%B %d, %Y at %H:%M'
 
 # Article slug configuration
-SLUG_CHARS = string.lowercase + string.digits + '-'
+SLUG_CHARS = string.ascii_lowercase + string.digits + '-'
 SLUG_SIZE = 50
 
 # Paths to find everything.

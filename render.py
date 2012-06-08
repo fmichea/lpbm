@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 # render.py - Render the complete website.
 # Author: Franck Michea < franck.michea@gmail.com >
 
@@ -12,6 +12,7 @@ import lpbm.authors
 import lpbm.categories
 import lpbm.rss
 import lpbm.templates
+import lpbm.logging
 
 def clean_tree():
     # Cleaning output tree.
@@ -39,18 +40,43 @@ def build_blog(ct_mgr, aut_mgr, art_mgr):
 def build_rss(cat_mgr, aut_mgr, art_mgr):
     lpbm.rss.render(art_mgr, aut_mgr, cat_mgr)
 
+COMMANDS = []
+
+def main(command, arguments): pass
+
 if __name__ == '__main__':
+    lpbm.logging.init()
+
+    lpbm.logging.get().info('TEST')
+
     # Command line arguments.
     parser = argparse.ArgumentParser(
         description='Lightweight Personal Blog Maker'
     )
-    parser.add_argument('-c', '--clean', action='store_true', default=False,
-                        help='Clean output tree before generation.')
-    parser.add_argument('-B', '--no-blog', action='store_true', default=False,
-                        help='Avoid generating blog.')
-    parser.add_argument('-R', '--no-rss', action='store_true', default=False,
-                        help='Avoid generating RSS.')
+    parser.add_argument('-d', '--debug', action='store_true', default=False,
+                        help='Prints debug information.')
+    parser.add_argument('-p', '--exec-path', action='store', default='.',
+                        help='Path where LPBM will search the blog. ' + \
+                             '(default: %(default)s)')
+#    parser.add_argument('-c', '--clean', action='store_true', default=False,
+#                        help='Clean output tree before generation.')
+#    parser.add_argument('-B', '--no-blog', action='store_true', default=False,
+#                        help='Avoid generating blog.')
+#    parser.add_argument('-R', '--no-rss', action='store_true', default=False,
+#                        help='Avoid generating RSS.')
     args = parser.parse_args(sys.argv[1:])
+
+    print(args)
+
+    if args.debug: lpbm.logging.configure({'logging-std': {'level': 'DEBUG'}})
+    else: lpbm.logging.configure({})
+
+    sys.exit(0)
+
+    # Logging setting.
+    #frmt = u'[%(levelname)5s:%(lineno)4d] %(module)s.%(funcName)s: %(message)s'
+    level = logging.NOTSET if args.debug else logging.CRITICAL
+    logging.basicConfig(format=frmt, level=level)
 
     # Doing what is asked.
     if args.clean: clean_tree()
