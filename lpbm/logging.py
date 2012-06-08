@@ -8,7 +8,7 @@ import queue
 
 _LOGGER_NAME = 'LPBM_LOGGER'
 _LOGGER_BASIC_CONFIG = {
-    'format': '[%(levelname)5s:%(lineno)4d] %(module)s.%(funcName)s: %(message)s',
+    'format': '[%(levelname)5s:%(lineno)3d] %(module)s.%(funcName)s: %(message)s',
     'level': logging.DEBUG,
 }
 

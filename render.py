@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # render.py - Render the complete website.
 # Author: Franck Michea < franck.michea@gmail.com >
+# License: New BSD License (See LICENSE)
 
 import argparse
 import os
@@ -13,6 +14,7 @@ import lpbm.categories
 import lpbm.rss
 import lpbm.templates
 import lpbm.logging
+import lpbm.module_loader
 
 def clean_tree():
     # Cleaning output tree.
@@ -40,14 +42,12 @@ def build_blog(ct_mgr, aut_mgr, art_mgr):
 def build_rss(cat_mgr, aut_mgr, art_mgr):
     lpbm.rss.render(art_mgr, aut_mgr, cat_mgr)
 
-COMMANDS = []
+COMMANDS = {}
 
 def main(command, arguments): pass
 
 if __name__ == '__main__':
     lpbm.logging.init()
-
-    lpbm.logging.get().info('TEST')
 
     # Command line arguments.
     parser = argparse.ArgumentParser(
@@ -58,12 +58,12 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--exec-path', action='store', default='.',
                         help='Path where LPBM will search the blog. ' + \
                              '(default: %(default)s)')
-#    parser.add_argument('-c', '--clean', action='store_true', default=False,
-#                        help='Clean output tree before generation.')
-#    parser.add_argument('-B', '--no-blog', action='store_true', default=False,
-#                        help='Avoid generating blog.')
-#    parser.add_argument('-R', '--no-rss', action='store_true', default=False,
-#                        help='Avoid generating RSS.')
+    subparser = parser.add_subparsers()
+
+    # Tools are loaded dynamically, so argument parser isn't complete.
+    lpbm.module_loader.load_modules(COMMANDS, subparser)
+
+    # Everything is loaded, we can parse command line.
     args = parser.parse_args(sys.argv[1:])
 
     print(args)
@@ -72,11 +72,6 @@ if __name__ == '__main__':
     else: lpbm.logging.configure({})
 
     sys.exit(0)
-
-    # Logging setting.
-    #frmt = u'[%(levelname)5s:%(lineno)4d] %(module)s.%(funcName)s: %(message)s'
-    level = logging.NOTSET if args.debug else logging.CRITICAL
-    logging.basicConfig(format=frmt, level=level)
 
     # Doing what is asked.
     if args.clean: clean_tree()
