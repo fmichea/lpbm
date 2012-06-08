@@ -44,7 +44,7 @@ class Module(metaclass=abc.ABCMeta):
         """Invoked if command was chosen on command line."""
         pass
 
-def load_modules(commands, argument_parser):
+def load_modules(argument_parser):
     """Dynamically loads all the compatible commands from modules directory"""
     main_root = os.path.join(os.path.dirname(__file__), 'modules')
     logger, modules = lpbm.logging.get(), []
@@ -78,10 +78,6 @@ def load_modules(commands, argument_parser):
                         tmp = item[1]()
                         tmp.module_init(argument_parser)
                         tmp.init()
-                        #if tmp.name() in commands:
-                        #    msg = 'A command already uses name %s.'
-                        #else:
-                        #    commands[tmp.name()] = tmp
                         msg = 'Command %s was correctly loaded.'
                         logger.info(msg, tmp.name())
                     except TypeError:
