@@ -11,16 +11,33 @@ import sys
 import lpbm.logging
 
 class Module(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def init(self, argument_parser): pass
+    """
+    This is the base class of all modules. You can find documentation for every
+    method required. To create a new module, you just have to create an new
+    file in modules directory, inheriting from this class, and implementing
+    following methods. It will then be loaded automatically.
+    """
 
     @abc.abstractmethod
-    def name(self): pass
+    def init(self, argument_parser):
+        """
+        This function may add its own arguments on command line. It should use
+        the string returned by name() method for its parser.
+        """
+        pass
 
     @abc.abstractmethod
-    def process(self): pass
+    def name(self):
+        """Returns the name of the parser on command line."""
+        pass
+
+    @abc.abstractmethod
+    def process(self):
+        """Invoked if command was chosen on command line."""
+        pass
 
 def load_modules(commands, argument_parser):
+    """Dynamically loads all the compatible commands from modules directory"""
     main_root = os.path.join(os.path.dirname(__file__), 'modules')
     logger, modules = lpbm.logging.get(), []
 
