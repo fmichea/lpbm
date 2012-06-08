@@ -2,6 +2,7 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+import abc
 import imp
 import inspect
 import os
@@ -9,10 +10,18 @@ import sys
 
 import lpbm.logging
 
-from lpbm.modules import Module
+class Module(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def init(self, argument_parser): pass
+
+    @abc.abstractmethod
+    def name(self): pass
+
+    @abc.abstractmethod
+    def process(self): pass
 
 def load_modules(commands, argument_parser):
-    main_root = os.path.join(os.path.dirname(__file__), 'tools')
+    main_root = os.path.join(os.path.dirname(__file__), 'modules')
     logger, modules = lpbm.logging.get(), []
 
     # Finds all submodules that should be loaded.
