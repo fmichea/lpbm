@@ -66,10 +66,11 @@ if __name__ == '__main__':
     # Everything is loaded, we can parse command line.
     args = parser.parse_args(sys.argv[1:])
 
-    print(args)
 
     if args.debug: lpbm.logging.configure({'logging-std': {'level': 'DEBUG'}})
     else: lpbm.logging.configure({})
+
+    args.func(args)
 
     sys.exit(0)
 

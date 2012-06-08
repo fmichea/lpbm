@@ -18,11 +18,15 @@ class Module(metaclass=abc.ABCMeta):
     following methods. It will then be loaded automatically.
     """
 
+    def module_init(self, argument_parser):
+        self.parser = argument_parser.add_parser(self.name(), help=self.abstract())
+        self.parser.set_defaults(func=self.process)
+
     @abc.abstractmethod
-    def init(self, argument_parser):
+    def init(self):
         """
-        This function may add its own arguments on command line. It should use
-        the string returned by name() method for its parser.
+        This function should add its own arguments on command line. When
+        called, self.parser will be initialized with a valid argument parser.
         """
         pass
 
@@ -31,8 +35,12 @@ class Module(metaclass=abc.ABCMeta):
         """Returns the name of the parser on command line."""
         pass
 
+    def abstract(self):
+        """Returns an abstract of the functionnality of the command."""
+        pass
+
     @abc.abstractmethod
-    def process(self):
+    def process(self, args):
         """Invoked if command was chosen on command line."""
         pass
 
@@ -68,12 +76,13 @@ def load_modules(commands, argument_parser):
                     try:
                         logger.debug('  -> Item is a subclass of Module class.')
                         tmp = item[1]()
-                        tmp.init(argument_parser)
-                        if tmp.name() in commands:
-                            msg = 'A command already uses name %s.'
-                        else:
-                            commands[tmp.name()] = tmp
-                            msg = 'Command %s was correctly loaded.'
+                        tmp.module_init(argument_parser)
+                        tmp.init()
+                        #if tmp.name() in commands:
+                        #    msg = 'A command already uses name %s.'
+                        #else:
+                        #    commands[tmp.name()] = tmp
+                        msg = 'Command %s was correctly loaded.'
                         logger.info(msg, tmp.name())
                     except TypeError:
                         msg = '  -> Failed to instanciate class %s, abstract '
