@@ -7,6 +7,7 @@ import os
 import sys
 
 import lpbm.module_loader
+import lpbm.logging
 
 _CONFIGURATION = {
     # 'sectionName': (Required, {
@@ -25,6 +26,9 @@ _CONFIGURATION = {
         'twitter': (False, 'Twitter id, for the mention (ex: kushou_)'),
         'disqus': (False, 'Disqus id for comments in articles.'),
     }),
+    'logging-std': (False, {
+        'level': (False, 'Level of messages logged on stderr.'),
+    })
 }
 
 class Config(lpbm.module_loader.Module):
@@ -56,6 +60,18 @@ class Config(lpbm.module_loader.Module):
     def load(self, modules, args):
         self.config = configparser.ConfigParser()
         self.config.read(os.path.join(args.exec_path, 'config'))
+
+        # Getting logging related configurations
+        logging_conf = dict()
+        for section in self.config.sections():
+            if not section.startswith('logging'):
+                continue
+            logging_conf[section] = dict()
+            for option in self.config[section]:
+                logging_conf[section][option] = self.config[section][option]
+        if args.debug:
+            logging_conf.update({'logging-std': {'level': 'DEBUG'}})
+        lpbm.logging.configure(logging_conf)
 
     # Particular functions for configuration.
     def list_options(self):
@@ -163,3 +179,5 @@ class Config(lpbm.module_loader.Module):
                   file=sys.stderr)
             return
         del self.config[section_name][var_name]
+        if len(self.config[section_name]) == 0:
+            del self.config[section_name]
