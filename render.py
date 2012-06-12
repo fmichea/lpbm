@@ -42,6 +42,8 @@ def build_blog(ct_mgr, aut_mgr, art_mgr):
 def build_rss(cat_mgr, aut_mgr, art_mgr):
     lpbm.rss.render(art_mgr, aut_mgr, cat_mgr)
 
+_MODULES = dict()
+
 if __name__ == '__main__':
     lpbm.logging.init()
 
@@ -51,21 +53,21 @@ if __name__ == '__main__':
     )
     parser.add_argument('-d', '--debug', action='store_true', default=False,
                         help='Prints debug information.')
-    parser.add_argument('-p', '--exec-path', action='store', default='.',
+    parser.add_argument('-p', '--exec-path', action='store', default='./sources',
                         help='Path where LPBM will search the blog. ' + \
                              '(default: %(default)s)')
     subparser = parser.add_subparsers()
 
     # Tools are loaded dynamically, so argument parser isn't complete.
-    lpbm.module_loader.load_modules(subparser)
+    lpbm.module_loader.load_modules(_MODULES, subparser)
 
-    # Everything is loaded, we can parse command line.
+    # Every command , we can parse command line.
     args = parser.parse_args(sys.argv[1:])
 
-    if args.debug: lpbm.logging.configure({'logging-std': {'level': 'DEBUG'}})
-    else: lpbm.logging.configure({})
+    #if args.debug: lpbm.logging.configure({'logging-std': {'level': 'DEBUG'}})
+    #else: lpbm.logging.configure({})
 
-    args.func(args)
+    args.func(_MODULES, args)
 
     sys.exit(0)
 

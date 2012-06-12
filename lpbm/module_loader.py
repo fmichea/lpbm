@@ -19,8 +19,27 @@ class Module(metaclass=abc.ABCMeta):
     """
 
     def module_init(self, argument_parser):
-        self.parser = argument_parser.add_parser(self.name(), help=self.abstract())
-        self.parser.set_defaults(func=self.process)
+        """
+        This function initialize a parser for the command line. It also,
+        initialize needed module to none (empty list). If you want to load data
+        from other modules, you should override this in your init function.
+        """
+        self.parser = argument_parser.add_parser(
+            self.name(), help=self.abstract(), description=self.abstract()
+        )
+        self.parser.set_defaults(func=self.module_process)
+        self.needed_modules = []
+
+    def module_process(self, modules, args):
+        """
+        This methods calls the load function of each needed module and then
+        calls the process function overriden by you. Configuration is always
+        loaded.
+        """
+        modules['config'].load(modules, args)
+        for mod in self.needed_modules:
+            modules[mod].load(modules, args)
+        self.process(modules, args)
 
     @abc.abstractmethod
     def init(self):
@@ -30,11 +49,19 @@ class Module(metaclass=abc.ABCMeta):
         """
         pass
 
+    def load(self, modules, args):
+        """
+        This function can be overriden to load data according to global
+        arguments. It can be overriden.
+        """
+        pass
+
     @abc.abstractmethod
     def name(self):
         """Returns the name of the parser on command line."""
         pass
 
+    @abc.abstractmethod
     def abstract(self):
         """Returns an abstract of the functionnality of the command."""
         pass
@@ -44,7 +71,7 @@ class Module(metaclass=abc.ABCMeta):
         """Invoked if command was chosen on command line."""
         pass
 
-def load_modules(argument_parser):
+def load_modules(modules_, argument_parser):
     """Dynamically loads all the compatible commands from modules directory"""
     main_root = os.path.join(os.path.dirname(__file__), 'modules')
     logger, modules = lpbm.logging.get(), []
@@ -80,6 +107,7 @@ def load_modules(argument_parser):
                         tmp.init()
                         msg = 'Command %s was correctly loaded.'
                         logger.info(msg, tmp.name())
+                        modules_[tmp.name()] = tmp
                     except TypeError:
                         msg = '  -> Failed to instanciate class %s, abstract '
                         msg += 'method or property missing?'
