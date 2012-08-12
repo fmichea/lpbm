@@ -4,7 +4,6 @@
 
 # Python standart modules imports.
 import codecs
-import datetime
 import jinja2
 import markdown
 import math
@@ -13,6 +12,9 @@ import re
 
 # Internal modules imports.
 import lpbm.constants
+
+from datetime import datetime
+import configparser
 
 class ArticleSameIdError(Exception):
     def __init__(self, art1, art2):
@@ -23,8 +25,123 @@ class ArticleSameIdError(Exception):
             self.art1.title, self.art2.title
         )
 
+CONFIG_SEPARATOR = '+' * 72
+TITLE_SEPARATOR = '=='
+
 class Article(object):
-    def __init__(self, filename, aut_mgr, cat_mgr):
+    def __init__(self, filename):
+        self.filename = filename
+        config, self.title, self.raw_content = '', '', ''
+        self.config = configparser.ConfigParser()
+
+        # Reads the content of the file, config being before SEPARATOR
+        try:
+            f = codecs.open(filename, 'r', 'utf-8')
+        except IOError:
+            return
+
+        # Reading the content of the file.
+        line = f.readline()
+        while line:
+            if line.startswith(CONFIG_SEPARATOR):
+                line = f.readline()
+                break
+            config += line
+            line = f.readline()
+        while line:
+            if line.startswith(TITLE_SEPARATOR):
+                line = f.readline()
+                break
+            self.title += line[:-1]
+            line = f.readline()
+        while line:
+            self.raw_content += line
+            line = f.readline()
+
+        # Parse configuration.
+        self.config.read_string(config)
+
+    def __lt__(self, other):
+        return self.raw_date() < other.raw_date()
+
+    def save(self):
+        f = codecs.open(self.filename, 'w', 'utf-8')
+        self.config.write(f)
+        f.write(CONFIG_SEPARATOR + '\n')
+
+        # Then we have the title.
+        f.write(self.title + '\n')
+        f.write(len(self.title) * '=' + '\n')
+
+        # End finally we have the content.
+        f.write(self.raw_content)
+        f.close()
+
+    def id(self):
+        return self.config.getint('general', 'id', fallback=-1)
+
+    def published(self):
+        return self.config.getboolean('general', 'published', fallback=False)
+
+    def authors(self):
+        authors = self.config.get('general', 'authors', fallback='NOTSET')
+        return re.split(',[ \t]*', authors)
+
+    def slug(self):
+        slug = self.config.get('general', 'slug', fallback=None)
+        if slug is None:
+            self.slug = self.title.lower().replace(' ', '-')
+            self.slug = ''.join(c for c in self.slug
+                                if c in lpbm.constants.SLUG_CHARS)
+            self.slug = self.slug[:lpbm.constants.SLUG_SIZE]
+        return slug
+
+    def content(self):
+        return markdown.markdown(self.raw_content,
+            ['codehilite(force_linenos=True)']
+        )
+
+    def raw_date(self):
+        date = self.config.get('general', 'date', fallback='')
+        try:
+            return datetime.strptime(date, lpbm.constants.FRMT_DATE_CONF)
+        except ValueError:
+            return datetime.fromtimestamp(0)
+
+    def date(self):
+        return self.raw_date().strftime(lpbm.constants.FRMT_DATE)
+
+    def html_filename(self):
+        return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
+
+    def url(self):
+        return ('/%s' % self.html_filename())
+
+    def publish(self):
+        self.config.set('general', 'published', 'yes')
+        self.config.set('general', 'date', datetime.now().strftime(
+            lpbm.constants.FRMT_DATE_CONF
+        ))
+
+    def create(self, pk, title, authors):
+        self.config.add_section('general')
+        self.config.set('general', 'id', str(pk))
+        self.config.set('general', 'published', 'no')
+        self.config.set('general', 'authors', authors)
+        self.title = title
+
+    # FIXME: aut_mgr doesn't exist.
+    def _render_authors(self):
+        template = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            lpbm.constants.ROOT_TEMPLATES
+        )).get_template(os.path.join('authors', 'link.html'))
+        return ', '.join([
+            template.render({'author': self.aut_mgr.authors[author]})
+            for author in self.authors
+        ])
+
+    # FIXME: Remove all this part when done.
+    def ex__init__(self, filename, aut_mgr, cat_mgr):
         self.filename = 0
         self.authors, self.categories, self.aut_mgr, index = [], [], aut_mgr, 0
 
@@ -84,10 +201,6 @@ class Article(object):
             self.slug = match.group(1)
             index += 1
         else: self.slug = self.title
-        self.slug = self.slug.lower().replace(' ', '-')
-        self.slug = ''.join(c for c in self.slug
-                              if c in lpbm.constants.SLUG_CHARS)
-        self.slug = self.slug[:lpbm.constants.SLUG_SIZE]
 
         # The rest is the article.
         self.content = '\n'.join(article[index:])
@@ -97,26 +210,6 @@ class Article(object):
             ['codehilite(force_linenos=True)']
         )
 
-    def get_filename(self):
-        return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
-
-    def get_url(self):
-        return ('/%s' % self.get_filename())
-
-    def get_authors(self):
-        template = jinja2.Environment(loader=jinja2.FileSystemLoader(
-            lpbm.constants.ROOT_TEMPLATES
-        )).get_template(os.path.join('authors', 'link.html'))
-        return ', '.join([
-            template.render({'author': self.aut_mgr.authors[author]})
-            for author in self.authors
-        ])
-
-    def get_date(self):
-        return self.crt_date.strftime(lpbm.constants.FRMT_DATE)
-
-    def __cmp__(self, other):
-        return -cmp(self.pk, other.pk)
 
 
 class ArticlesManager(object):

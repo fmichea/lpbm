@@ -28,7 +28,7 @@ _CONFIGURATION = {
     }),
     'logging-std': (False, {
         'level': (False, 'Level of messages logged on stderr.'),
-    })
+    }),
 }
 
 class Config(lpbm.module_loader.Module):
