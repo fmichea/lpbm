@@ -39,6 +39,7 @@ class Module(metaclass=abc.ABCMeta):
         modules['config'].load(modules, args)
         for mod in self.needed_modules:
             modules[mod].load(modules, args)
+        self.load(modules, args)
         self.process(modules, args)
 
     @abc.abstractmethod
