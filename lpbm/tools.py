@@ -11,3 +11,8 @@ def mkdir_p(path):
 
 def cp(src, dst):
     shutil.copyfile(src, dst)
+
+def slugify(text):
+    slug = text.lower().replace(' ', '-')
+    slug = ''.join(c for c in slug if c in lpbm.constants.SLUG_CHARS)
+    return slug[:lpbm.constants.SLUG_SIZE]
