@@ -13,6 +13,8 @@ import re
 # Internal modules imports.
 import lpbm.constants
 
+import lpbm.datas.configmodel as cm_module
+
 from datetime import datetime
 import configparser
 
@@ -25,218 +27,193 @@ class ArticleSameIdError(Exception):
             self.art1.title, self.art2.title
         )
 
-CONFIG_SEPARATOR = '+' * 72
 TITLE_SEPARATOR = '=='
 
-class Article(object):
+class Article:
+    id = cm_module.opt_int('general', 'id', default=-1)
+    published = cm_module.opt_bool('general', 'published', default=False)
+
+    _date = cm_module.opt('general', 'date')
+    _slug = cm_module.opt('general', 'slug')
+    _authors = cm_module.opt('general', 'authors', default='')
+
     def __init__(self, filename):
-        self.filename = filename
-        config, self.title, self.raw_content = '', '', ''
-        self.config = configparser.ConfigParser()
+        '''
+        Articles are devided in two files. The actual article (written in
+        markdown syntax) and a configuration file containing information for
+        blog generation.
+        '''
+        self._filename, self.title, self._content = filename[:-9], '', ''
 
         # Reads the content of the file, config being before SEPARATOR
         try:
             f = codecs.open(filename, 'r', 'utf-8')
+            line = f.readline()
+            while line:
+                if line.startswith(TITLE_SEPARATOR):
+                    line = f.readline()
+                    break
+                self.title += line[:-1]
+                line = f.readline()
+            while line:
+                self.raw_content += line
+                line = f.readline()
         except IOError:
-            return
-
-        # Reading the content of the file.
-        line = f.readline()
-        while line:
-            if line.startswith(CONFIG_SEPARATOR):
-                line = f.readline()
-                break
-            config += line
-            line = f.readline()
-        while line:
-            if line.startswith(TITLE_SEPARATOR):
-                line = f.readline()
-                break
-            self.title += line[:-1]
-            line = f.readline()
-        while line:
-            self.raw_content += line
-            line = f.readline()
+            pass
 
         # Parse configuration.
-        self.config.read_string(config)
+        self.cm = cm_module.ConfigModel(self._config_filename())
+
+        # Authors
+        self._authors_set = set()
+        self.add_authors(self._authors)
+
+        # If creating the article, set date to now.
+        if self._date is None:
+            self.date = datetime.now()
+
+    def __del__(self):
+        '''Saving authors in configuration.'''
+        self._authors = ', '.join(list(self._authors_set))
 
     def __lt__(self, other):
-        return self.raw_date() < other.raw_date()
+        '''Articles are sorted by date'''
+        return self.date < other.date or self.id < other.id
 
     def save(self):
-        f = codecs.open(self.filename, 'w', 'utf-8')
-        self.config.write(f)
-        f.write(CONFIG_SEPARATOR + '\n')
+        '''Articles' configuration is saved automatically.'''
+        with codecs.open(self._markdown_filename(), 'w', 'utf-8') as f:
+            # Then we have the title.
+            f.write(self.title + '\n')
+            f.write(len(self.title) * '=' + '\n')
 
-        # Then we have the title.
-        f.write(self.title + '\n')
-        f.write(len(self.title) * '=' + '\n')
+            # End finally we have the content.
+            f.write(self._content)
 
-        # End finally we have the content.
-        f.write(self.raw_content)
-        f.close()
+    def _split_authors_string(self, authors):
+        return (set(re.split(',[ \t]*', authors)) - set(['']))
 
-    def id(self):
-        return self.config.getint('general', 'id', fallback=-1)
-
-    def published(self):
-        return self.config.getboolean('general', 'published', fallback=False)
-
+    @property
     def authors(self):
-        authors = self.config.get('general', 'authors', fallback='NOTSET')
-        return re.split(',[ \t]*', authors)
+        '''Returns the list of authors.'''
+        return list(self._authors_set)
 
+    def authors_list(self):
+        '''
+        Returns a well formated list of authors, ready for printing.
+
+        Examples:
+          - Trevor Reznik
+          - Teddy and Leonard
+          - Rita, Astor, Cody and Dexter
+        '''
+        authors = list(self._authors_set)
+        if 1 < len(authors):
+            return ', '.join(authors[:-1]) + ' and ' + authors[-1]
+        elif len(authors) == 0:
+            return '[no author]'
+        return authors[0]
+
+    def add_authors(self, authors):
+        '''
+        Takes a string of comma-separated authors and adds them to authors of
+        the article.
+        '''
+        self._authors_set |= self._split_authors_string(authors)
+
+    def remove_authors(self, authors):
+        '''
+        Takes a string of comma-separated authors and removes them from authors
+        list for the article.
+        '''
+        self._authors_set -= self._split_authors_string(authors)
+
+    @property
     def slug(self):
-        slug = self.config.get('general', 'slug', fallback=None)
-        if slug is None:
-            self.slug = self.title.lower().replace(' ', '-')
-            self.slug = ''.join(c for c in self.slug
-                                if c in lpbm.constants.SLUG_CHARS)
-            self.slug = self.slug[:lpbm.constants.SLUG_SIZE]
-        return slug
+        return self._slug
 
-    def content(self):
-        return markdown.markdown(self.raw_content,
-            ['codehilite(force_linenos=True)']
-        )
+    @slug.setter
+    def slug(self, value):
+        if value is None:
+            self._slug = None
+        else:
+            self._slug = lpbm.tools.slugify(value)
 
-    def raw_date(self):
-        date = self.config.get('general', 'date', fallback='')
+    @property
+    def date(self):
         try:
-            return datetime.strptime(date, lpbm.constants.FRMT_DATE_CONF)
+            return datetime.strptime(self._date, lpbm.constants.FRMT_DATE_CONF)
         except ValueError:
             return datetime.fromtimestamp(0)
 
-    def date(self):
-        return self.raw_date().strftime(lpbm.constants.FRMT_DATE)
+    @date.setter
+    def date(self, value):
+        if value is None:
+            self._date = None
+        else:
+            self._date = value.strftime(lpbm.constants.FRMT_DATE_CONF)
+
+    def content(self):
+        opt = 'codehilite(force_linenos=True)'
+        return markdown.markdown(self._content, [opt])
+
+    def _config_filename(self):
+        return '{filename}.cfg'.format(filename = self._filename)
+
+    def _markdown_filename(self):
+        return '{filename}.markdown'.format(filename = self._filename)
 
     def html_filename(self):
-        return os.path.join('articles', '%d-%s.html' % (self.pk, self.slug))
+        slug = self._slug
+        if slug is None:
+            slug = lpbm.tools.slugify(self._title)
+        return os.path.join('articles', '%d-%s.html' % (self.pk, slug))
 
     def url(self):
+        '''The direct link to the article.'''
         return ('/%s' % self.html_filename())
 
     def publish(self):
-        self.config.set('general', 'published', 'yes')
-        self.config.set('general', 'date', datetime.now().strftime(
-            lpbm.constants.FRMT_DATE_CONF
-        ))
+        self.published = True
+        self.date = datetime.now()
 
-    def create(self, pk, title, authors):
-        self.config.add_section('general')
-        self.config.set('general', 'id', str(pk))
-        self.config.set('general', 'published', 'no')
-        self.config.set('general', 'authors', authors)
-        self.title = title
-
-    # FIXME: aut_mgr doesn't exist.
-    def _render_authors(self):
-        template = jinja2.Environment(loader=jinja2.FileSystemLoader(
-            lpbm.constants.ROOT_TEMPLATES
-        )).get_template(os.path.join('authors', 'link.html'))
-        return ', '.join([
-            template.render({'author': self.aut_mgr.authors[author]})
-            for author in self.authors
-        ])
-
-    # FIXME: Remove all this part when done.
-    def ex__init__(self, filename, aut_mgr, cat_mgr):
-        self.filename = 0
-        self.authors, self.categories, self.aut_mgr, index = [], [], aut_mgr, 0
-
-        f = codecs.open(filename, 'r', 'utf-8')
-        article = map(lambda a: a[:-1] if a[-1] == '\n' else a, f.readlines())
-
-        # Finding if the article has an id.
-        match = re.match('^id: ([0-9]+)$', article[index])
-        if match is not None:
-            self.pk = int(match.group(1))
-            index += 1
-        else:
-            self.pk = None
-
-        # Parsing authors.
-        frmt = re.compile('^author: (%s)$' % lpbm.constants.FRMT_LOGIN)
-        match = frmt.match(article[index])
-        while match is not None:
-            self.authors.append(match.group(1))
-            self.aut_mgr.add_author(match.group(1))
-            index += 1
-            match = frmt.match(article[index])
-
-        # Parsing categories
-        frmt = re.compile('^category: (%s)$' % lpbm.constants.FRMT_CATEGORY)
-        match = frmt.match(article[index])
-        while match is not None:
-            self.categories.append(match.group(1))
-            cat_mgr.parse_category(match.group(1)).articles.append(self)
-            index += 1
-            match = frmt.match(article[index])
-
-        # Parsing the title.
-        match = re.match('^title: (.+)$', article[index])
-        if match is None: self.title = 'FIXME: No Title.'
-        else:
-            self.title = match.group(1)
-            index += 1
-
-        # Getting some time informations.
-        s = os.stat(filename)
-        self.crt_date = datetime.datetime.fromtimestamp(s.st_ctime)
-        self.mod_date = datetime.datetime.fromtimestamp(s.st_mtime)
-
-        # Parsing the pubdate.
-        match = re.match('^pubdate: (.+)$', article[index])
-        if match is not None:
-            self.crt_date = datetime.datetime.strptime(
-                match.group(1),
-                "%Y-%m-%dT%H:%M:%S"
-            )
-            index += 1
-
-        # Generate a slug to use in the URL
-        match = re.match('^slug: (.+)$', article[index])
-        if match is not None:
-            self.slug = match.group(1)
-            index += 1
-        else: self.slug = self.title
-
-        # The rest is the article.
-        self.content = '\n'.join(article[index:])
-
-    def get_content(self):
-        return markdown.markdown(self.content,
-            ['codehilite(force_linenos=True)']
-        )
+# FIXME: aut_mgr doesn't exist.
+#    def _render_authors(self):
+#        template = jinja2.Environment(loader=jinja2.FileSystemLoader(
+#            lpbm.constants.ROOT_TEMPLATES
+#        )).get_template(os.path.join('authors', 'link.html'))
+#        return ', '.join([
+#            template.render({'author': self.aut_mgr.authors[author]})
+#            for author in self.authors
+#        ])
 
 
-
-class ArticlesManager(object):
-    def __init__(self, aut_mgr, cat_mgr):
-        self.articles = dict()
-
-        for root, dirs, files in os.walk(lpbm.constants.ROOT_SRC_ARTICLES):
-            for filename in files:
-                if not filename.endswith('.markdown'):
-                    continue
-                a = Article(os.path.join(root, filename), aut_mgr, cat_mgr)
-                if a.pk is not None:
-                    if a.pk in self.articles:
-                        raise ArticleSameIdError(self.articles[a.pk], a)
-                    else:
-                        self.articles[a.pk] = a
-
-    def get_articles(self):
-        return sorted(self.articles.values())
-
-    def render(self, template):
-        template.init_template('articles', 'base.html')
-
-        # Render all articles
-        for article in self.articles.values():
-            template.render(article.get_filename(), {
-                'page_title': article.title,
-                'articles': [article],
-                'comments_enabled': True,
-            })
+# FIXME: Remove me.
+#class ArticlesManager(object):
+#    def __init__(self, aut_mgr, cat_mgr):
+#        self.articles = dict()
+#
+#        for root, dirs, files in os.walk(lpbm.constants.ROOT_SRC_ARTICLES):
+#            for filename in files:
+#                if not filename.endswith('.markdown'):
+#                    continue
+#                a = Article(os.path.join(root, filename), aut_mgr, cat_mgr)
+#                if a.pk is not None:
+#                    if a.pk in self.articles:
+#                        raise ArticleSameIdError(self.articles[a.pk], a)
+#                    else:
+#                        self.articles[a.pk] = a
+#
+#    def get_articles(self):
+#        return sorted(self.articles.values())
+#
+#    def render(self, template):
+#        template.init_template('articles', 'base.html')
+#
+#        # Render all articles
+#        for article in self.articles.values():
+#            template.render(article.get_filename(), {
+#                'page_title': article.title,
+#                'articles': [article],
+#                'comments_enabled': True,
+#            })

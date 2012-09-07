@@ -58,14 +58,14 @@ class Articles(lpbm.module_loader.Module):
     def list_articles(self):
         count, count_pub, articles = 0, 0, self.get_articles_list()
         print('All articles:')
-        for article in reversed(articles):
+        for article in articles:
             print(' {id:2d} + "{title}" by {authors} [{published}]'.format(
-                id = article.id(), title = article.title,
-                authors = ', '.join(article.authors()),
-                published = 'published' if article.published() else 'draft',
+                id = article.id, title = article.title,
+                authors = article.authors_list(),
+                published = 'published' if article.published else 'draft',
             ))
             count += 1
-            if article.published():
+            if article.published:
                 count_pub += 1
         print('    + {} article(s) available ({} published, {} drafts).'.format(
             count, count_pub, count - count_pub
@@ -74,13 +74,13 @@ class Articles(lpbm.module_loader.Module):
     def publish_article(self):
         self.check_article_selected('publish')
         try:
-            article = list(filter(lambda a: a.id() == self.args.article,
+            article = list(filter(lambda a: a.id == self.args.article,
                                    self.get_articles_list()))[0]
             article.publish()
             article.save()
             print('Article "{title}" by {authors} was published.'.format(
                 title = article.title,
-                authors = ', '.join( article.authors()),
+                authors = article.authors_list(),
             ))
         except IndexError:
             sys.exit('This article doesn\'t exist.')
@@ -99,8 +99,11 @@ class Articles(lpbm.module_loader.Module):
                 path
             ))
         # Then we check if we want to use the first available id.
-        ids, pk = list(map(lambda a: a.id(), self.get_articles_list())), None
-        last_id = max(ids) + 1
+        ids, pk = list(map(lambda a: a.id, self.get_articles_list())), None
+        try:
+            last_id = max(ids) + 1
+        except ValueError:
+            last_id = 0
         while pk is None:
             try:
                 pk = int(input('Please enter an id [{}]: '.format(last_id)))
@@ -114,7 +117,9 @@ class Articles(lpbm.module_loader.Module):
         title = input('Please enter a title: ')
         authors = input('Please list authors (comma separated): ')
         article = lpbm.articles.Article(path)
-        article.create(pk, title, authors)
+        article.id = pk
+        article.title = title
+        article.add_authors(authors)
         article.save()
 
         # We successfully created article.
