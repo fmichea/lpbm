@@ -7,7 +7,7 @@ import os
 import subprocess
 import sys
 
-import lpbm.articles
+import lpbm.datas.articles
 import lpbm.logging
 import lpbm.module_loader
 import lpbm.path
@@ -21,9 +21,9 @@ class Articles(lpbm.module_loader.Module):
     def init(self):
         self.parser.add_argument('-l', '--list', action='store_true',
                                  help='List the articles by title.')
-        self.parser.add_argument('-a', '--article', action='store', type=int,
+        self.parser.add_argument('-i', '--id', action='store', type=int,
                                  metavar='id', default=None,
-                                 help='Select an article for several options.')
+                                 help='Selects an article for several options.')
         self.parser.add_argument('-p', '--publish', action='store_true',
                                  help='Publishes the draft.')
         self.parser.add_argument('-P', '--preview', action='store_true',
@@ -47,7 +47,7 @@ class Articles(lpbm.module_loader.Module):
     def get_articles_list(self):
         f, articles = lambda a: a.endswith('.markdown'), []
         for f in lpbm.path.filter_files(f, self.args.exec_path, 'articles'):
-            articles.append(lpbm.articles.Article(f))
+            articles.append(lpbm.datas.articles.Article(f))
         return sorted(articles)
 
     def check_article_selected(self, option):
@@ -116,7 +116,7 @@ class Articles(lpbm.module_loader.Module):
         # Then we want a title.
         title = input('Please enter a title: ')
         authors = input('Please list authors (comma separated): ')
-        article = lpbm.articles.Article(path)
+        article = lpbm.datas.articles.Article(path)
         article.id = pk
         article.title = title
         article.add_authors(authors)

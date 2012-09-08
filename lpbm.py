@@ -8,7 +8,7 @@ import os
 import shutil
 import sys
 
-import lpbm.articles
+#import lpbm.articles
 import lpbm.authors
 import lpbm.categories
 import lpbm.rss
