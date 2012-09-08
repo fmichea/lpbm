@@ -16,3 +16,11 @@ def slugify(text):
     slug = text.lower().replace(' ', '-')
     slug = ''.join(c for c in slug if c in lpbm.constants.SLUG_CHARS)
     return slug[:lpbm.constants.SLUG_SIZE]
+
+def input_default(prompt, default):
+    tmp = input('{prompt} [{default}]: '.format(
+        prompt = prompt, default = default,
+    ))
+    if not tmp:
+        tmp = default
+    return tmp
