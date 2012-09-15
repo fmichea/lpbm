@@ -33,7 +33,10 @@ class ConfigOptionDescriptor:
             cfg.set(self._section, self._option, str(val))
 
     def __get__(self, instance, type=None):
-        getter, cfg = self._getter_function(), instance.cm.config
+        try:
+            getter, cfg = self._getter_function(), instance.cm.config
+        except AttributeError:
+            return self._default
         if getter is None:
             getter = configparser.ConfigParser.get
         value = getter(cfg, self._section, self._option, fallback=None)
