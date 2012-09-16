@@ -63,6 +63,13 @@ class Articles(lpbm.module_loader.Module):
         elif args.edit:
             self.edit_article(args.id)
 
+    # Manipulation function
+    def _get_article(self, id):
+        try:
+            return self.articles[id]
+        except KeyError:
+            sys.exit('This article doesn\'t exist.')
+
     # Particular functions for command line.
     def list_articles(self):
         count, count_pub = 0, 0
@@ -81,20 +88,16 @@ class Articles(lpbm.module_loader.Module):
         ))
 
     def publish_article(self, id):
-        try:
-            article = self.articles[id]
-            article.publish()
-            article.save()
-            print('Article "{title}" by {authors} was published.'.format(
-                title = article.title,
-                authors = article.authors_list(),
-            ))
-        except KeyError:
-            sys.exit('This article doesn\'t exist.')
+        article = self._get_article(id)
+        article.publish()
+        article.save()
+        print('Article "{title}" by {authors} was published.'.format(
+            title = article.title,
+            authors = article.authors_list(),
+        ))
 
     def preview_article(self, id):
-        self.check_article_selected('preview')
-        # FIXME
+        pass
 
     def new_article(self, filename):
         # First we check that file doesn't exist.
@@ -139,10 +142,7 @@ class Articles(lpbm.module_loader.Module):
             self.edit_article(article.id)
 
     def edit_article(self, id):
-        try:
-            article = self.articles[id]
-        except KeyError:
-            sys.exit('This article doesn\'t exist.')
+        article = self._get_article(id)
         subprocess.call('{editor} "{filename}"'.format(
             editor = os.environ.get('EDITOR', 'vim'),
             filename = article.path,
