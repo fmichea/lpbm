@@ -70,7 +70,7 @@ class Module(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def process(self, args):
+    def process(self, modules, args):
         """Invoked if command was chosen on command line."""
         pass
 

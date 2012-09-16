@@ -167,8 +167,8 @@ class Article:
     def html_filename(self):
         slug = self._slug
         if slug is None:
-            slug = lpbm.tools.slugify(self._title)
-        return os.path.join('articles', '%d-%s.html' % (self.pk, slug))
+            slug = lpbm.tools.slugify(self.title)
+        return os.path.join('articles', '%d-%s.html' % (self.id, slug))
 
     def url(self):
         '''The direct link to the article.'''

@@ -5,6 +5,8 @@
 import os
 import shutil
 
+import lpbm.constants
+
 def mkdir_p(path):
     try: os.makedirs(path)
     except OSError: pass
