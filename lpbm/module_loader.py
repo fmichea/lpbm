@@ -29,6 +29,7 @@ class Module(metaclass=abc.ABCMeta):
         )
         self.parser.set_defaults(func=self.module_process)
         self.needed_modules = []
+        self.init()
 
     def module_process(self, modules, args):
         """
@@ -39,6 +40,7 @@ class Module(metaclass=abc.ABCMeta):
         modules['config'].load(modules, args)
         for mod in self.needed_modules:
             modules[mod].load(modules, args)
+        self.modules, self.args = modules, args
         self.load(modules, args)
         self.process(modules, args)
 
@@ -105,7 +107,6 @@ def load_modules(modules_, argument_parser):
                         logger.debug('  -> Item is a subclass of Module class.')
                         tmp = item[1]()
                         tmp.module_init(argument_parser)
-                        tmp.init()
                         msg = 'Command %s was correctly loaded.'
                         logger.info(msg, tmp.name())
                         modules_[tmp.name()] = tmp

@@ -44,6 +44,7 @@ class Article:
         blog generation.
         '''
         self._filename, self.title, self._content = filename[:-9], '', ''
+        self.path = filename
 
         # Reads the content of the file, config being before SEPARATOR
         try:
@@ -56,7 +57,7 @@ class Article:
                 self.title += line[:-1]
                 line = f.readline()
             while line:
-                self.raw_content += line
+                self._content += line
                 line = f.readline()
         except IOError:
             pass
@@ -72,10 +73,6 @@ class Article:
         if self._date is None:
             self.date = datetime.now()
 
-    def __del__(self):
-        '''Saving authors in configuration.'''
-        self._authors = ', '.join(list(self._authors_set))
-
     def __lt__(self, other):
         '''Articles are sorted by date'''
         return self.date < other.date or self.id < other.id
@@ -89,6 +86,10 @@ class Article:
 
             # End finally we have the content.
             f.write(self._content)
+
+        # Saving configuration
+        self._authors = ', '.join(list(self._authors_set))
+        self.cm.save()
 
     def _split_authors_string(self, authors):
         return (set(re.split(',[ \t]*', authors)) - set(['']))

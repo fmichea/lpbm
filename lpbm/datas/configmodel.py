@@ -83,10 +83,6 @@ class ConfigModel:
         self.config, self._filename = configparser.ConfigParser(), filename
         self.config.read(filename, encoding='utf-8')
 
-    # FIXME: probably shouldn't do this.
-    def __del__(self):
-        self.save()
-
     def save(self):
         with codecs.open(self._filename, 'w', 'utf-8') as file_descriptor:
             self.config.write(file_descriptor)

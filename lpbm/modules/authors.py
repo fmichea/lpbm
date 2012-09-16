@@ -21,13 +21,17 @@ class Authors(lpbm.module_loader.Module):
         self.parser.add_argument('-i', '--id', action='store',
                                  metavar='nickname', help='Selects an author.')
 
-        group = self.parser.add_argument_group(title='actions')
+        group = self.parser.add_argument_group(title='general actions')
         group.add_argument('-l', '--list', action='store_true',
                            help='List the nicknames.')
+
+        group = self.parser.add_argument_group(
+            title='specific actions (need --id)'
+        )
         group.add_argument('-n', '--new', action='store_true',
-                           help='Helper to add a new author. (needs --id)')
+                           help='Helper to add a new author.')
         group.add_argument('-e', '--edit', action='store_true',
-                           help='Helper to edit an author. (needs --id)')
+                           help='Helper to edit an author.')
 
     def load(self, modules, args):
         filename = lpbm.path.join(args.exec_path, 'authors.cfg')
@@ -44,7 +48,7 @@ class Authors(lpbm.module_loader.Module):
 
         # Following options need --id precised to work.
         if args.id is None:
-            self.parser.error('You should precise --id option with this action.')
+            self.parser.error('This action needs --id option.')
         elif args.new:
             self.new_author(args.id)
         elif args.edit:
