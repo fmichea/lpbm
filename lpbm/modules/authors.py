@@ -18,14 +18,16 @@ class Authors(lpbm.module_loader.Module):
     def init(self):
         self.authors = dict()
 
-        self.parser.add_argument('-l', '--list', action='store_true',
-                                 help='List the nicknames.')
         self.parser.add_argument('-i', '--id', action='store',
                                  metavar='nickname', help='Selects an author.')
-        self.parser.add_argument('-n', '--new', action='store_true',
-                                 help='Helper to add a new author.')
-        self.parser.add_argument('-e', '--edit', action='store_true',
-                                 help='Helper to edit an author.')
+
+        group = self.parser.add_argument_group(title='actions')
+        group.add_argument('-l', '--list', action='store_true',
+                           help='List the nicknames.')
+        group.add_argument('-n', '--new', action='store_true',
+                           help='Helper to add a new author. (needs --id)')
+        group.add_argument('-e', '--edit', action='store_true',
+                           help='Helper to edit an author. (needs --id)')
 
     def load(self, modules, args):
         filename = lpbm.path.join(args.exec_path, 'authors.cfg')
@@ -38,10 +40,11 @@ class Authors(lpbm.module_loader.Module):
     def process(self, modules, args):
         if args.list:
             self.list_authors()
+            return
 
         # Following options need --id precised to work.
         if args.id is None:
-            sys.exit('You should precise --id option with this option.')
+            self.parser.error('You should precise --id option with this action.')
         elif args.new:
             self.new_author(args.id)
         elif args.edit:
