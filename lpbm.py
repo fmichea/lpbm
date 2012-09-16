@@ -9,10 +9,10 @@ import shutil
 import sys
 
 #import lpbm.articles
-import lpbm.authors
-import lpbm.categories
-import lpbm.rss
-import lpbm.templates
+#import lpbm.authors
+#import lpbm.categories
+#import lpbm.rss
+#import lpbm.templates
 import lpbm.logging
 import lpbm.module_loader
 
@@ -40,7 +40,9 @@ def build_blog(ct_mgr, aut_mgr, art_mgr):
     ))
 
 def build_rss(cat_mgr, aut_mgr, art_mgr):
-    lpbm.rss.render(art_mgr, aut_mgr, cat_mgr)
+# FIXME:
+#    lpbm.rss.render(art_mgr, aut_mgr, cat_mgr)
+    pass
 
 _MODULES = dict()
 
@@ -68,17 +70,18 @@ if __name__ == '__main__':
 
     sys.exit(0)
 
-    # Doing what is asked.
-    if args.clean: clean_tree()
-
-    # Parsing articles, authors and generating categories.
-    if not args.no_blog or not args.no_rss:
-        cat_mgr = lpbm.categories.CategoryManager('Categories')
-        aut_mgr = lpbm.authors.AuthorsManager()
-        art_mgr = lpbm.articles.ArticlesManager(aut_mgr, cat_mgr)
-
-    # Generating what is asked.
-    if not args.no_blog:
-        build_blog(cat_mgr, aut_mgr, art_mgr)
-    if not args.no_rss:
-        build_rss(cat_mgr, aut_mgr, art_mgr)
+# FIXME: dead code.
+#    # Doing what is asked.
+#    if args.clean: clean_tree()
+#
+#    # Parsing articles, authors and generating categories.
+#    if not args.no_blog or not args.no_rss:
+#        cat_mgr = lpbm.categories.CategoryManager('Categories')
+#        aut_mgr = lpbm.authors.AuthorsManager()
+#        art_mgr = lpbm.articles.ArticlesManager(aut_mgr, cat_mgr)
+#
+#    # Generating what is asked.
+#    if not args.no_blog:
+#        build_blog(cat_mgr, aut_mgr, art_mgr)
+#    if not args.no_rss:
+#        build_rss(cat_mgr, aut_mgr, art_mgr)

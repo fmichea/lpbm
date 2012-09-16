@@ -5,7 +5,8 @@
 import configparser
 import sys
 
-import lpbm.authors
+import lpbm.datas.authors
+import lpbm.datas.configmodel as cm_module
 import lpbm.logging
 import lpbm.module_loader
 import lpbm.path
@@ -19,43 +20,41 @@ class Authors(lpbm.module_loader.Module):
 
         self.parser.add_argument('-l', '--list', action='store_true',
                                  help='List the nicknames.')
-        self.parser.add_argument('-n', '--new', action='store', metavar='nickname',
+        self.parser.add_argument('-i', '--id', action='store',
+                                 metavar='nickname', help='Selects an author.')
+        self.parser.add_argument('-n', '--new', action='store_true',
                                  help='Helper to add a new author.')
-        self.parser.add_argument('-e', '--edit', action='store', metavar='nickname',
+        self.parser.add_argument('-e', '--edit', action='store_true',
                                  help='Helper to edit an author.')
 
     def load(self, modules, args):
-        self.config = configparser.ConfigParser()
-        self.filename = lpbm.path.join(args.exec_path, 'authors.cfg')
-        try:
-            with open(self.filename, 'r') as f:
-                self.config.read_file(f)
-        except IOError:
-            return
+        filename = lpbm.path.join(args.exec_path, 'authors.cfg')
+        self.cm = cm_module.ConfigModel(filename)
 
         # Now loads all authors.
-        for section in self.config.sections():
-            self.authors[section] = lpbm.authors.Author(section, self.config)
+        for section in self.cm.config.sections():
+            self.authors[section] = lpbm.datas.authors.Author(section, self.cm)
 
     def process(self, modules, args):
         if args.list:
             self.list_authors()
-        elif args.new:
-            self.new_author(args.new)
-        elif args.edit:
-            self.edit_author(args.edit)
 
-    def save(self):
-        with open(self.filename, 'w') as f:
-            self.config.write(f)
+        # Following options need --id precised to work.
+        if args.id is None:
+            sys.exit('You should precise --id option with this option.')
+        elif args.new:
+            self.new_author(args.id)
+        elif args.edit:
+            self.edit_author(args.id)
 
     # Particular functions requested on command line.
     def list_authors(self):
         print('All authors:')
         if self.authors:
             for key, author in sorted(self.authors.items()):
-                email = '[{}]'.format(author.email) if author.email else ''
-                print(' + {first} {last} a.k.a. {nickname} {email}'.format(
+                email = ' [{}]'.format(author.email) if author.email else ''
+                print(' {id:2d} + {first} {last} a.k.a. {nickname}{email}'.format(
+                    id = author.id,
                     nickname = author.nickname,
                     first = author.first_name,
                     last = author.last_name,
@@ -65,14 +64,18 @@ class Authors(lpbm.module_loader.Module):
             print(' + There is no author.')
 
     def new_author(self, nickname):
-        if self.config.has_section(nickname):
+        if self.cm.config.has_section(nickname):
             sys.exit('This nickname is already used!')
-        author = lpbm.authors.Author(nickname, self.config)
+        author = lpbm.datas.authors.Author(nickname, self.cm)
+        try:
+            author.id = max([aut.id for aut in self.authors.values()]) + 1
+        except ValueError:
+            author.id = 0
         author.interactive()
-        self.save()
+        self.cm.save()
 
     def edit_author(self, nickname):
         if nickname not in self.authors.keys():
             sys.exit('Unknown author nickname!')
         self.authors[nickname].interactive()
-        self.save()
+        self.cm.save()

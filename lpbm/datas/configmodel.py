@@ -15,9 +15,17 @@ class ConfigOptionDescriptor:
         b = a # gets foo.bar ([foo] option bar) (here 1).
     '''
 
-    def __init__(self, section, option, **kwargs):
+    def __init__(self, *args, **kwargs):
         # Private attributes.
-        self._section, self._option = section, option
+        if len(args) == 1:
+            self._section, self._option = None, args[0]
+        elif len(args) == 2:
+            self._section, self._option = args
+        else:
+            text = 'ConfigOptionDescriptor.__init__ takes one or two '
+            text += 'arguments. Section and option names, OR only option '
+            text += 'name.'
+            raise TypeError(text)
         self._default = kwargs.get('default', None)
         self._read_only = kwargs.get('read_only', False)
 
@@ -25,12 +33,13 @@ class ConfigOptionDescriptor:
         cfg = instance.cm.config
         if self._read_only:
             return
-        if not cfg.has_section(self._section):
-            cfg.add_section(self._section)
+        section = self._section or instance.section
+        if not cfg.has_section(section):
+            cfg.add_section(section)
         if val is None:
-            cfg.remove_option(self._section, self._option)
+            cfg.remove_option(section, self._option)
         else:
-            cfg.set(self._section, self._option, str(val))
+            cfg.set(section, self._option, str(val))
 
     def __get__(self, instance, type=None):
         try:
@@ -39,7 +48,8 @@ class ConfigOptionDescriptor:
             return self._default
         if getter is None:
             getter = configparser.ConfigParser.get
-        value = getter(cfg, self._section, self._option, fallback=None)
+        section = self._section or instance.section
+        value = getter(cfg, section, self._option, fallback=None)
         if value is None and self._default is not None:
             value = self._default
             self.__set__(instance, self._default)
@@ -73,19 +83,23 @@ class ConfigModel:
         self.config, self._filename = configparser.ConfigParser(), filename
         self.config.read(filename, encoding='utf-8')
 
+    # FIXME: probably shouldn't do this.
     def __del__(self):
+        self.save()
+
+    def save(self):
         with codecs.open(self._filename, 'w', 'utf-8') as file_descriptor:
             self.config.write(file_descriptor)
 
 
-def opt(sect, opt, **kwargs):
-    return ConfigOptionDescriptor(sect, opt, **kwargs)
+def opt(*args, **kwargs):
+    return ConfigOptionDescriptor(*args, **kwargs)
 
-def opt_int(sect, opt, **kwargs):
-    return ConfigOptionDescriptorInt(sect, opt, **kwargs)
+def opt_int(*args, **kwargs):
+    return ConfigOptionDescriptorInt(*args, **kwargs)
 
-def opt_bool(sect, opt, **kwargs):
-    return ConfigOptionDescriptorBoolean(sect, opt, **kwargs)
+def opt_bool(*args, **kwargs):
+    return ConfigOptionDescriptorBoolean(*args, **kwargs)
 
-def opt_float(sect, opt, **kwargs):
-    return ConfigOptionDescriptorFloat(sect, opt, **kwargs)
+def opt_float(*args, **kwargs):
+    return ConfigOptionDescriptorFloat(*args, **kwargs)
