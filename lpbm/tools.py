@@ -28,17 +28,22 @@ def slugify(text):
     slug = ''.join(c for c in slug if c in lpbm.constants.SLUG_CHARS)
     return slug[:lpbm.constants.SLUG_SIZE]
 
-def input_default(prompt, default):
+def input_default(prompt, default, required=False, is_valid=None):
     '''
     Prompts the user for input, with a default value if nothing is given from
     the user.
     '''
     try:
-        tmp = input('{prompt} [{default}]: '.format(
-            prompt = prompt, default = default if default is not None else '',
-        ))
+        while True:
+            tmp = input('{prompt}{required} [{default}]: '.format(
+                prompt = prompt,
+                default = default if default is not None else '',
+                required = ' (required)' if required else '',
+            ))
+            if not tmp:
+                tmp = default
+            if (is_valid is None or is_valid(tmp)) and (not required or tmp):
+                break
     except (KeyboardInterrupt, EOFError):
         sys.exit(1)
-    if not tmp:
-        tmp = default
     return tmp
