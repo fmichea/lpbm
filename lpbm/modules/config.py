@@ -54,8 +54,11 @@ class Config(lpbm.module_loader.Module):
             self.set_var(args.set)
         elif args.unset: # We want to unset some variable.
             self.unset_var(args.unset)
-        with open(os.path.join(args.exec_path, 'config'), 'w') as f:
-            self.config.write(f)
+        try:
+            with open(os.path.join(args.exec_path, 'config'), 'w') as f:
+                self.config.write(f)
+        except IOError:
+            pass
 
     def load(self, modules, args):
         self.config = configparser.ConfigParser()
