@@ -4,6 +4,7 @@
 
 import os
 import shutil
+import sys
 
 import lpbm.constants
 
@@ -32,9 +33,12 @@ def input_default(prompt, default):
     Prompts the user for input, with a default value if nothing is given from
     the user.
     '''
-    tmp = input('{prompt} [{default}]: '.format(
-        prompt = prompt, default = default,
-    ))
+    try:
+        tmp = input('{prompt} [{default}]: '.format(
+            prompt = prompt, default = default if default is not None else '',
+        ))
+    except (KeyboardInterrupt, EOFError):
+        sys.exit(1)
     if not tmp:
         tmp = default
     return tmp
