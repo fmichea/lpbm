@@ -18,6 +18,10 @@ class Module(metaclass=abc.ABCMeta):
     following methods. It will then be loaded automatically.
     """
 
+    def __init__(self):
+        self.parser, self.modules, self.args = None, None, None
+        self.needed_modules = None
+
     def module_init(self, argument_parser):
         """
         This function initialize a parser for the command line. It also,
@@ -81,7 +85,7 @@ def load_modules(modules_, argument_parser):
 
     # Finds all submodules that should be loaded.
     logger.debug('Tool being loaded from %s.', main_root)
-    for root, dirs, files in os.walk(main_root):
+    for root, _, files in os.walk(main_root):
         root_ = root[len(main_root):]
         for filename in files:
             if not filename.endswith('.py'):
