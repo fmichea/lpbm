@@ -32,6 +32,8 @@ class Authors(lpbm.module_loader.Module):
                            help='Helper to add a new author.')
         group.add_argument('-e', '--edit', action='store_true',
                            help='Helper to edit an author.')
+        group.add_argument('-d', '--delete', action='store_true',
+                           help='Helper to delete an author.')
 
     def load(self, modules, args):
         filename = lpbm.path.join(args.exec_path, 'authors.cfg')
@@ -53,6 +55,8 @@ class Authors(lpbm.module_loader.Module):
             self.new_author(args.id)
         elif args.edit:
             self.edit_author(args.id)
+        elif args.delete:
+            self.delete_author(args.id)
 
     # Particular functions requested on command line.
     def list_authors(self):
@@ -85,4 +89,10 @@ class Authors(lpbm.module_loader.Module):
         if nickname not in self.authors.keys():
             sys.exit('Unknown author nickname!')
         self.authors[nickname].interactive()
+        self.cm.save()
+
+    def delete_author(self, nickname):
+        if nickname not in self.authors.keys():
+            sys.exit('Unknown author nickname!')
+        self.cm.config.remove_section(nickname)
         self.cm.save()
