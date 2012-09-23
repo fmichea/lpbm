@@ -28,6 +28,8 @@ class Categories(lpbm.module_loader.Module):
         )
         group.add_argument('-e', '--edit', action='store_true',
                            help='Edit a category.')
+        group.add_argument('-d', '--delete', action='store_true',
+                           help='Delete a category and all its children.')
 
     def load(self, modules, args):
         filename = lpbm.path.join(args.exec_path, 'categories.cfg')
@@ -41,8 +43,24 @@ class Categories(lpbm.module_loader.Module):
     def process(self, modules, args):
         if args.list:
             self.list_categories()
+            return
         elif args.new:
             self.new_category()
+            return
+
+        if args.id is None:
+            self.parser.error('This action needs --id option.')
+        elif args.edit:
+            self.edit_category(args.id)
+        elif args.delete:
+            self.delete_category(args.id)
+
+    # Manipulation function
+    def _get_category(self, id):
+        try:
+            return self.categories[id]
+        except KeyError:
+            sys.exit('This category doesn\'t exist.')
 
     # All the actions.
     def list_categories(self, short=False):
@@ -51,7 +69,7 @@ class Categories(lpbm.module_loader.Module):
         if self.categories:
             categories = sorted(self.categories.values())
             for cat in categories:
-                print('{level} {id} + {name}'.format(
+                print('{level} {id:2d} + {name}'.format(
                     level = '  ' * cat.level(),
                     id = cat.id,
                     name = cat.name,
@@ -67,3 +85,31 @@ class Categories(lpbm.module_loader.Module):
         cat = cd_module.Category(self, id)
         cat.interactive()
         self.cm.save()
+
+    def edit_category(self, id):
+        category = self._get_category(id)
+        category.interactive()
+        self.cm.save()
+
+    def delete_category(self, id):
+        categories, to_delete = {id: self._get_category(id)}, [id]
+        categories_copy = self.categories.copy()
+        while to_delete:
+            to_delete = []
+            for cat_id, cat in categories_copy.items():
+                if cat.parent in categories:
+                    categories[cat.id] = cat
+                    to_delete.append(cat.id)
+            for cat_id in to_delete:
+                del categories_copy[cat_id]
+        print('All categories to be deleted:')
+        for cat in categories.values():
+            print('{level} + {name}'.format(
+                name = cat.name,
+                level = '  ' * (cat.level() - categories[id].level())
+            ))
+        if lpbm.tools.ask_sure():
+            for cat in categories.values():
+                self.cm.config.remove_section(str(cat.id))
+            self.cm.save()
+            print('Categories successfully deleted!')

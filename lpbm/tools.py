@@ -47,3 +47,12 @@ def input_default(prompt, default, required=False, is_valid=None):
     except (KeyboardInterrupt, EOFError):
         sys.exit(1)
     return tmp
+
+def ask_sure(default=False):
+    try:
+        sure = input('Are you sure you want to proceed? [{default}] '.format(
+            default = 'Y/n' if default else 'y/N',
+        ))
+    except (KeyboardInterrupt, EOFError):
+        sys.exit('')
+    return (not sure and default) or (sure.lower() == 'y')

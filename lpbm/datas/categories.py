@@ -21,9 +21,15 @@ class Category:
         self.manager.list_categories(short=True)
         known_categories = self.manager.categories.keys()
         def is_valid(value):
-            return (value is None or int(value) in known_categories)
+            try:
+                ivalue = int(value)
+            except ValueError:
+                return False
+            return (value is None or ivalue == -1 or ivalue in known_categories)
         self.parent = lpbm.tools.input_default('Parent', self.parent,
                                                is_valid=is_valid)
+        if self.parent == -1:
+            self.parent = None
 
     def full_name(self):
         if self._full_name is not None:
