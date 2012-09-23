@@ -99,6 +99,8 @@ def load_modules(modules_, argument_parser):
             except ImportError:
                 logger.debug('Failed to find module %s.', mod_name)
 
+    modules = sorted(modules, key=lambda mod: mod[0])
+
     # Loads modules 1 by 1.
     for mod_name, (fd, pathname, description) in modules:
         try:
