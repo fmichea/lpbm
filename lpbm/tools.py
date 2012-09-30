@@ -4,6 +4,7 @@
 
 import os
 import shutil
+import string
 import sys
 
 def mkdir_p(path):
