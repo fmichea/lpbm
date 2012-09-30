@@ -10,9 +10,6 @@ import math
 import os
 import re
 
-# Internal modules imports.
-import lpbm.constants
-
 import lpbm.datas.configmodel as cm_module
 
 from datetime import datetime
@@ -27,7 +24,8 @@ class ArticleSameIdError(Exception):
             self.art1.title, self.art2.title
         )
 
-TITLE_SEPARATOR = '=='
+_TITLE_SEPARATOR = '=='
+_FRMT_DATE_CONF = '%Y-%m-%dT%H:%M:%S'
 
 class Article:
     id = cm_module.opt_int('general', 'id', default=-1)
@@ -51,7 +49,7 @@ class Article:
             f = codecs.open(filename, 'r', 'utf-8')
             line = f.readline()
             while line:
-                if line.startswith(TITLE_SEPARATOR):
+                if line.startswith(_TITLE_SEPARATOR):
                     line = f.readline()
                     break
                 self.title += line[:-1]
@@ -143,7 +141,7 @@ class Article:
     @property
     def date(self):
         try:
-            return datetime.strptime(self._date, lpbm.constants.FRMT_DATE_CONF)
+            return datetime.strptime(self._date, _FRMT_DATE_CONF)
         except ValueError:
             return datetime.fromtimestamp(0)
 
@@ -152,7 +150,7 @@ class Article:
         if value is None:
             self._date = None
         else:
-            self._date = value.strftime(lpbm.constants.FRMT_DATE_CONF)
+            self._date = value.strftime(_FRMT_DATE_CONF)
 
     def content(self):
         opt = 'codehilite(force_linenos=True)'

@@ -6,8 +6,6 @@ import os
 import shutil
 import sys
 
-import lpbm.constants
-
 def mkdir_p(path):
     '''
     Emulates the behaviour of `mkdir -p` in shell (makes all the directories
@@ -22,11 +20,14 @@ def copy(src, dst):
     '''Copies the file from src to dst.'''
     shutil.copyfile(src, dst)
 
+_SLUG_CHARS = string.ascii_lowercase + string.digits + '-'
+_SLUG_SIZE = 50
+
 def slugify(text):
     '''Returns the slug of a string (that can be used in an URL for example.'''
     slug = text.lower().replace(' ', '-')
-    slug = ''.join(c for c in slug if c in lpbm.constants.SLUG_CHARS)
-    return slug[:lpbm.constants.SLUG_SIZE]
+    slug = ''.join(c for c in slug if c in _SLUG_CHARS)
+    return slug[:_SLUG_SIZE]
 
 def input_default(prompt, default, required=False, is_valid=None):
     '''
