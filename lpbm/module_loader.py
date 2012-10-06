@@ -2,6 +2,11 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+'''
+This module dynamically loads all the command line modules in `modules`
+directory.
+'''
+
 import abc
 import imp
 import inspect

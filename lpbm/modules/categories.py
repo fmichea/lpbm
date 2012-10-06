@@ -2,11 +2,24 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+'''
+Categories manager, getting authors configuration in blog sources and loading
+all the categories.
+'''
+
+import sys
+
 import lpbm.datas.categories as cd_module
 import lpbm.datas.configmodel as cm_module
 import lpbm.module_loader
 
 class Categories(lpbm.module_loader.Module):
+    '''
+    Categories manager, getting authors configuration in blog sources and
+    loading all the categories.
+    '''
+
+    # pylint: disable=C0321
     def name(self): return 'categories'
     def abstract(self): return 'Loads and manipulates categories.'
 
@@ -57,6 +70,10 @@ class Categories(lpbm.module_loader.Module):
 
     # Manipulation function
     def _get_category(self, id):
+        '''
+        Gets a category by its id, or displays an error and exits if it doesn't
+        exist.
+        '''
         try:
             return self.categories[id]
         except KeyError:
@@ -64,6 +81,7 @@ class Categories(lpbm.module_loader.Module):
 
     # All the actions.
     def list_categories(self, short=False):
+        '''Lists all the categories.'''
         if not short:
             print('All categories:')
         if self.categories:
@@ -78,6 +96,7 @@ class Categories(lpbm.module_loader.Module):
             print(' + There is no category yet.')
 
     def new_category(self):
+        '''Helps creating a new category.'''
         try:
             id = max([cat.id for cat in self.categories.values()]) + 1
         except ValueError:
@@ -87,11 +106,13 @@ class Categories(lpbm.module_loader.Module):
         self.cm.save()
 
     def edit_category(self, id):
+        '''Edits an existing category.'''
         category = self._get_category(id)
         category.interactive()
         self.cm.save()
 
     def delete_category(self, id):
+        '''Deletes an existing category.'''
         categories, to_delete = {id: self._get_category(id)}, [id]
         categories_copy = self.categories.copy()
         while to_delete:

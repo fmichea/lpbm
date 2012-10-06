@@ -2,12 +2,17 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+'''
+Configuration can be manipulated with this module, so that use should never
+have to change the file by hand.
+'''
+
 import configparser
 import os
 import sys
 
-import lpbm.module_loader
 import lpbm.logging
+import lpbm.module_loader
 
 _CONFIGURATION = {
     # 'sectionName': (Required, {
@@ -32,14 +37,20 @@ _CONFIGURATION = {
 }
 
 class Config(lpbm.module_loader.Module):
+    '''
+    Configuration can be manipulated with this module, so that use should never
+    have to change the file by hand.
+    '''
+
+    # pylint: disable=C0321
     def name(self): return 'config'
     def abstract(self): return 'Manipulates blog configuration.'
 
     def init(self):
         self.parser.add_argument('-l', '--list', action='store_true',
                                  help='List available options, with their meaning.')
-        self.parser.add_argument('-k', '--check', action='store_true',
-                                 help='Check syntax and options of the configuration file.')
+        _help = 'Check syntax and options of the configuration file.'
+        self.parser.add_argument('-k', '--check', action='store_true', help=_help)
         self.parser.add_argument('-s', '--set', action='store', metavar='option',
                                  help='Set option to value (section.option=val).')
         self.parser.add_argument('-u', '--unset', action='store', metavar='option',
@@ -77,6 +88,7 @@ class Config(lpbm.module_loader.Module):
         lpbm.logging.configure(logging_conf)
 
     # Particular functions for configuration.
+    # pylint: disable=R0201
     def list_options(self):
         """
         List all the avilable options with an abstract of their meaning.
@@ -111,23 +123,21 @@ class Config(lpbm.module_loader.Module):
             if section in tmp_file:
                 print(' + Checking section {}'.format(section))
                 for option in options:
-                    required, desc = options[option]
+                    required, _ = options[option]
                     try:
                         idx = tmp_file[section].index(option)
                         print('  + Option `{}` was found.'.format(option))
                         del tmp_file[section][idx]
-                    except (ValueError,KeyError):
+                    except (ValueError, KeyError):
+                        _msg = '  ! Option `{}` is required and wasn\'t found.'
                         if required:
-                            print('  ! Option `{}` is required and wasn\'t found.'.format(
-                                option
-                            ))
+                            print(_msg.format(option))
                 if tmp_file[section] == []:
                     del tmp_file[section]
             elif required:
                 if required:
-                    print(' ! Section `{}` is required and wasn\'t found.'.format(
-                        section
-                    ))
+                    _msg = ' ! Section `{}` is required and wasn\'t found.'
+                    print(_msg.format(section))
 
         if tmp_file != dict():
             print('\nThese options are defined but not known:')
@@ -146,15 +156,15 @@ class Config(lpbm.module_loader.Module):
             return
         section_name, var_name, value = parts_[0], parts_[1], parts[1]
         if section_name not in _CONFIGURATION:
-            print('Unknown section name `{}` in configuration.'.format(section_name),
-                  file=sys.stderr)
+            _msg = 'Unknown section name `{}` in configuration.'
+            print(_msg.format(section_name), file=sys.stderr)
             return
         if var_name not in _CONFIGURATION[section_name][1]:
             print('Unknown variable name `{}` in section `{}` in configuration.'
                   .format(var_name, section_name), file=sys.stderr)
             return
         if value == '':
-            print('You can\'t set value to empty. Use --unset to unset a variable.',
+            print('You can\'t set value to empty. Use --unset instead.',
                   file=sys.stderr)
             return
         self.config[section_name][var_name] = value
@@ -170,8 +180,8 @@ class Config(lpbm.module_loader.Module):
             return
         section_name, var_name = parts[0], parts[1]
         if section_name not in self.config:
-            print('Section `{}` was not found in configuration.'.format(section_name),
-                  file=sys.stderr)
+            _msg = 'Section `{}` was not found in configuration.'
+            print(_msg.format(section_name), file=sys.stderr)
             return
         if var_name not in self.config[section_name]:
             print('Option `{}` was not found in section `{}`.'

@@ -2,7 +2,11 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
-import configparser
+'''
+Author manager, getting authors configuration in blog sources and loading all
+the authors.
+'''
+
 import sys
 
 import lpbm.datas.authors
@@ -12,6 +16,12 @@ import lpbm.module_loader
 import lpbm.path
 
 class Authors(lpbm.module_loader.Module):
+    '''
+    Author manager, getting authors configuration in blog sources and loading
+    all the authors.
+    '''
+
+    # pylint: disable=C0321
     def name(self): return 'authors'
     def abstract(self): return 'Loads, manipulates and renders authors.'
 
@@ -60,9 +70,10 @@ class Authors(lpbm.module_loader.Module):
 
     # Particular functions requested on command line.
     def list_authors(self):
+        '''This function lists all the authors of the blog.'''
         print('All authors:')
         if self.authors:
-            for key, author in sorted(self.authors.items()):
+            for _, author in sorted(self.authors.items()):
                 email = ' [{}]'.format(author.email) if author.email else ''
                 print(' {id:2d} + {first} {last} a.k.a. {nickname}{email}'.format(
                     id = author.id,
@@ -75,6 +86,7 @@ class Authors(lpbm.module_loader.Module):
             print(' + There is no author.')
 
     def new_author(self, nickname):
+        '''Interactively create an author.'''
         if self.cm.config.has_section(nickname):
             sys.exit('This nickname is already used!')
         author = lpbm.datas.authors.Author(nickname, self.cm)
@@ -86,12 +98,14 @@ class Authors(lpbm.module_loader.Module):
         self.cm.save()
 
     def edit_author(self, nickname):
+        '''Interactively edit and existing author.'''
         if nickname not in self.authors.keys():
             sys.exit('Unknown author nickname!')
         self.authors[nickname].interactive()
         self.cm.save()
 
     def delete_author(self, nickname):
+        '''Deletes an author from authors list.'''
         if nickname not in self.authors.keys():
             sys.exit('Unknown author nickname!')
         self.cm.config.remove_section(nickname)

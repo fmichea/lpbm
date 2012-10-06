@@ -2,6 +2,11 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+'''
+Helper tools on paths to reference and walk through blog sources absolutely
+to script position.
+'''
+
 import os
 
 _ROOT = os.path.join(os.path.dirname(__file__), '..')

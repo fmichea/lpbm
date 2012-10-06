@@ -2,7 +2,11 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
-import datetime
+'''
+Articles manager, finds and loads all the articles of the blog. These are a
+pair of two files. One is a markdown file, the other one an ini file.
+'''
+
 import os
 import subprocess
 import sys
@@ -15,6 +19,12 @@ import lpbm.path
 _LOGGER = lpbm.logging.get()
 
 class Articles(lpbm.module_loader.Module):
+    '''
+    Articles manager, finds and loads all the articles of the blog. These are a
+    pair of two files. One is a markdown file, the other one an ini file.
+    '''
+
+    # pylint: disable=C0321
     def name(self): return 'articles'
     def abstract(self): return 'Loads, manipulates and renders articles.'
 
@@ -65,6 +75,9 @@ class Articles(lpbm.module_loader.Module):
 
     # Manipulation function
     def _get_article(self, id):
+        '''
+        This litle helper finds an article by it's id or exits with an error.
+        '''
         try:
             return self.articles[id]
         except KeyError:
@@ -72,6 +85,7 @@ class Articles(lpbm.module_loader.Module):
 
     # Particular functions for command line.
     def list_articles(self):
+        '''Lists all the articles with some useful information.'''
         count, count_pub = 0, 0
         print('All articles:')
         for article in self.articles.values():
@@ -88,6 +102,7 @@ class Articles(lpbm.module_loader.Module):
         ))
 
     def publish_article(self, id):
+        '''Publish an article.'''
         article = self._get_article(id)
         article.publish()
         article.save()
@@ -97,9 +112,16 @@ class Articles(lpbm.module_loader.Module):
         ))
 
     def preview_article(self, id):
+        '''
+        This is here to render a particular article (draft) and get its link.
+        '''
         pass
 
     def new_article(self, filename):
+        '''
+        New article from command line. This will help the user create a
+        particular file.
+        '''
         # First we check that file doesn't exist.
         path = lpbm.path.join(
             self.args.exec_path, 'articles', '{}.markdown'.format(filename)
@@ -109,25 +131,25 @@ class Articles(lpbm.module_loader.Module):
                 path
             ))
         # Then we check if we want to use the first available id.
-        ids, pk = self.articles.keys(), None
+        ids, id = self.articles.keys(), None
         try:
             last_id = max(ids) + 1
         except ValueError:
             last_id = 0
-        while pk is None:
+        while id is None:
             try:
-                pk = int(input('Please enter an id [{}]: '.format(last_id)))
-                if pk in ids:
+                id = int(input('Please enter an id [{}]: '.format(last_id)))
+                if id in ids:
                     print('Id already exists, please choose a different one.')
-                    pk = None
+                    id = None
             except ValueError:
-                pk = last_id
+                id = last_id
 
         # Then we want a title.
         title = input('Please enter a title: ')
         authors = input('Please list authors (comma separated): ')
         article = lpbm.datas.articles.Article(path)
-        article.id = pk
+        article.id = id
         article.title = title
         article.add_authors(authors)
         article.save()
@@ -142,6 +164,7 @@ class Articles(lpbm.module_loader.Module):
             self.edit_article(article.id)
 
     def edit_article(self, id):
+        '''Opens editor to modify its content.'''
         article = self._get_article(id)
         subprocess.call('{editor} "{filename}"'.format(
             editor = os.environ.get('EDITOR', 'vim'),

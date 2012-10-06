@@ -2,10 +2,14 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+'''This module provides some tools needed almost everywhere in the code.'''
+
 import os
 import shutil
-import string
 import sys
+
+# pylint: disable=W0402
+import string
 
 def mkdir_p(path):
     '''
@@ -51,10 +55,14 @@ def input_default(prompt, default, required=False, is_valid=None):
     return tmp
 
 def ask_sure(default=False):
+    '''
+    Makes sure the user wants to proceed the following action. It returns True
+    if user answers yes or y, else False.
+    '''
     try:
         sure = input('Are you sure you want to proceed? [{default}] '.format(
             default = 'Y/n' if default else 'y/N',
         ))
     except (KeyboardInterrupt, EOFError):
         sys.exit('')
-    return (not sure and default) or (sure.lower() == 'y')
+    return (not sure and default) or (sure.lower() in ['y', 'yes'])
