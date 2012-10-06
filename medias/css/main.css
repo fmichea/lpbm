@@ -1,0 +1,240 @@
+@import url("pygments.css");
+@import url("http://fonts.googleapis.com/css?family=Oswald");
+@import url("http://fonts.googleapis.com/css?family=Droid+Sans:regular,italic,bold,bolditalic");
+*, html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form,
+label, fieldset, input, p, blockquote, th, td {
+  margin: 0;
+  padding: 0; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+fieldset, img {
+  border: 0; }
+
+address, caption, cite, code, dfn, em, strong, th, var {
+  font-style: normal;
+  font-weight: normal; }
+
+ol, ul, li {
+  list-style: none; }
+
+caption, th {
+  text-align: left; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: normal; }
+
+q:before, q:after {
+  content: ''; }
+
+/* Global reset-RESET */
+/* The below restores some sensible defaults */
+strong {
+  font-weight: bold; }
+
+em {
+  font-style: italic; }
+
+a img {
+  border: none; }
+
+/* Gets rid of IE's blue borders */
+body {
+  font-family: "Droid Sans", Arial, serif;
+  font-size: 12px;
+  color: #626262;
+  background-color: #646464; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Oswald", Arial, serif;
+  margin-bottom: 10px; }
+
+h1 {
+  font-size: 28px; }
+
+h2 {
+  font-size: 22px; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 14px; }
+
+h5 {
+  font-size: 12px; }
+
+a {
+  text-decoration: none;
+  color: #19b7de; }
+  a:hover {
+    text-decoration: underline; }
+
+.cAlign, #header h1, #header h2, #main_body, #footer {
+  min-width: 800px;
+  max-width: 1024px;
+  margin: 0 auto;
+  border-left: 1px solid #404246;
+  border-right: 1px solid #404246; }
+
+.cleaner {
+  clear: both; }
+
+#header {
+  margin: 0 auto;
+  background-color: #2f3134;
+  border-bottom: 1px solid #404246; }
+  #header h1 {
+    color: white;
+    padding: 0px 15px;
+    vertical-align: middle;
+    height: 36px; }
+  #header h2 {
+    color: #ececec;
+    padding: 2px 15px;
+    font-size: 12px;
+    vertical-align: middle; }
+
+#main_body {
+  background-color: white;
+  padding: 0px 15px; }
+
+.mail {
+  font-size: 7px;
+  color: #2f3134;
+  vertical-align: 40%; }
+
+ul#articles {
+  padding: 10px 0;
+  margin-right: 200px;
+  border-right: 1px solid #dadce1; }
+  ul#articles h1 {
+    color: #44464a;
+    border-bottom: 3px double #404246; }
+  ul#articles p {
+    margin-bottom: 10px;
+    text-align: justify; }
+  ul#articles > li {
+    padding-left: 10px;
+    padding-right: 25px; }
+  ul#articles div.infos {
+    font-style: italic;
+    font-size: 11px;
+    text-align: right;
+    color: #878f9a; }
+    ul#articles div.infos p {
+      margin-bottom: 0; }
+    ul#articles div.infos .twitter-share-button {
+      display: inline-block; }
+    ul#articles div.infos div.comments-link {
+      display: inline-block;
+      vertical-align: top;
+      padding-top: 4px; }
+  ul#articles li > blockquote {
+    border: 1px solid #2a762a;
+    border-left: 3px solid #2a762a;
+    max-width: 80%;
+    margin: 0 auto;
+    margin-bottom: 10px; }
+  ul#articles blockquote {
+    border-left: 3px solid #2a762a;
+    background-color: #8cbc8c;
+    color: #005000;
+    padding: 2px 5px;
+    margin-bottom: 3px; }
+    ul#articles blockquote p {
+      margin: 0; }
+    ul#articles blockquote a {
+      color: #000f00; }
+  ul#articles img {
+    display: block;
+    max-width: 100%;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 10px; }
+  ul#articles ul {
+    display: block;
+    margin-left: 20px;
+    margin-bottom: 10px; }
+    ul#articles ul li {
+      list-style-type: disc;
+      margin-bottom: 2px; }
+  ul#articles div#disqus_thread li {
+    list-style-type: none; }
+
+ul#menu {
+  width: 180px;
+  padding: 10px;
+  float: right; }
+  ul#menu strong {
+    display: block;
+    margin-bottom: 4px; }
+  ul#menu #categories > ul, ul#menu #authors > ul {
+    padding-left: 10px; }
+    ul#menu #categories > ul li, ul#menu #authors > ul li {
+      padding: 2px 0px;
+      margin-left: 10px; }
+    ul#menu #categories > ul > li, ul#menu #authors > ul > li {
+      list-style-type: circle; }
+      ul#menu #categories > ul > li > ul > li, ul#menu #authors > ul > li > ul > li {
+        list-style-type: disc; }
+        ul#menu #categories > ul > li > ul > li > ul > li, ul#menu #authors > ul > li > ul > li > ul > li {
+          list-style-type: square; }
+  ul#menu li {
+    padding: 5px; }
+
+#footer {
+  background-color: #2f3134;
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  padding: 4px 15px;
+  border-radius: 0px 0px 5px 5px; }
+
+.codehilitetable {
+  font-size: 11px;
+  background-color: #f0f0f0;
+  border: 3px double #a0a0a0;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  width: 630px; }
+  .codehilitetable div.codehilite {
+    width: 630px;
+    overflow: auto; }
+  .codehilitetable .codehilite > pre {
+    width: 100%; }
+  .codehilitetable td {
+    padding: 4px; }
+  .codehilitetable td.code {
+    width: auto; }
+  .codehilitetable td.linenos {
+    border-right: 1px solid #a0a0a0;
+    width: 12px;
+    text-align: right;
+    vertical-align: top; }
+
+a.rss {
+  display: block;
+  background: url("/images/feed-icon-28x28.png") no-repeat left center;
+  padding-left: 36px;
+  padding-top: 16px;
+  height: 30px;
+  font-weight: bold; }
+
+.paginate {
+  height: 17px; }
+  .paginate ul {
+    float: right; }
+    .paginate ul li {
+      border: 1px solid #a0a0a0;
+      background-color: #f0f0f0;
+      padding: 3px 5px;
+      margin-right: 5px;
+      list-style-type: none !important;
+      float: left; }
+    .paginate ul .cur_page {
+      font-weight: bold;
+      text-decoration: underline; }
