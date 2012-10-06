@@ -13,7 +13,7 @@ import lpbm.datas.authors
 import lpbm.datas.configmodel as cm_module
 import lpbm.logging
 import lpbm.module_loader
-import lpbm.path
+import lpbm.tools
 
 class Authors(lpbm.module_loader.Module):
     '''
@@ -46,7 +46,7 @@ class Authors(lpbm.module_loader.Module):
                            help='Helper to delete an author.')
 
     def load(self, modules, args):
-        filename = lpbm.path.join(args.exec_path, 'authors.cfg')
+        filename = lpbm.tools.join(args.exec_path, 'authors.cfg')
         self.cm = cm_module.ConfigModel(filename)
 
         # Now loads all authors.

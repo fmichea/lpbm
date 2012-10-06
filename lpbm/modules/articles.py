@@ -14,7 +14,7 @@ import sys
 import lpbm.datas.articles
 import lpbm.logging
 import lpbm.module_loader
-import lpbm.path
+import lpbm.tools
 
 _LOGGER = lpbm.logging.get()
 
@@ -52,7 +52,7 @@ class Articles(lpbm.module_loader.Module):
 
     def load(self, modules, args):
         self.articles, f = dict(), lambda a: a.endswith('.markdown')
-        for f in lpbm.path.filter_files(f, self.args.exec_path, 'articles'):
+        for f in lpbm.tools.filter_files(f, self.args.exec_path, 'articles'):
             art = lpbm.datas.articles.Article(f)
             self.articles[art.id] = art
 
@@ -123,7 +123,7 @@ class Articles(lpbm.module_loader.Module):
         particular file.
         '''
         # First we check that file doesn't exist.
-        path = lpbm.path.join(
+        path = lpbm.tools.join(
             self.args.exec_path, 'articles', '{}.markdown'.format(filename)
         )
         if os.path.exists(path):
