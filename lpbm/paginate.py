@@ -24,16 +24,16 @@ class Paginate(object):
 
     def left_stone(self, nb):
         nb -= 1
-        return max(
+        return min(
             max(0, nb - lpbm.constants.WIDTH_PAGINATE / 2),
-            self.pages - lpbm.constants.WIDTH_PAGINATE
+            max(0, self.pages - lpbm.constants.WIDTH_PAGINATE)
         )
 
     def right_stone(self, nb):
         nb -= 1
-        return min(
+        return max(
             min(self.pages, nb + lpbm.constants.WIDTH_PAGINATE / 2),
-            lpbm.constants.WIDTH_PAGINATE - 1
+            min(self.pages, lpbm.constants.WIDTH_PAGINATE - 1)
         )
 
     def render(self):
