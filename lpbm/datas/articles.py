@@ -160,6 +160,10 @@ class Article:
         else:
             self._date = value.strftime(_FRMT_DATE_CONF)
 
+    @property
+    def content(self):
+        return self._content
+
     def _config_filename(self):
         '''Returns the filename with config's extension.'''
         return '{filename}.cfg'.format(filename = self._filename)
@@ -173,11 +177,11 @@ class Article:
         slug = self._slug
         if slug is None:
             slug = lpbm.tools.slugify(self.title)
-        return os.path.join('articles', '%d-%s.html' % (self.id, slug))
+        return '%d-%s.html' % (self.id, slug)
 
     def url(self):
         '''The direct link to the article.'''
-        return ('/%s' % self.html_filename())
+        return os.path.join('/', 'articles', self.html_filename())
 
     def publish(self):
         '''

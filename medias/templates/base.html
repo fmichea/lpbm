@@ -2,20 +2,22 @@
 <html lang="{{ lang|default('en') }}">
     <head>
         <meta charset="utf-8">
-        <title>{{ page_title|default('Index') }} - {{ config.title }}</title>
+        <title>{{ page_title|default('Index') }} - {{ config_mod['general.title'] }}</title>
 
+        {#
         {% for css_file in stylesheet_mgr.stylesheets %}
         <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
         {% endfor %}
+        #}
 
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ config.url|default('/') }}rssfeed.xml" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ config_mod.url|default('/') }}rssfeed.xml" />
     </head>
     <body>
 
 <div id="header">
-    <a href="/"><h1>{{ config.title }}</h1></a>
-    {% if config.subtitle %}
-    <h2>{{ config.subtitle }}</h2>
+    <a href="/"><h1>{{ config_mod['general.title'] }}</h1></a>
+    {% if config_mod['general.subtitle'] %}
+    <h2>{{ config_mod['general.subtitle'] }}</h2>
     {% endif %}
 </div>
 
@@ -29,11 +31,10 @@
         {# Displays a list of the categories in the menu. #}
         <li><div id="categories"><strong>Categories</strong>
             <ul>
-                {% set categories=category_mgr %}
-                {% for cat in categories recursive %}
+                {% for cat, children in categories_mod.recursive_view().values()|sorted recursive %}
                 <li><a href="{{ cat.url }}">{{ cat.name }}</a>
-                    {% if cat.sub %}
-                    <ul>{{ loop(cat.sub.values()) }}</ul>
+                    {% if children %}
+                    <ul>{{ loop(children.values()|sorted) }}</ul>
                     {% endif %}
                 </li>
                 {% endfor %}
@@ -43,7 +44,7 @@
         {# Displays a list of the authors in the menu. #}
         <li><div id="authors"><strong>Authors</strong>
             <ul>
-                {% for author in author_mgr|list %}
+                {% for author in authors_mod.authors.values()|sorted %}
                 <li>{% include "authors/link.html" %}</li>
                 {% endfor %}
             </ul>
@@ -60,8 +61,8 @@
 </div>
 
 <p id="footer">
-    {{ config.footer }} {% if config.footer %}&mdash;{% endif %} <a href="{{ config.url|default('/') }}rssfeed.xml">RSS Feed</a>
+    {% if config_mod['general.footer'] %}{{ config_mod['general.footer'] }} &mdash;{% endif %}
+    <a href="{{ config_mod['general.footer']|default('/') }}rssfeed.xml">RSS Feed</a>
 </p>
-
     </body>
 </html>

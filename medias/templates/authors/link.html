@@ -1,1 +1,5 @@
-<a href="mailto:{{ author.email }}">{{ author.name }}</a>
+{% if author.email %}
+<a href="mailto:{{ author.email }}">{{ author.full_name() }}</a>
+{% else %}
+{{ author.full_name() }}
+{% endif %}

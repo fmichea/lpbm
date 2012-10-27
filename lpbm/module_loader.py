@@ -25,7 +25,7 @@ class Module(metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.parser, self.modules, self.args = None, None, None
-        self.needed_modules = None
+        self.needed_modules, self.module_loaded = None, False
 
     def module_init(self, argument_parser):
         """
@@ -46,12 +46,18 @@ class Module(metaclass=abc.ABCMeta):
         calls the process function overriden by you. Configuration is always
         loaded.
         """
-        modules['config'].load(modules, args)
+        modules['config'].module_load(modules, args)
         for mod in self.needed_modules:
-            modules[mod].load(modules, args)
+            modules[mod].module_load(modules, args)
         self.modules, self.args = modules, args
-        self.load(modules, args)
+        self.module_load(modules, args)
         self.process(modules, args)
+
+    def module_load(self, modules, args):
+        if self.module_loaded:
+            return
+        self.module_loaded, self.args = True, args
+        self.load(modules, args)
 
     @abc.abstractmethod
     def init(self):

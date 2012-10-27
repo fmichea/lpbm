@@ -21,7 +21,7 @@ class Category:
 
     def __init__(self, manager, id):
         self.manager, self.id, self.cm = manager, int(id), manager.cm
-        self._full_name, self._level = None, None
+        self._full_path, self._level = None, None
 
     def __lt__(self, other):
         return (self.full_name() < other.full_name())
@@ -43,16 +43,18 @@ class Category:
         if self.parent == -1:
             self.parent = None
 
+    def full_path(self):
+        if self._full_path is not None:
+            return self._full_path
+        self._full_path = []
+        if self.parent is not None:
+            self._full_path.extend(self.manager.categories[self.parent].full_path())
+        self._full_path.append(self)
+        return self._full_path
+
     def full_name(self):
         '''This represent the path to the category, including parent's names.'''
-        if self._full_name is not None:
-            return self._full_name
-        parent_fn = ''
-        if self.parent is not None:
-            parent_fn = self.manager.categories[self.parent].full_name() + ' > '
-        return '{parent_fn}{name}'.format(
-            parent_fn = parent_fn, name = self.name,
-        )
+        return ' > '.join(it.name for it in self.full_path())
 
     def level(self):
         '''The level of the category (number of its parents).'''

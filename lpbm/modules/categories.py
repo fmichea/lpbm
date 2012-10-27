@@ -70,6 +70,22 @@ class Categories(lpbm.module_loader.Module):
             self.delete_category(args.id)
 
     # Manipulation function
+    def recursive_view(self):
+        res, cats, level = dict(), dict(self.categories), 0
+        while cats:
+            _to_delete = []
+            for cat in cats.values():
+                if cat.level() == level:
+                    _parent_res = res
+                    for parent in cat.full_path()[:-1]:
+                        _parent_res = _parent_res[parent.name][1]
+                    _parent_res[cat.name] = (cat, dict())
+                    _to_delete.append(cat.id)
+            for it in _to_delete:
+                del cats[it]
+            level += 1
+        return res
+
     def _get_category(self, id):
         '''
         Gets a category by its id, or displays an error and exits if it doesn't

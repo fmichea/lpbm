@@ -56,7 +56,7 @@ class ConfigOptionDescriptor:
         else:
             cfg.set(section, self._option, str(val))
 
-    def __get__(self, instance):
+    def __get__(self, instance, type=None):
         try:
             getter, cfg = self._getter_function(), instance.cm.config
         except AttributeError:

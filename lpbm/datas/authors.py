@@ -28,6 +28,12 @@ class Author:
         return (self.last_name < other.last_name or
                 self.first_name < other.first_name)
 
+    def full_name(self):
+        if self.last_name:
+            return '{} {}'.format(self.first_name, self.last_name)
+        else:
+            return self.first_name
+
     def interactive(self):
         '''Interactively prompts the user for fields of the model.'''
         self.first_name = ltools.input_default('First name', self.first_name)

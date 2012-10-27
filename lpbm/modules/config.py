@@ -66,14 +66,14 @@ class Config(lpbm.module_loader.Module):
         elif args.unset: # We want to unset some variable.
             self.unset_var(args.unset)
         try:
-            with open(os.path.join(args.exec_path, 'config'), 'w') as f:
+            with open(os.path.join(args.exec_path, 'lpbm.cfg'), 'w') as f:
                 self.config.write(f)
         except IOError:
             pass
 
     def load(self, modules, args):
         self.config = configparser.ConfigParser()
-        self.config.read(os.path.join(args.exec_path, 'config'))
+        self.config.read(os.path.join(args.exec_path, 'lpbm.cfg'))
 
         # Getting logging related configurations
         logging_conf = dict()
@@ -86,6 +86,14 @@ class Config(lpbm.module_loader.Module):
         if args.debug:
             logging_conf.update({'logging-std': {'level': 'DEBUG'}})
         lpbm.logging.configure(logging_conf)
+
+    # Acces to the configuration safely.
+    def __getitem__(self, name):
+        try:
+            section, option = name.split('.')
+        except ValueError:
+            return None
+        return self.config.get(section, option, fallback=None)
 
     # Particular functions for configuration.
     # pylint: disable=R0201
@@ -101,10 +109,10 @@ class Config(lpbm.module_loader.Module):
             ))
             for option in sorted(options.keys()):
                 required, desc = options[option]
-                print('  ' + '+' * 70)
-                print('  + Option: {}'.format(option))
-                print('  + Required: {}'.format(required))
-                print('  + Description: {}'.format(desc))
+                print('  +' + '-' * 69)
+                print('  | Option: {}'.format(option))
+                print('  | Required: {}'.format(required))
+                print('  | Description: {}'.format(desc))
             print('')
 
     def check_options(self):
@@ -113,37 +121,34 @@ class Config(lpbm.module_loader.Module):
         in the configuration file that wasn't detected (to warn for typos
         etc...).
         """
-        tmp_file = dict()
-        for section in self.config.sections():
-            tmp_file[section] = list(self.config[section])
+        unknown_sections = dict()
 
         print('Checking of all the options available:')
-        for section in _CONFIGURATION.keys():
-            required, options = _CONFIGURATION[section]
-            if section in tmp_file:
+        for section, (required, options) in sorted(_CONFIGURATION.items()):
+            if self.config.has_section(section):
                 print(' + Checking section {}'.format(section))
-                for option in options:
-                    required, _ = options[option]
-                    try:
-                        idx = tmp_file[section].index(option)
+                for option, (required, _) in sorted(options.items()):
+                    if self.config.has_option(section, option):
                         print('  + Option `{}` was found.'.format(option))
-                        del tmp_file[section][idx]
-                    except (ValueError, KeyError):
+                    elif required:
                         _msg = '  ! Option `{}` is required and wasn\'t found.'
-                        if required:
-                            print(_msg.format(option))
-                if tmp_file[section] == []:
-                    del tmp_file[section]
+                        print(_msg.format(option))
+                unknown = list(set(self.config.options(section)) - set(options))
+                if unknown:
+                    unknown_sections[section] = unknown
             elif required:
-                if required:
-                    _msg = ' ! Section `{}` is required and wasn\'t found.'
-                    print(_msg.format(section))
+                _msg = ' ! Section `{}` is required and wasn\'t found.'
+                print(_msg.format(section))
 
-        if tmp_file != dict():
+        unknown = list(set(self.config.sections()) - set(_CONFIGURATION))
+        for section in unknown:
+            unknown_sections[section] = self.config.options(section)
+
+        if unknown_sections:
             print('\nThese options are defined but not known:')
-            for section in tmp_file.keys():
+            for section, options in sorted(unknown_sections.items()):
                 print(' - Section `{}`.'.format(section))
-                for option in tmp_file[section]:
+                for option in sorted(options):
                     print('  - Option `{}`.'.format(option))
 
     def set_var(self, var):
@@ -167,7 +172,9 @@ class Config(lpbm.module_loader.Module):
             print('You can\'t set value to empty. Use --unset instead.',
                   file=sys.stderr)
             return
-        self.config[section_name][var_name] = value
+        if not self.config.has_section(section_name):
+            self.config.add_section(section_name)
+        self.config.set(section_name, var_name, value)
 
     def unset_var(self, var):
         """
