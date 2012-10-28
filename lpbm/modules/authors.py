@@ -48,7 +48,7 @@ class Authors(lpbm.module_loader.Module):
                            help='Helper to delete an author.')
 
     def load(self, modules, args):
-        filename = os.path.join(args.exec_path, 'authors.cfg')
+        filename = ltools.join(args.exec_path, 'authors.cfg')
         self.cm = cm_module.ConfigModel(filename)
 
         # Now loads all authors.

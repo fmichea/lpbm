@@ -55,8 +55,8 @@ class Articles(lpbm.module_loader.Module):
 
     def load(self, modules, args):
         self.articles, f = dict(), lambda a: a.endswith('.markdown')
-        for f in lpbm.tools.filter_files(f, self.args.exec_path, 'articles'):
-            art = lpbm.datas.articles.Article(f)
+        for root, filename in lpbm.tools.filter_files(f, self.args.exec_path, 'articles'):
+            art = lpbm.datas.articles.Article(ltools.join(root, filename))
             self.articles[art.id] = art
 
     def process(self, modules, args):
@@ -135,7 +135,7 @@ class Articles(lpbm.module_loader.Module):
         particular file.
         '''
         # First we check that file doesn't exist.
-        path = os.path.join(
+        path = ltool.join(
             self.args.exec_path, 'articles', '{}.markdown'.format(filename)
         )
         if os.path.exists(path):

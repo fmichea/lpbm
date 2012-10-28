@@ -6,18 +6,20 @@ import codecs
 import jinja2
 import markdown
 import os
+import shutil
 import tempfile
 
 import lpbm.module_loader
 import lpbm.tools as ltools
 
 _ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    lpbm.tools.join('medias', 'templates')
+    ltools.join(ltools.ROOT, 'medias', 'templates')
 ))
 
 def _get_template(*args):
     return _ENV.get_template(os.path.join(*args))
 
+# Miscenalleous filters for jinja2
 def do_markdown(value, code=False):
     if not code:
         return markdown.markdown(value)
@@ -75,13 +77,18 @@ class Render(lpbm.module_loader.Module):
         })
 
     def process(self, modules, args):
+        # Last update of environment before beginning of page generation,
+        _ENV.globals.update({
+            'static_files':  self.copy_static_files(),
+        })
+
         if args.articles or args.all:
             self.render_articles()
 
     # Functions for internal use.
     def _build_path(self, *args):
-        lpbm.tools.mkdir_p(os.path.join(self.build_dir, *(args[:-1])))
-        return os.path.join(self.build_dir, *args)
+        lpbm.tools.mkdir_p(ltools.join(self.build_dir, *(args[:-1])))
+        return ltools.join(self.build_dir, *args)
 
     def render_articles(self, draft=False):
         template = _get_template('articles', 'base.html')
@@ -94,3 +101,21 @@ class Render(lpbm.module_loader.Module):
                 f.write(template.render({
                     'articles': [article],
                 }))
+
+    def _copy_static_dir(self, statics, fltr, *subdirs):
+        out_root = self._build_path(*subdirs)
+        def sub(root):
+            res = []
+            for root, filename in ltools.filter_files(fltr, root, *subdirs):
+                res.append(ltools.join('/', *(subdirs + (filename,))))
+                ltools.copy(ltools.join(root, filename),
+                            ltools.join(out_root, filename))
+            return res
+        statics.extend(sub(ltools.ROOT))
+        statics.extend(sub(self.args.exec_path))
+
+    def copy_static_files(self):
+        static_files = {'css': []}
+        self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'),
+                              'medias', 'css')
+        return static_files

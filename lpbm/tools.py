@@ -12,20 +12,20 @@ import sys
 # pylint: disable=W0402
 import string
 
-_ROOT = os.path.join(os.path.dirname(__file__), '..')
+ROOT = os.path.join(os.path.dirname(__file__), '..')
 
 def join(*args):
     '''Joins a some paths with ROOT as base path.'''
-    return os.path.realpath(os.path.join(_ROOT, *args))
+    return os.path.realpath(os.path.join(*args))
 
 def filter_files(filter_fun, *path):
     '''Yields every filenames that match filter_fun in directories.'''
-    root = os.path.join(*path)
-    for root, directories, files in os.walk(root):
+    root = join(*path)
+    root_len = len(root)
+    for subroot, directories, files in os.walk(root):
         for filename in files:
-            filepath = os.path.join(root, filename)
-            if filter_fun(filepath):
-                yield filepath
+            if filter_fun(filename):
+                yield (root, os.path.join(subroot[root_len:], filename))
 
 def mkdir_p(path):
     '''
@@ -39,6 +39,7 @@ def mkdir_p(path):
 
 def copy(src, dst):
     '''Copies the file from src to dst.'''
+    mkdir_p(os.path.dirname(dst))
     shutil.copyfile(src, dst)
 
 _SLUG_CHARS = string.ascii_lowercase + string.digits + '-'

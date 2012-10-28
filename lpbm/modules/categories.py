@@ -12,7 +12,7 @@ import sys
 import lpbm.datas.categories as cd_module
 import lpbm.datas.configmodel as cm_module
 import lpbm.module_loader
-import lpbm.tools
+import lpbm.tools as ltools
 
 class Categories(lpbm.module_loader.Module):
     '''
@@ -46,7 +46,7 @@ class Categories(lpbm.module_loader.Module):
                            help='Delete a category and all its children.')
 
     def load(self, modules, args):
-        filename = lpbm.tools.join(args.exec_path, 'categories.cfg')
+        filename = ltools.join(args.exec_path, 'categories.cfg')
         self.cm = cm_module.ConfigModel(filename)
 
         # Now we load all the categories.
@@ -146,7 +146,7 @@ class Categories(lpbm.module_loader.Module):
                 name = cat.name,
                 level = '  ' * (cat.level() - categories[id].level())
             ))
-        if lpbm.tools.ask_sure():
+        if ltools.ask_sure():
             for cat in categories.values():
                 self.cm.config.remove_section(str(cat.id))
             self.cm.save()

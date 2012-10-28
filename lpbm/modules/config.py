@@ -8,11 +8,11 @@ have to change the file by hand.
 '''
 
 import configparser
-import os
 import sys
 
 import lpbm.logging
 import lpbm.module_loader
+import lpbm.tools as ltools
 
 _CONFIGURATION = {
     # 'sectionName': (Required, {
@@ -66,14 +66,14 @@ class Config(lpbm.module_loader.Module):
         elif args.unset: # We want to unset some variable.
             self.unset_var(args.unset)
         try:
-            with open(os.path.join(args.exec_path, 'lpbm.cfg'), 'w') as f:
+            with open(ltools.join(args.exec_path, 'lpbm.cfg'), 'w') as f:
                 self.config.write(f)
         except IOError:
             pass
 
     def load(self, modules, args):
         self.config = configparser.ConfigParser()
-        self.config.read(os.path.join(args.exec_path, 'lpbm.cfg'))
+        self.config.read(ltools.join(args.exec_path, 'lpbm.cfg'))
 
         # Getting logging related configurations
         logging_conf = dict()
