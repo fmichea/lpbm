@@ -12,9 +12,10 @@ import subprocess
 import sys
 
 import lpbm.datas.articles
+import lpbm.exceptions
 import lpbm.logging
 import lpbm.module_loader
-import lpbm.tools
+import lpbm.tools as ltools
 
 _LOGGER = lpbm.logging.get()
 
@@ -29,6 +30,8 @@ class Articles(lpbm.module_loader.Module):
     def abstract(self): return 'Loads, manipulates and renders articles.'
 
     def init(self):
+        self.needed_modules = ['authors']
+
         self.parser.add_argument('-i', '--id', action='store', type=int,
                                  metavar='id', default=None,
                                  help='Selects an article for several options.')
@@ -36,7 +39,7 @@ class Articles(lpbm.module_loader.Module):
         group = self.parser.add_argument_group(title='general actions')
         group.add_argument('-n', '--new', action='store', metavar='filename',
                            help='Help create a new draft. ' + \
-                                '(path/to/articles/ARGUMENT.markdown)')
+                                '(blog_sources/articles/ARGUMENT.markdown)')
         group.add_argument('-l', '--list', action='store_true',
                            help='List all the articles.')
 
@@ -74,14 +77,23 @@ class Articles(lpbm.module_loader.Module):
             self.edit_article(args.id)
 
     # Manipulation function
-    def _get_article(self, id):
+    def __getitem__(self, id):
         '''
         This litle helper finds an article by it's id or exits with an error.
         '''
         try:
-            return self.articles[id]
+            return self.articles[int(id)]
         except KeyError:
-            sys.exit('This article doesn\'t exist.')
+            sys.exit('This article doesn\'t exist. (id = {})'.format(id))
+
+    def _get_author_verbose(self, authors):
+        res = []
+        for idx in authors:
+            try:
+                res.append(self.modules['authors'][idx].nickname)
+            except lpbm.exceptions.NoSuchAuthorError:
+                pass
+        return ltools.join_names(res)
 
     # Particular functions for command line.
     def list_articles(self):
@@ -91,7 +103,7 @@ class Articles(lpbm.module_loader.Module):
         for article in self.articles.values():
             print(' {id:2d} + "{title}" by {authors} [{published}]'.format(
                 id = article.id, title = article.title,
-                authors = article.authors_list(),
+                authors = self._get_author_verbose(article.authors),
                 published = 'published' if article.published else 'draft',
             ))
             count += 1
@@ -103,12 +115,12 @@ class Articles(lpbm.module_loader.Module):
 
     def publish_article(self, id):
         '''Publish an article.'''
-        article = self._get_article(id)
+        article = self[id]
         article.publish()
         article.save()
         print('Article "{title}" by {authors} was published.'.format(
             title = article.title,
-            authors = article.authors_list(),
+            authors = self._get_author_verbose(article.authors),
         ))
 
     def preview_article(self, id):
@@ -123,7 +135,7 @@ class Articles(lpbm.module_loader.Module):
         particular file.
         '''
         # First we check that file doesn't exist.
-        path = lpbm.tools.join(
+        path = os.path.join(
             self.args.exec_path, 'articles', '{}.markdown'.format(filename)
         )
         if os.path.exists(path):
@@ -147,7 +159,12 @@ class Articles(lpbm.module_loader.Module):
 
         # Then we want a title.
         title = input('Please enter a title: ')
-        authors = input('Please list authors (comma separated): ')
+        self.modules['authors'].list_authors(short=True)
+        authors = ltools.input_default('Please list authors (comma separated)',
+                                       None, required=True,
+                                       is_valid=self.modules['authors'].is_valid)
+
+        # Actually creating the article.
         article = lpbm.datas.articles.Article(path)
         article.id = id
         article.title = title
@@ -165,7 +182,7 @@ class Articles(lpbm.module_loader.Module):
 
     def edit_article(self, id):
         '''Opens editor to modify its content.'''
-        article = self._get_article(id)
+        article = self[id]
         subprocess.call('{editor} "{filename}"'.format(
             editor = os.environ.get('EDITOR', 'vim'),
             filename = article.path,

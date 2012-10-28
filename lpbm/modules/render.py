@@ -29,12 +29,11 @@ def do_sorted(value):
 def do_authors_list(value, mod):
     res, template = [], _get_template('authors', 'link.html')
     for author_id in value:
-        res.append(template.render({'author': mod.authors[author_id]}))
-    if 1 < len(res):
-        return ', '.join(sorted(res[:-1])) + ' and ' + res[-1]
-    elif len(res) == 0:
-        return '[no author]'
-    return res[0]
+        try:
+            res.append(template.render({'author': mod[author_id]}))
+        except lpbm.exceptions.NoSuchAuthorError:
+            pass
+    return ltools.join_names(res)
 
 class Render(lpbm.module_loader.Module):
     def name(self): return 'render'

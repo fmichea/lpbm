@@ -36,7 +36,8 @@ class Author:
 
     def interactive(self):
         '''Interactively prompts the user for fields of the model.'''
-        self.first_name = ltools.input_default('First name', self.first_name)
+        self.nickname = ltools.input_default('Nickname', self.nickname, required=True)
+        self.first_name = ltools.input_default('First name', self.first_name, required=True)
         self.last_name = ltools.input_default('Last name', self.last_name)
         self.email = ltools.input_default('Email', self.email)
 

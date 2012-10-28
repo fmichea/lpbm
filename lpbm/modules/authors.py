@@ -7,13 +7,15 @@ Author manager, getting authors configuration in blog sources and loading all
 the authors.
 '''
 
+import os
 import sys
 
 import lpbm.datas.authors
 import lpbm.datas.configmodel as cm_module
+import lpbm.exceptions
 import lpbm.logging
 import lpbm.module_loader
-import lpbm.tools
+import lpbm.tools as ltools
 
 class Authors(lpbm.module_loader.Module):
     '''
@@ -29,49 +31,71 @@ class Authors(lpbm.module_loader.Module):
         self.authors = dict()
 
         self.parser.add_argument('-i', '--id', action='store',
-                                 metavar='nickname', help='Selects an author.')
+                                 metavar='id', help='Selects an author.')
 
         group = self.parser.add_argument_group(title='general actions')
         group.add_argument('-l', '--list', action='store_true',
                            help='List the nicknames.')
+        group.add_argument('-n', '--new', action='store_true',
+                           help='Helper to add a new author.')
 
         group = self.parser.add_argument_group(
             title='specific actions (need --id)'
         )
-        group.add_argument('-n', '--new', action='store_true',
-                           help='Helper to add a new author.')
         group.add_argument('-e', '--edit', action='store_true',
                            help='Helper to edit an author.')
         group.add_argument('-d', '--delete', action='store_true',
                            help='Helper to delete an author.')
 
     def load(self, modules, args):
-        filename = lpbm.tools.join(args.exec_path, 'authors.cfg')
+        filename = os.path.join(args.exec_path, 'authors.cfg')
         self.cm = cm_module.ConfigModel(filename)
 
         # Now loads all authors.
         for section in self.cm.config.sections():
-            self.authors[section] = lpbm.datas.authors.Author(section, self.cm)
+             author = lpbm.datas.authors.Author(section, self.cm)
+             self.authors[author.id] = author
 
     def process(self, modules, args):
         if args.list:
             self.list_authors()
             return
+        elif args.new:
+            self.new_author()
+            return
 
         # Following options need --id precised to work.
         if args.id is None:
             self.parser.error('This action needs --id option.')
-        elif args.new:
-            self.new_author(args.id)
         elif args.edit:
             self.edit_author(args.id)
         elif args.delete:
             self.delete_author(args.id)
 
+    # Random module functions internal to lpbm
+    def __getitem__(self, idx):
+        try:
+            return self.authors[int(idx)]
+        except KeyError:
+            raise lpbm.exceptions.NoSuchAuthorError(idx)
+
+    def is_valid(self, authors):
+        authors = ltools.split_on_comma(authors)
+        try:
+            authors = [int(idx) for idx in authors]
+        except ValueError:
+            return False
+        for author in authors:
+            if author not in self.authors:
+                print('Author id {} is invalid!'.format(author))
+                return False
+        return True
+
     # Particular functions requested on command line.
-    def list_authors(self):
+    def list_authors(self, short=False):
         '''This function lists all the authors of the blog.'''
-        print('All authors:')
+        if not short:
+            print('All authors:')
         if self.authors:
             for _, author in sorted(self.authors.items()):
                 email = ' [{}]'.format(author.email) if author.email else ''
@@ -85,28 +109,23 @@ class Authors(lpbm.module_loader.Module):
         else:
             print(' + There is no author.')
 
-    def new_author(self, nickname):
+    def new_author(self):
         '''Interactively create an author.'''
-        if self.cm.config.has_section(nickname):
-            sys.exit('This nickname is already used!')
-        author = lpbm.datas.authors.Author(nickname, self.cm)
+        author = lpbm.datas.authors.Author(None, self.cm)
+        author.interactive()
         try:
-            author.id = max([aut.id for aut in self.authors.values()]) + 1
+            author.id = max(self.authors) + 1
         except ValueError:
             author.id = 0
-        author.interactive()
         self.cm.save()
 
-    def edit_author(self, nickname):
+    def edit_author(self, id):
         '''Interactively edit and existing author.'''
-        if nickname not in self.authors.keys():
-            sys.exit('Unknown author nickname!')
-        self.authors[nickname].interactive()
+        self[id].interactive()
         self.cm.save()
 
-    def delete_author(self, nickname):
+    def delete_author(self, id):
         '''Deletes an author from authors list.'''
-        if nickname not in self.authors.keys():
-            sys.exit('Unknown author nickname!')
-        self.cm.config.remove_section(nickname)
+        author = self[id]
+        self.cm.config.remove_section(author.nickname)
         self.cm.save()

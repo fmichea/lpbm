@@ -5,6 +5,7 @@
 '''This module provides some tools needed almost everywhere in the code.'''
 
 import os
+import re
 import shutil
 import sys
 
@@ -17,9 +18,9 @@ def join(*args):
     '''Joins a some paths with ROOT as base path.'''
     return os.path.realpath(os.path.join(_ROOT, *args))
 
-def filter_files(filter_fun, *directories):
+def filter_files(filter_fun, *path):
     '''Yields every filenames that match filter_fun in directories.'''
-    root = os.path.join(_ROOT, *directories)
+    root = os.path.join(*path)
     for root, directories, files in os.walk(root):
         for filename in files:
             filepath = os.path.join(root, filename)
@@ -81,3 +82,22 @@ def ask_sure(default=False):
     except (KeyboardInterrupt, EOFError):
         sys.exit('')
     return (not sure and default) or (sure.lower() in ['y', 'yes'])
+
+def join_names(names):
+    '''
+    Returns a well formated list of names, ready for printing.
+
+    Examples:
+      - Trevor Reznik
+      - Teddy and Leonard
+      - Rita, Astor, Cody and Dexter
+    '''
+    if 1 < len(names):
+        return ', '.join(sorted(names[:-1])) + ' and ' + names[-1]
+    elif len(names) == 0:
+        return '[deleted]'
+    return names[0]
+
+def split_on_comma(authors):
+    '''Splits a string on commas and retrusn a set of the values.'''
+    return (set(re.split(',[ \t]*', authors)) - set(['']))

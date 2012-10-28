@@ -7,10 +7,9 @@
 import codecs
 import datetime
 import os
-import re
 
 import lpbm.datas.configmodel as cm_module
-import lpbm.tools
+import lpbm.tools as ltools
 
 class ArticleSameIdError(Exception):
     '''Exception raised when two articles are found with the same id.'''
@@ -95,35 +94,19 @@ class Article:
         '''Returns the list of authors.'''
         return list(self._authors_set)
 
-    def authors_list(self):
-        '''
-        Returns a well formated list of authors, ready for printing.
-
-        Examples:
-          - Trevor Reznik
-          - Teddy and Leonard
-          - Rita, Astor, Cody and Dexter
-        '''
-        authors = list(self._authors_set)
-        if 1 < len(authors):
-            return ', '.join(authors[:-1]) + ' and ' + authors[-1]
-        elif len(authors) == 0:
-            return '[no author]'
-        return authors[0]
-
     def add_authors(self, authors):
         '''
         Takes a string of comma-separated authors and adds them to authors of
         the article.
         '''
-        self._authors_set |= _split_authors_string(authors)
+        self._authors_set |= ltools.split_on_comma(authors)
 
     def remove_authors(self, authors):
         '''
         Takes a string of comma-separated authors and removes them from authors
         list for the article.
         '''
-        self._authors_set -= _split_authors_string(authors)
+        self._authors_set -= ltools.split_on_comma(authors)
 
     @property
     def slug(self):
@@ -142,7 +125,7 @@ class Article:
         if value is None:
             self._slug = None
         else:
-            self._slug = lpbm.tools.slugify(value)
+            self._slug = ltools.slugify(value)
 
     @property
     def date(self):
@@ -176,7 +159,7 @@ class Article:
         '''Returns the filename of the HTML file for that article.'''
         slug = self._slug
         if slug is None:
-            slug = lpbm.tools.slugify(self.title)
+            slug = ltools.slugify(self.title)
         return '%d-%s.html' % (self.id, slug)
 
     def url(self):
@@ -189,8 +172,3 @@ class Article:
         '''
         self.published = True
         self.date = datetime.datetime.now()
-
-
-def _split_authors_string(authors):
-    '''Splits a string on commas and retrusn a set of the values.'''
-    return (set(re.split(',[ \t]*', authors)) - set(['']))
