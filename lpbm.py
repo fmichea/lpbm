@@ -30,7 +30,7 @@ def main():
     )
     parser.add_argument('-d', '--debug', action='store_true', default=False,
                         help='Prints debug information.')
-    parser.add_argument('-p', '--exec-path', action='store', default='./sources',
+    parser.add_argument('-p', '--exec-path', action='store', default='.',
                         help='Path where LPBM will search the blog. ' + \
                              '(default: %(default)s)')
     subparser = parser.add_subparsers()
