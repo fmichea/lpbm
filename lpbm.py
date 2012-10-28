@@ -11,7 +11,9 @@ details.
 '''
 
 import argparse
+import pdb
 import sys
+import traceback
 
 # pylint: disable=E0611
 import lpbm.logging
@@ -33,6 +35,8 @@ def main():
     parser.add_argument('-p', '--exec-path', action='store', default='.',
                         help='Path where LPBM will search the blog. ' + \
                              '(default: %(default)s)')
+    parser.add_argument('-P', '--pdb', action='store_true', default=False,
+                        help='Starts pdb debugger on exception.')
     subparser = parser.add_subparsers()
 
     # Tools are loaded dynamically, so argument parser isn't complete.
@@ -42,7 +46,14 @@ def main():
     # Every command , we can parse command line.
     args = parser.parse_args(sys.argv[1:])
 
-    args.func(_MODULES, args)
+    try:
+        args.func(_MODULES, args)
+    except Exception as err:
+        if args.pdb:
+            traceback.print_exc()
+            pdb.post_mortem(sys.exc_info()[2])
+        else:
+            sys.exit('ERROR: ' + str(err))
 
 if __name__ == '__main__':
     main()
