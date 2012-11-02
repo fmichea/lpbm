@@ -8,6 +8,7 @@ have to change the file by hand.
 '''
 
 import configparser
+import os
 import sys
 
 import lpbm.logging
@@ -72,8 +73,14 @@ class Config(lpbm.module_loader.Module):
             pass
 
     def load(self, modules, args):
+        config_path = ltools.join(args.exec_path, 'lpbm.cfg')
+
+        if not os.path.exists(config_path):
+            sys.exit('This execution path ({}) doesn\'t look like an LPBM'
+                     ' blog.'.format(args.exec_path))
+
         self.config = configparser.ConfigParser()
-        self.config.read(ltools.join(args.exec_path, 'lpbm.cfg'))
+        self.config.read(config_path)
 
         # Getting logging related configurations
         logging_conf = dict()
