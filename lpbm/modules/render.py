@@ -7,6 +7,7 @@ import codecs
 import datetime
 import jinja2
 import markdown
+import math
 import os
 import sys
 import tempfile
@@ -93,6 +94,7 @@ class Render(lpbm.module_loader.Module):
 
         self.render_articles()
         self.render_index()
+        self.render_pages()
         self.render_rss()
 
         # If full rendering completed (we are still alive), then we copy the
@@ -159,6 +161,29 @@ class Render(lpbm.module_loader.Module):
                 'show_more': limit < len(self._get_articles()),
                 'articles': articles,
             }))
+
+    def render_pages(self):
+        articles = self._get_articles()
+        app = self.modules['config']['paginate.nb_articles'] or 5
+        pages = int(math.ceil(len(articles) / float(app)))
+        pwidth = self.modules['config']['paginate.width'] or 5
+        def left_stone(page):
+            return min(max(0, page - pwidth / 2), max(0, pages - pwidth))
+        def right_stone(page):
+            return max(min(pages, page + pwidth / 2), min(pages, pwidth - 1))
+        template = _get_template('articles', 'base.html')
+        display_pages = range(1, pages + 1)
+        for page in range(pages):
+            display_page = page + 1
+            tmp = 'page-{}.html'.format(display_page)
+            with codecs.open(self._build_path('pages', tmp), 'w', 'utf-8') as f:
+                f.write(template.render({
+                    'articles': articles[page * app: (page + 1) * app],
+                    'cur_page': display_page,
+                    'last_page': pages,
+                    'pages': display_pages[left_stone(page):right_stone(page)],
+                    'paginate': True,
+                }))
 
     def render_rss(self):
         def rss_item(article):
