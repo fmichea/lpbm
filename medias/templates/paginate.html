@@ -19,4 +19,10 @@
     </ul>
     <div class="cleaner"></div>
 </li>
-{% endif %}
+{% else %}{% if show_more %}
+<li class="paginate">
+    <ul>
+        <li><a href="/pages/page-2.html">More &raquo;</a></li>
+    </ul>
+</li>
+{% endif %}{% endif %}

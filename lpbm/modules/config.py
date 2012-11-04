@@ -25,6 +25,9 @@ _CONFIGURATION = {
         'subtitle': (False, 'Sub-title of the blog.'),
         'footer': (False, 'Footer of the blog. (default: RSS link).'),
     }),
+    'paginate': (False, {
+        'nb_articles': (False, 'Number of articles per page. (default: 5).'),
+    }),
     'rss': (False, {
         'nb_articles': (False, 'Number of articles in RSS Feed. (default: 10).'),
     }),

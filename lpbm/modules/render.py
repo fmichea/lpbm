@@ -22,7 +22,7 @@ def _get_template(*args):
     return _ENV.get_template(os.path.join(*args))
 
 # Miscenalleous filters for jinja2
-def do_markdown(value, code=False):
+def do_markdown(value, code=True):
     if not code:
         return markdown.markdown(value)
     return markdown.markdown(value, ['codehilite(force_linenos=True)'])
@@ -46,12 +46,14 @@ class Render(lpbm.module_loader.Module):
     def init(self):
         self.needed_modules = ['authors', 'articles', 'categories']
 
-        self.parser.add_argument('--articles', action='store_true',
-                                 help='Renders all the articles.')
-        self.parser.add_argument('--rss', action='store_true',
-                                 help='Renders the RSS feed.')
-        self.parser.add_argument('--all', action='store_true',
-                                 help='Renders everything.')
+#        self.parser.add_argument('--all', action='store_true',
+#                                 help='Renders everything.')
+        self.parser.add_argument('--drafts', action='store_true', default=False,
+                                 help='Also renders drafts.')
+#        self.parser.add_argument('--articles', action='store_true',
+#                                 help='Renders all the articles.')
+#        self.parser.add_argument('--rss', action='store_true',
+#                                 help='Renders the RSS feed.')
 
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')
@@ -89,10 +91,9 @@ class Render(lpbm.module_loader.Module):
             'static_files':  self.copy_static_files(),
         })
 
-        if args.articles or args.all:
-            self.render_articles()
-        if args.rss or args.all:
-            self.render_rss()
+        self.render_articles()
+        self.render_index()
+        self.render_rss()
 
         # If full rendering completed (we are still alive), then we copy the
         # temporary directory to the output directory.
@@ -102,6 +103,14 @@ class Render(lpbm.module_loader.Module):
     def _build_path(self, *args):
         lpbm.tools.mkdir_p(ltools.join(self.build_dir, *(args[:-1])))
         return ltools.join(self.build_dir, *args)
+
+    def _get_articles(self, limit=None):
+        articles = sorted(self.modules['articles'].articles.values())
+        articles = [a for a in articles if a.published or self.args.drafts]
+        articles = list(reversed(articles))
+        if limit is not None:
+            articles = articles[:limit]
+        return articles
 
     def _copy_all(self):
         # First big clean up of all the files.
@@ -128,10 +137,10 @@ class Render(lpbm.module_loader.Module):
         return static_files
 
     # Public functions.
-    def render_articles(self, draft=False):
+    def render_articles(self):
         template = _get_template('articles', 'base.html')
         for article in self.modules['articles'].articles.values():
-            if article.published == draft:
+            if not (article.published or self.args.drafts):
                 continue
             path = self._build_path('articles', article.html_filename())
             with codecs.open(path, 'w', 'utf-8') as f:
@@ -140,7 +149,18 @@ class Render(lpbm.module_loader.Module):
                     'articles': [article],
                 }))
 
-    def render_rss(self, draft=False):
+    def render_index(self):
+        template = _get_template('articles', 'base.html')
+        limit = self.modules['config']['paginate.nb_articles'] or 5
+        articles = self._get_articles(limit)
+        with codecs.open(self._build_path('index.html'), 'w', 'utf-8') as f:
+            print('Writing index file.')
+            f.write(template.render({
+                'show_more': limit < len(self._get_articles()),
+                'articles': articles,
+            }))
+
+    def render_rss(self):
         def rss_item(article):
             def rss_aut(author_id):
                 try:
@@ -160,18 +180,17 @@ class Render(lpbm.module_loader.Module):
                 ),
                 author = authors,
                 guid = str(article.id),
-                description = do_markdown(article.content, code=True),
+                description = do_markdown(article.content),
                 pubDate = article.date,
             )
-        articles = sorted(self.modules['articles'].articles.values())
-        articles = [a for a in articles if a.published or draft]
-        articles = articles[-(self.modules['config']['rss.nb_articles'] or 0):]
+        print('Generating RSS file.')
+        articles = self._get_articles(self.modules['config']['rss.nb_articles'] or 10)
         rss = PyRSS2Gen.RSS2(
             title = self.modules['config']['general.title'],
             link = self.modules['config']['general.url'],
             description = self.modules['config']['general.subtitle'],
             lastBuildDate = datetime.datetime.now(),
-            items = [rss_item(a) for a in reversed(articles)],
+            items = [rss_item(a) for a in articles],
         )
         rss_path = ltools.join(self.build_dir, 'rssfeed.xml')
         with codecs.open(rss_path, 'w', 'utf-8') as f:
