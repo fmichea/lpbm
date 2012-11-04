@@ -2,12 +2,14 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
+import PyRSS2Gen
 import codecs
+import datetime
 import jinja2
 import markdown
 import os
-import tempfile
 import sys
+import tempfile
 
 import lpbm.module_loader
 import lpbm.tools as ltools
@@ -89,6 +91,8 @@ class Render(lpbm.module_loader.Module):
 
         if args.articles or args.all:
             self.render_articles()
+        if args.rss or args.all:
+            self.render_rss()
 
         # If full rendering completed (we are still alive), then we copy the
         # temporary directory to the output directory.
@@ -104,18 +108,6 @@ class Render(lpbm.module_loader.Module):
         ltools.empty_directory(self.output_dir)
         ltools.move_content(self.build_dir, self.output_dir)
         os.rmdir(self.build_dir)
-
-    def render_articles(self, draft=False):
-        template = _get_template('articles', 'base.html')
-        for article in self.modules['articles'].articles.values():
-            if article.published == draft:
-                continue
-            path = self._build_path('articles', article.html_filename())
-            with codecs.open(path, 'w', 'utf-8') as f:
-                print('Writing article to', path)
-                f.write(template.render({
-                    'articles': [article],
-                }))
 
     def _copy_static_dir(self, statics, fltr, *subdirs):
         out_root = self._build_path(*subdirs)
@@ -134,3 +126,53 @@ class Render(lpbm.module_loader.Module):
         self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'),
                               'medias', 'css')
         return static_files
+
+    # Public functions.
+    def render_articles(self, draft=False):
+        template = _get_template('articles', 'base.html')
+        for article in self.modules['articles'].articles.values():
+            if article.published == draft:
+                continue
+            path = self._build_path('articles', article.html_filename())
+            with codecs.open(path, 'w', 'utf-8') as f:
+                print('Writing article to', path)
+                f.write(template.render({
+                    'articles': [article],
+                }))
+
+    def render_rss(self, draft=False):
+        def rss_item(article):
+            def rss_aut(author_id):
+                try:
+                    author = self.modules['authors'][author_id]
+                    return '{email} ({full_name})'.format(
+                        email = author.email,
+                        full_name = author.full_name(),
+                    )
+                except lpbm.exceptions.NoSuchAuthorError:
+                    return '[deleted]'
+            authors = ltools.join_names([rss_aut(a) for a in article.authors])
+            return PyRSS2Gen.RSSItem(
+                title = article.title,
+                link = '{base_url}{html_filename}'.format(
+                    base_url = self.modules['config']['general.url'],
+                    html_filename = article.html_filename(),
+                ),
+                author = authors,
+                guid = str(article.id),
+                description = do_markdown(article.content, code=True),
+                pubDate = article.date,
+            )
+        articles = sorted(self.modules['articles'].articles.values())
+        articles = [a for a in articles if a.published or draft]
+        articles = articles[-(self.modules['config']['rss.nb_articles'] or 0):]
+        rss = PyRSS2Gen.RSS2(
+            title = self.modules['config']['general.title'],
+            link = self.modules['config']['general.url'],
+            description = self.modules['config']['general.subtitle'],
+            lastBuildDate = datetime.datetime.now(),
+            items = [rss_item(a) for a in reversed(articles)],
+        )
+        rss_path = ltools.join(self.build_dir, 'rssfeed.xml')
+        with codecs.open(rss_path, 'w', 'utf-8') as f:
+            rss.write_xml(f, encoding='utf-8')
