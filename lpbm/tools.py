@@ -37,6 +37,20 @@ def mkdir_p(path):
     except OSError:
         pass
 
+def empty_directory(directory):
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for f in files:
+            os.unlink(join(root, f))
+        for d in dirs:
+            os.rmdir(join(root, d))
+
+def move_content(src, dst):
+    for root, dirs, files in os.walk(src):
+        for f in (files + dirs):
+            shutil.move(join(root, f), dst)
+        while dirs:
+            dirs.pop()
+
 def copy(src, dst):
     '''Copies the file from src to dst.'''
     mkdir_p(os.path.dirname(dst))

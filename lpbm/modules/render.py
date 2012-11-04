@@ -6,8 +6,8 @@ import codecs
 import jinja2
 import markdown
 import os
-import shutil
 import tempfile
+import sys
 
 import lpbm.module_loader
 import lpbm.tools as ltools
@@ -53,6 +53,11 @@ class Render(lpbm.module_loader.Module):
 
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')
+        self.output_dir = ltools.join(args.exec_path, 'result')
+
+        if not os.path.exists(self.output_dir):
+            sys.exit('I didn\'t find directory/symbolic link named `result`'
+                     ' where to put the blog.')
 
         # Menu header.
         menu_header = None
@@ -85,10 +90,20 @@ class Render(lpbm.module_loader.Module):
         if args.articles or args.all:
             self.render_articles()
 
+        # If full rendering completed (we are still alive), then we copy the
+        # temporary directory to the output directory.
+        self._copy_all()
+
     # Functions for internal use.
     def _build_path(self, *args):
         lpbm.tools.mkdir_p(ltools.join(self.build_dir, *(args[:-1])))
         return ltools.join(self.build_dir, *args)
+
+    def _copy_all(self):
+        # First big clean up of all the files.
+        ltools.empty_directory(self.output_dir)
+        ltools.move_content(self.build_dir, self.output_dir)
+        os.rmdir(self.build_dir)
 
     def render_articles(self, draft=False):
         template = _get_template('articles', 'base.html')
