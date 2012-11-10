@@ -1,15 +1,14 @@
 Lightweight Personal Blog Maker
 ===============================
 
-This project aims to provide an easy way to generate static blog and personnal
+This project aims to provide an easy way to generate static blog and personal
 website using python scripts. Every page of the site is written using markdown,
 to help formatting easily text.
 
-This project is still under heavy developpement, and a lot of things aren't
-fixed yet (meaning config file can change rapidly and often, for example).
-
-Don't use it right now if you are not willing to spend some time fix things
-between big updates.
+This project is still under heavy development, and a lot of things aren't
+fixed yet (meaning configuration file can change rapidly and often, for
+example). Don't use it right now if you are not willing to spend some time fix
+things between big updates.
 
 This file only contains the minimum you need to know to install LPBM. A more
 detailed documentation is provided in `doc/` directory, as a sphinx
@@ -18,10 +17,10 @@ documentation.
 Features
 --------
 
-* LPBM is splited in several sub-modules. Including config management, articles
-  management, authors management and blog generation.
-* You only need to know markdown to write articles. Every meta-dta is stored in
-  ini files, meaning you can manage them with any CVS.
+* LPBM is split in several sub-modules. Including configuration management,
+  articles management, authors management and blog generation.
+* You only need to know markdown to write articles. Every meta-data is stored
+  in ini files, meaning you can manage them with any CVS.
 * You can have any number of authors on articles, and any number of categories.
 * Simple code embedding into articles. (using pygments).
 
@@ -47,7 +46,7 @@ Usage
 -----
 
 There will be a detailed description of all the features and the usage of all
-commands in the sphinx documentation in `doc` directory.
+commands in the sphinx documentation in `doc/` directory.
 
 Other information
 -----------------
