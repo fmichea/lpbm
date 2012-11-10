@@ -5,88 +5,61 @@ This project aims to provide an easy way to generate static blog and personnal
 website using python scripts. Every page of the site is written using markdown,
 to help formatting easily text.
 
-In this READ, you will see SOURCES several times. By default it is in sources/
-from the root of your clone, but you can change it in lpbm/constansts. Actually
-you can change a lot of paths in this file.
+This project is still under heavy developpement, and a lot of things aren't
+fixed yet (meaning config file can change rapidly and often, for example).
 
-By the way, this project is still under heavy developpement, and a lot of
-things aren't fixed yet (meaning config file can change rapidly and often, for
-example). Don't use it right now if you are not willing to spend some time fix
-things between updates.
+Don't use it right now if you are not willing to spend some time fix things
+between big updates.
+
+This file only contains the minimum you need to know to install LPBM. A more
+detailed documentation is provided in `doc/` directory, as a sphinx
+documentation.
 
 Features
 --------
 
-* Articles created with a unique *.markdown* file.
-    * Unlimited authors and categories.
-    * A permalink is based on article id (fixed if not changed).
-* RSS Feed generated at /rssfeed.xml
-* Author management based on logins.
-    * Biographical pages availble.
-* Simple code embedding (using pygments).
-* Simple menu management.
-    * Menu is generated using informations available in articles.
-* Paginate.
+* LPBM is splited in several sub-modules. Including config management, articles
+  management, authors management and blog generation.
+* You only need to know markdown to write articles. Every meta-dta is stored in
+  ini files, meaning you can manage them with any CVS.
+* You can have any number of authors on articles, and any number of categories.
+* Simple code embedding into articles. (using pygments).
+
+Installation
+------------
+
+LPBM will soon be packaged with setup.py and PKGBUILD, and I will put it in AUR
+too, when it will be ready for a Release Candidate.
+
+### Install LPBM as a script.
+
+For know, you can just clone this repository and link `~/.local/bin/lpbm` to
+the lpbm.py file. Then you add `$HOME/.local/bin/` to your `PATH` environment
+variable and you can execute LPBM everywhere.
+
+### Install dependencies
+
+You also must install `python` version 3, `pip` for python version 3 and all
+the python library dependencies. To do this, you just have to execute `pip
+install -r requirements.txt` and you'll have everything you need.
 
 Usage
 -----
 
-### Configuration
-
-Configuration can be set in the files SOURCES/config. It can contain blog
-title, subtitle and footer (in this order). Syntax is s follow:
-
-    [title: My blog title]
-    [subtitle: My blog subtitle]
-    [footer: My blog footer]
-    [url: http://blog.example.com/]
-    [disqus_id: id]
-    [twitter_id: id]
-    [rss_articles: nb_articles_in_rss]
-
-Keep line empty if you don't want to set a variable.
-
-### Articles
-
-Articles are represented by *.markdown* files. The header of the file can
-contain informations such as id, authors and categories. Syntax is as follow:
-
-    id: 1337
-    author: login1
-    [author: login2] ...
-    category: Master1|Sub Category1
-    [category: Master2|Sub Category2] ...
-    title: Article Title
-    [slug: slug]
-
-    Article content...
-
-*id* has a special meaning. When it is absent, article will be ignored, else it
-will be used in permalink and for ordering articles (from highest to lower).
-Each author and category must be on their own lines, authors first. No new line
-between authors and categories.
-
-*slug* is there if you want to change the title of your article without
-breaking permalinks.
-
-### Authors
-
-You can set some variables to authors, like his name, email or bio. A file to
-describe an author should be placed in SOURCES/authors/*login*.markdown with
-*login* replaced correctly. Syntax is as follow:
-
-    name: Your Name Here
-    email: your.email@example.com
-
-    [bio (markdown)]
+There will be a detailed description of all the features and the usage of all
+commands in the sphinx documentation in `doc` directory.
 
 Other information
 -----------------
 
-### Authors
+### Authors (v2)
 
-* [Pierre Bourdon](http://blog.delroth.net/)
 * [Franck Michea](http://blog.kushou.eu/)
+
+### Authors (v1)
+
+* [Franck Michea](http://blog.kushou.eu/)
+* [Pierre Bourdon](http://blog.delroth.net/)
 
 ### LPBM generates this blog:
 
@@ -96,15 +69,3 @@ Other information
 
 * [Markdown Syntax](http://daringfireball.net/projects/markdown/syntax)
 * [Code Embedding](http://packages.python.org/Markdown/extensions/code_hilite.html)
-
-### Dependencies
-
-Library used:
-
-* **PyRSS2Gen**: RSS Generator. ([http://www.dalkescientific.com/Python/PyRSS2Gen.html](http://www.dalkescientific.com/Python/PyRSS2Gen.html))
-* **Jinja2**: Template engine. ([http://jinja.pocoo.org/](http://jinja.pocoo.org/))
-
-These programs are executed by the script.
-
-* **sass**: SCSS to CSS Translator in ruby.
-* **pygmentize**: Gets pygment's stylesheet.
