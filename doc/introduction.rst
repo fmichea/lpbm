@@ -1,7 +1,7 @@
 Introduction
 ============
 
-LPBM - Lightweight Personal Blog Maker
+lpbm - Lightweight Personal Blog Maker
 --------------------------------------
 
 Welcome to the documentation of lpbm. This project aims to provide a simple way
@@ -11,17 +11,17 @@ The main idea of this is that you write your article in an enhanced version of
 text files, and this project helps you manage them and generate a bunch of html
 files that make a nice little blog.
 
-This approach is insteresting for few reasons:
+This approach is interesting for few reasons:
 
  * First you don't need to use any program to write your articles. Indeed, your
-   standart editor (the one in which you write text or code) will just do.
+   standard editor (the one in which you write text or code) will just do.
  * Since articles and lpbm files are basically text files, you can use whatever
    you want to sync them. Indeed I foster you a DCVS like git or mercurial.
 
 Features
 --------
 
-LPBM is shiped with most of the features you want on a blog. Please keep in
+lpbm is shipped with most of the features you want on a blog. Please keep in
 mind that I broke most of the program on purpose, to enhance code base enough
 so that I won't have to break it that much later when it's used by someone
 other than me (hopefully).
@@ -49,6 +49,6 @@ code base and to document everything. My second goal is to add some automated
 test (as much as possible). This will help maintain the current code breaking
 on things that worked before.
 
-When this will be done, it will be more easy to add new features. I am ok with
+When this will be done, it will be more easy to add new features. I am OK with
 new ideas, but please keep in mind that this project should stay as tiny as
 possible. Few features, only the necessary, but done nicely.
