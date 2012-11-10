@@ -79,7 +79,7 @@ def input_default(prompt, default, required=False, is_valid=None):
             ))
             if not tmp:
                 tmp = default
-            if (is_valid is None or is_valid(tmp)) and (not required or tmp):
+            if (not required or tmp) and (is_valid is None or is_valid(tmp)):
                 break
     except KeyboardInterrupt:
         sys.exit(1)

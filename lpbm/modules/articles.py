@@ -95,6 +95,16 @@ class Articles(lpbm.module_loader.Module):
                 pass
         return ltools.join_names(res)
 
+    def _input_authors(self, id):
+        if self.articles[id].authors:
+            authors_list = ', '.join(self.artices[id].authors)
+        else:
+            authors_list = None
+        self.modules['authors'].list_authors(short=True)
+        return ltools.input_default('Please list authors (comma separated)',
+                                    authors_list, required=True,
+                                    is_valid=self.modules['authors'].is_valid)
+
     # Particular functions for command line.
     def list_articles(self):
         '''Lists all the articles with some useful information.'''
@@ -123,54 +133,31 @@ class Articles(lpbm.module_loader.Module):
             authors = self._get_author_verbose(article.authors),
         ))
 
-    def preview_article(self, id):
-        '''
-        This is here to render a particular article (draft) and get its link.
-        '''
-        pass
-
     def new_article(self, filename):
         '''
         New article from command line. This will help the user create a
         particular file.
         '''
         # First we check that file doesn't exist.
-        path = ltool.join(
+        path = ltools.join(
             self.args.exec_path, 'articles', '{}.markdown'.format(filename)
         )
         if os.path.exists(path):
             sys.exit('File `{}\' exists, please choose a different name.'.format(
                 path
             ))
-        # Then we check if we want to use the first available id.
-        ids, id = self.articles.keys(), None
         try:
-            last_id = max(ids) + 1
+            last_id = max([a.id for a in self.articles.values()]) + 1
         except ValueError:
             last_id = 0
-        while id is None:
-            try:
-                id = int(input('Please enter an id [{}]: '.format(last_id)))
-                if id in ids:
-                    print('Id already exists, please choose a different one.')
-                    id = None
-            except ValueError:
-                id = last_id
 
-        # Then we want a title.
-        title = input('Please enter a title: ')
-        self.modules['authors'].list_authors(short=True)
-        authors = ltools.input_default('Please list authors (comma separated)',
-                                       None, required=True,
-                                       is_valid=self.modules['authors'].is_valid)
-
-        # Actually creating the article.
         article = lpbm.datas.articles.Article(path)
-        article.id = id
-        article.title = title
-        article.add_authors(authors)
+        self.articles[last_id] = article
+
+        article.id = last_id
+        article.interactive()
+        article.authors = self._input_authors(last_id)
         article.save()
-        self.articles[article.id] = article
 
         # We successfully created article.
         print('Article `{}\' was successfully created!'.format(path))

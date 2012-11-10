@@ -89,24 +89,21 @@ class Article:
         self._authors = ', '.join(list(self._authors_set))
         self.cm.save()
 
+    def interactive(self):
+       self.title = ltools.input_default('Title', self.title, required=True)
+
     @property
     def authors(self):
         '''Returns the list of authors.'''
         return list(self._authors_set)
 
-    def add_authors(self, authors):
+    @authors.setter
+    def authors(self, authors):
         '''
         Takes a string of comma-separated authors and adds them to authors of
         the article.
         '''
-        self._authors_set |= ltools.split_on_comma(authors)
-
-    def remove_authors(self, authors):
-        '''
-        Takes a string of comma-separated authors and removes them from authors
-        list for the article.
-        '''
-        self._authors_set -= ltools.split_on_comma(authors)
+        self._authors_set = set(ltools.split_on_comma(authors))
 
     @property
     def slug(self):
