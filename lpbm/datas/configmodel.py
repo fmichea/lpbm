@@ -10,6 +10,19 @@ in ini files like normal attributes of an object.
 import codecs
 import configparser
 
+class Data:
+    def init_data(self, *args, **kwargs):
+        self.required = kwargs.get('required', False)
+
+def data_factory(type_):
+    class GeneratedDataClass(Data, type_):
+        def __init__(self, *args, **kwargs):
+            try:
+                super().__init__(self, *args, **kwargs)
+            except TypeError:
+                pass
+    return GeneratedDataClass
+
 # pylint: disable=R0903
 class ConfigOptionDescriptor:
     '''
@@ -56,18 +69,24 @@ class ConfigOptionDescriptor:
         else:
             cfg.set(section, self._option, str(val))
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, type_=None):
+        def manage_none():
+            return data_factory(type(None))(None)
         try:
             getter, cfg = self._getter_function(), instance.cm.config
+            if getter is None:
+                getter = configparser.ConfigParser.get
+            section = self._section or instance.section
+            value = getter(cfg, section, self._option, fallback=None)
+            if self._default is not None:
+                value = self._default
+                self.__set__(instance, self._default)
+            if value is None:
+                value = manage_none()
+            else:
+                value = self._getter_type()(value)
         except AttributeError:
-            return self._default
-        if getter is None:
-            getter = configparser.ConfigParser.get
-        section = self._section or instance.section
-        value = getter(cfg, section, self._option, fallback=None)
-        if value is None and self._default is not None:
-            value = self._default
-            self.__set__(instance, self._default)
+            value = manage_none()
         return value
 
     # pylint: disable=R0201
@@ -77,6 +96,9 @@ class ConfigOptionDescriptor:
         the value in configuration.
         '''
         return None
+
+    def _getter_type(self):
+        return data_factory(str)
 
 
 # pylint: disable=R0903
@@ -91,6 +113,14 @@ class ConfigOptionDescriptorBoolean(ConfigOptionDescriptor):
         val = 'yes' if val else 'no'
         super(ConfigOptionDescriptorBoolean, self).__set__(obj, val)
 
+    def _getter_type(self):
+        class DataBool(Data):
+            def __init__(self, val):
+                self._value = val
+            def __bool__(self):
+                return self._value
+        return DataBool
+
 
 # pylint: disable=R0903
 class ConfigOptionDescriptorInt(ConfigOptionDescriptor):
@@ -99,6 +129,9 @@ class ConfigOptionDescriptorInt(ConfigOptionDescriptor):
     def _getter_function(self):
         return configparser.ConfigParser.getint
 
+    def _getter_type(self):
+        return data_factory(int)
+
 
 # pylint: disable=R0903
 class ConfigOptionDescriptorFloat(ConfigOptionDescriptor):
@@ -106,6 +139,9 @@ class ConfigOptionDescriptorFloat(ConfigOptionDescriptor):
 
     def _getter_function(self):
         return configparser.ConfigParser.getfloat
+
+    def _getter_type(self):
+        return data_factory(float)
 
 
 # pylint: disable=R0903
@@ -140,3 +176,38 @@ def opt_bool(*args, **kwargs):
 def opt_float(*args, **kwargs):
     '''Returns an instance of ConfigOptionDescriptorFloat.'''
     return ConfigOptionDescriptorFloat(*args, **kwargs)
+
+class Model:
+    id = opt_int('general', 'id')
+    deleted = opt_bool('general', 'deleted', default=False)
+
+    def __init__(self, mod, mods):
+        self.cm, self.mod, self.mods = None, mod, mods
+
+    def interactive(self):
+        def prompt_name(attr_name):
+            return attr.replace('_', ' ').title()
+        fields = ['id'] + self._interactive_fields
+        for attr_name in fields:
+            attr = getattr(self, attr_name)
+            try:
+                getattr(self, 'interactive_' + attr_name)(self)
+            except AttributeError:
+                if isinstance(attr, cm_module.Data):
+                    prompt = getattr(attr, 'verbose_name', prompt_name(attr_name))
+                    setattr(self, attr_name, ltools.input_default(
+                        prompt, attr, required=attr.required,
+                    ))
+                else:
+                    vattr_name = prompt_name(attr_name)
+                    setattr(self, attr_name, ltools.input_default(vattr_name, attr))
+
+    def interactive_id(self):
+        def is_valid(val):
+            return val not in self.mod.all_objects
+        if self.id is None:
+            self.id = ltools.input_default('Id', None, required=True,
+                                           is_valid=is_valid)
+
+    def save(self):
+        self.cm.save()

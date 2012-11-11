@@ -19,7 +19,7 @@ import lpbm.tools as ltools
 
 _LOGGER = lpbm.logging.get()
 
-class Articles(lpbm.module_loader.Module):
+class Articles(lpbm.module_loader.ModelManagerModule):
     '''
     Articles manager, finds and loads all the articles of the blog. These are a
     pair of two files. One is a markdown file, the other one an ini file.
@@ -57,7 +57,7 @@ class Articles(lpbm.module_loader.Module):
         self.articles, f = dict(), lambda a: a.endswith('.markdown')
         for root, filename in lpbm.tools.filter_files(f, self.args.exec_path, 'articles'):
             art = lpbm.datas.articles.Article(ltools.join(root, filename))
-            self.articles[art.id] = art
+            self.objects[art.id] = art
 
     def process(self, modules, args):
         if args.list:

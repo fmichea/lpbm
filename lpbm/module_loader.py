@@ -89,6 +89,55 @@ class Module(metaclass=abc.ABCMeta):
         """Invoked if command was chosen on command line."""
         pass
 
+
+def ModelManagerModule(Module):
+    def __init__(self):
+        super(ModelManagerModule, self).__init__(self)
+        self._objects = dict()
+        self.helps = {
+            'delete': 'Deletes the selected object.',
+            'edit': 'Edit the object.',
+            'id': 'Selects an object for several options.',
+            'list': 'List all the objects.',
+            'new': 'Adds a new object interactively.',
+        }
+
+    def __getitem__(self, id):
+        try:
+            return self._objects[id]
+        except KeyError:
+            raise lpbm.exceptions.ModelDoesNotExistError(self.__class__, id)
+
+    @property
+    def objects(self):
+        return [obj for obj in self._objects.values() if not obj.deleted]
+
+    @property
+    def all_objects(self):
+        return list(self._objects.values())
+
+    def init(self):
+        self.parser.add_argument('-i', '--id', action='store', type=int,
+                                 metavar='id', default=None, help=self.helps['id'])
+
+        group = self.parser.add_argument_group(title='general actions')
+        group.add_argument('-n', '--new', action='store', metavar='filename',
+                           help=self.helps['new'])
+        group.add_argument('-l', '--list', action='store_true', help=self.helps['list'])
+        self.gen_group = group
+
+        group = self.parser.add_argument_group(
+            title='specific actions (need --id)'
+        )
+        group.add_argument('-e', '--edit', action='store_true',
+                           help=self.helps['edit'])
+        group.add_argument('-d', '--delete', action='store_true',
+                           help=self.helps['delete'])
+        self.spec_group = group
+
+    def helps_update(self):
+        pass
+
 def load_modules(modules_, argument_parser):
     """Dynamically loads all the compatible commands from modules directory"""
     main_root = os.path.join(os.path.dirname(__file__), 'modules')
