@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# render.py - Render the complete website.
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
