@@ -10,8 +10,8 @@ the authors.
 import os
 import sys
 
-import lpbm.datas.authors
-import lpbm.datas.configmodel as cm_module
+import lpbm.models.authors
+import lpbm.models.configmodel as cm_module
 import lpbm.exceptions
 import lpbm.logging
 import lpbm.module_loader
@@ -53,7 +53,7 @@ class Authors(lpbm.module_loader.Module):
 
         # Now loads all authors.
         for section in self.cm.config.sections():
-             author = lpbm.datas.authors.Author(section, self.cm)
+             author = lpbm.models.authors.Author(section, self.cm)
              self.authors[author.id] = author
 
     def process(self, modules, args):
@@ -111,7 +111,7 @@ class Authors(lpbm.module_loader.Module):
 
     def new_author(self):
         '''Interactively create an author.'''
-        author = lpbm.datas.authors.Author(None, self.cm)
+        author = lpbm.models.authors.Author(None, self.cm)
         author.interactive()
         try:
             author.id = max(self.authors) + 1

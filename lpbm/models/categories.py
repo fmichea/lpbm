@@ -7,7 +7,7 @@ Category's model in blog sources. Maps a section in an ini file containing all
 the categories of the blog.
 '''
 
-import lpbm.datas.configmodel as cm_module
+import lpbm.models.configmodel as cm_module
 import lpbm.tools
 
 class Category:

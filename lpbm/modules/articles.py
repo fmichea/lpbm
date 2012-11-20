@@ -11,7 +11,7 @@ import os
 import subprocess
 import sys
 
-import lpbm.datas.articles
+import lpbm.models.articles
 import lpbm.exceptions
 import lpbm.logging
 import lpbm.module_loader
@@ -56,7 +56,7 @@ class Articles(lpbm.module_loader.ModelManagerModule):
     def load(self, modules, args):
         self.articles, f = dict(), lambda a: a.endswith('.markdown')
         for root, filename in lpbm.tools.filter_files(f, self.args.exec_path, 'articles'):
-            art = lpbm.datas.articles.Article(ltools.join(root, filename))
+            art = lpbm.models.articles.Article(ltools.join(root, filename))
             self.objects[art.id] = art
 
     def process(self, modules, args):
@@ -151,7 +151,7 @@ class Articles(lpbm.module_loader.ModelManagerModule):
         except ValueError:
             last_id = 0
 
-        article = lpbm.datas.articles.Article(path)
+        article = lpbm.models.articles.Article(path)
         self.articles[last_id] = article
 
         article.id = last_id

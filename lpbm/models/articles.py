@@ -8,7 +8,7 @@ import codecs
 import datetime
 import os
 
-import lpbm.datas.configmodel as cm_module
+import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
 class ArticleSameIdError(Exception):

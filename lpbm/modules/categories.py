@@ -9,8 +9,8 @@ all the categories.
 
 import sys
 
-import lpbm.datas.categories as cd_module
-import lpbm.datas.configmodel as cm_module
+import lpbm.models.categories as cd_module
+import lpbm.models.configmodel as cm_module
 import lpbm.module_loader
 import lpbm.tools as ltools
 
