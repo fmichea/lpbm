@@ -91,13 +91,14 @@ def input_default(prompt, default, required=False, is_valid=None):
         sys.exit(1)
     return tmp
 
-def ask_sure(default=False):
+def ask_sure(prompt='Are you sure you want to proceed?', default=False):
     '''
     Makes sure the user wants to proceed the following action. It returns True
     if user answers yes or y, else False.
     '''
     try:
-        sure = input('Are you sure you want to proceed? [{default}] '.format(
+        sure = input('{prompt} [{default}] '.format(
+            prompt = prompt,
             default = 'Y/n' if default else 'y/N',
         ))
     except (KeyboardInterrupt, EOFError):
