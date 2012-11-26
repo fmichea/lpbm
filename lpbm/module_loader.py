@@ -90,16 +90,19 @@ class Module(metaclass=abc.ABCMeta):
         pass
 
 
-def ModelManagerModule(Module):
+class ModelManagerModule(Module, metaclass=abc.ABCMeta):
     def __init__(self):
-        super(ModelManagerModule, self).__init__(self)
+        super().__init__()
         self._objects = dict()
+        self.fgroup, self.ggroup, self.igroup = None, None, None
+        self.fopts, self.gopts, self.iopts = [], [], []
         self.helps = {
-            'delete': 'Deletes the selected object.',
-            'edit': 'Edit the object.',
-            'id': 'Selects an object for several options.',
-            'list': 'List all the objects.',
-            'new': 'Adds a new object interactively.',
+            'delete': 'Deletes the selected {object_name}.',
+            'edit': 'Edit the {object_name}.',
+            'id': 'Selects an {object_name} for several options.',
+            'list': 'List all the {object_name}s.',
+            'new': 'Adds a new {object_name} interactively.',
+            'with-deleted': 'Includes deleted {object_name}s in listings.',
         }
 
     def __getitem__(self, id):
@@ -108,34 +111,121 @@ def ModelManagerModule(Module):
         except KeyError:
             raise lpbm.exceptions.ModelDoesNotExistError(self.__class__, id)
 
+    def create_object(self, cls, *args, **kwargs):
+        return cls(self, self.modules, *args, **kwargs)
+
+    def register_object(self, cls, *args, **kwargs):
+        obj = self.create_object(cls, *args, **kwargs)
+        self._objects[obj.id] = obj
+        return obj
+
     @property
     def objects(self):
-        return [obj for obj in self._objects.values() if not obj.deleted]
+        return [obj for obj in self._objects.values()
+                if self.args.with_deleted or not obj.deleted]
 
     @property
     def all_objects(self):
         return list(self._objects.values())
 
     def init(self):
+        # Set correctly object name to its value.
+        self.helps = dict((k, v.format(object_name=self.object_name()))
+                          for (k, v) in self.helps.items())
+
+        # Default options.
         self.parser.add_argument('-i', '--id', action='store', type=int,
                                  metavar='id', default=None, help=self.helps['id'])
 
-        group = self.parser.add_argument_group(title='general actions')
-        group.add_argument('-n', '--new', action='store', metavar='filename',
-                           help=self.helps['new'])
-        group.add_argument('-l', '--list', action='store_true', help=self.helps['list'])
-        self.gen_group = group
+        self.ggroup = self.parser.add_argument_group(title='general actions')
+        self.add_general_option('-n', '--new', help=self.helps['new'])
+        self.add_general_option('-l', '--list', help=self.helps['list'])
 
-        group = self.parser.add_argument_group(
-            title='specific actions (need --id)'
-        )
-        group.add_argument('-e', '--edit', action='store_true',
-                           help=self.helps['edit'])
-        group.add_argument('-d', '--delete', action='store_true',
-                           help=self.helps['delete'])
-        self.spec_group = group
+        self.fgroup = self.parser.add_argument_group(title='flags')
+        self.add_flag_option('-D', '--with-deleted', help=self.helps['with-deleted'])
 
-    def helps_update(self):
+        self.igroup = self.parser.add_argument_group(title='specific actions (need --id)')
+        self.add_id_option('-e', '--edit', help=self.helps['edit'])
+        self.add_id_option('-d', '--delete', help=self.helps['delete'])
+
+    def _add_option(self, group, opts, args, kwargs_):
+        opts.append(kwargs_.get('dest', sorted(args, key=len)[-1][2:]))
+        kwargs = {'default': None, 'action': 'store_true'}
+        kwargs.update(kwargs_)
+        group.add_argument(*args, **kwargs)
+
+    def add_flag_option(self, *args, **kwargs):
+        self._add_option(self.fgroup, self.fopts, args, kwargs)
+
+    def add_general_option(self, *args, **kwargs):
+        self._add_option(self.ggroup, self.gopts, args, kwargs)
+
+    def add_id_option(self, *args, **kwargs):
+        self._add_option(self.igroup, self.iopts, args, kwargs)
+
+    def process(self, modules, args):
+        def option_mangle(opt):
+            return opt.replace('-', '_')
+        def option_states(opts):
+            return dict((k, getattr(args, option_mangle(k))) for k in opts)
+
+        # First check general options.
+        opts_states = option_states(self.gopts)
+        for opt, state in opts_states.items():
+            if state is not None:
+                try:
+                    getattr(self, 'opt_' + opt)()
+                    return
+                except (AttributeError, TypeError):
+                    raise lpbm.exceptions.GeneralOptionError(opt)
+
+        # If we have any id option in there.
+        opts_states = option_states(self.iopts)
+        for opt, state in opts_states.items():
+            if state is not None:
+                if args.id is None:
+                    raise lpbm.exceptions.IdOptionMissingError(opt)
+                try:
+                    getattr(self, 'opt_' + opt)(args.id)
+                    return
+                except (AttributeError, TypeError):
+                    raise lpbm.exceptions.IdOptionError(opt)
+
+        self.parser.print_help()
+
+    # Actions.
+    def opt_list(self, short=False):
+        if not short:
+            print('All {object_name}s:'.format(object_name=self.object_name()))
+        for obj in self.objects:
+            print(' {id:2d} - {obj}{deleted}'.format(
+                id=obj.id, obj=obj,
+                deleted=' [deleted]' if obj.deleted else '',
+            ))
+
+    def opt_new(self, *args, **kwargs):
+        obj = self.create_object(self.model_cls(), *args, **kwargs)
+        obj.interactive()
+        obj.save()
+        self._objects[obj.id] = obj
+        return obj
+
+    def opt_edit(self, id):
+        obj = self[id]
+        obj.interactive()
+        obj.save()
+
+    def opt_delete(self, id):
+        obj = self[id]
+        obj.delete()
+        obj.save()
+
+    @abc.abstractmethod
+    def object_name(self):
+        pass
+
+    @abc.abstractmethod
+    def model_cls(self):
         pass
 
 def load_modules(modules_, argument_parser):

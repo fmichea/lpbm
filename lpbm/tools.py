@@ -56,6 +56,7 @@ def copy(src, dst):
     mkdir_p(os.path.dirname(dst))
     shutil.copyfile(src, dst)
 
+SLUG_CHARS_DISPLAY = '[a-z0-9-]'
 _SLUG_CHARS = string.ascii_lowercase + string.digits + '-'
 _SLUG_SIZE = 50
 

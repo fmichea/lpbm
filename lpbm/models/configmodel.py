@@ -10,57 +10,59 @@ in ini files like normal attributes of an object.
 import codecs
 import configparser
 
-class Data:
-    def init_data(self, *args, **kwargs):
-        self.required = kwargs.get('required', False)
+import lpbm.tools as ltools
+import lpbm.exceptions
 
-def data_factory(type_):
-    class GeneratedDataClass(Data, type_):
-        def __init__(self, *args, **kwargs):
-            try:
-                super().__init__(self, *args, **kwargs)
-            except TypeError:
-                pass
-    return GeneratedDataClass
+class BaseField:
+    def __init__(self, **kwargs):
+        # Options all fields should have,
+        self.default = kwargs.get('default', None)
+        self.read_only = kwargs.get('read_only', False)
+        self.required = kwargs.get('required', False)
+        self.verbose_name = kwargs.get('verbose_name', None)
+
+
+class ValueField(BaseField):
+    def __init__(self, name, **kwargs):
+        super().__init__(**kwargs)
+        self._name = name
+
+    def __get__(self, instance, type=None):
+        if instance is None:
+            return self
+        return getattr(instance, self._mangled_name(), self.default)
+
+    def __set__(self, instance, value):
+        if self.read_only:
+            raise lpbm.exceptions.FieldReadOnlyError()
+        if self.required and value is None:
+            if self.default is not None:
+                value = self.default
+            else:
+                raise lpbm.exceptions.FieldRequiredError()
+        setattr(instance, self._mangled_name(), value)
+
+    def _mangled_name(self):
+        return '_{}_{}'.format(self.__class__, self._name)
+
 
 # pylint: disable=R0903
-class ConfigOptionDescriptor:
-    '''
-    Maps a value in a configuration to be able to get and set it blindly. If
-    `a` maps section 'foo' and option 'bar'. You can use `a` like this:
-
-        a = 1 # sets foo.bar ([foo] option bar) to 1.
-        b = a # gets foo.bar ([foo] option bar) (here 1).
-
-    Constructor take one or two "normal" arguments, depending of the behavior
-    you want to achieve. Both should be strings. If you give two parameters,
-    then you give section_name as first paramter, and option_name as second. If
-    you only give one, it's option_name and section_name will be retreived by
-    getting section property of the instance.
-
-    You can subclass this descriptor for types. Basic types managed by
-    configparser are builtin implemented in module. You have function to help
-    you create them with a shorter name.
-    '''
-
+class ConfigOptionField(BaseField):
     def __init__(self, *args, **kwargs):
+        super().__init__(**kwargs)
+
         # Private attributes.
         if len(args) == 1:
             self._section, self._option = None, args[0]
         elif len(args) == 2:
             self._section, self._option = args
         else:
-            text = 'ConfigOptionDescriptor.__init__ takes one or two '
-            text += 'arguments. Section and option names, OR only option '
-            text += 'name.'
-            raise TypeError(text)
-        self._default = kwargs.get('default', None)
-        self._read_only = kwargs.get('read_only', False)
+            raise lpbm.exception.ConfigOptionArgsError(text)
 
     def __set__(self, instance, val):
         cfg = instance.cm.config
-        if self._read_only:
-            return
+        if self.read_only:
+            raise lpbm.exceptions.AssignFieldReadOnlyError()
         section = self._section or instance.section
         if not cfg.has_section(section):
             cfg.add_section(section)
@@ -70,23 +72,19 @@ class ConfigOptionDescriptor:
             cfg.set(section, self._option, str(val))
 
     def __get__(self, instance, type_=None):
-        def manage_none():
-            return data_factory(type(None))(None)
+        if instance is None:
+            return self
         try:
             getter, cfg = self._getter_function(), instance.cm.config
             if getter is None:
                 getter = configparser.ConfigParser.get
             section = self._section or instance.section
             value = getter(cfg, section, self._option, fallback=None)
-            if self._default is not None:
-                value = self._default
-                self.__set__(instance, self._default)
-            if value is None:
-                value = manage_none()
-            else:
-                value = self._getter_type()(value)
+            if value is None and self.default is not None:
+                value = self.default
+                self.__set__(instance, value)
         except AttributeError:
-            value = manage_none()
+            value = self.default
         return value
 
     # pylint: disable=R0201
@@ -97,13 +95,9 @@ class ConfigOptionDescriptor:
         '''
         return None
 
-    def _getter_type(self):
-        return data_factory(str)
-
-
 # pylint: disable=R0903
-class ConfigOptionDescriptorBoolean(ConfigOptionDescriptor):
-    '''ConfigOptionDescriptor returning and setting booleans.'''
+class ConfigOptionFieldBoolean(ConfigOptionField):
+    '''ConfigOptionField returning and setting booleans.'''
 
     def _getter_function(self):
         return configparser.ConfigParser.getboolean
@@ -111,7 +105,7 @@ class ConfigOptionDescriptorBoolean(ConfigOptionDescriptor):
     # pylint: disable=E1002
     def __set__(self, obj, val):
         val = 'yes' if val else 'no'
-        super(ConfigOptionDescriptorBoolean, self).__set__(obj, val)
+        super(ConfigOptionFieldBoolean, self).__set__(obj, val)
 
     def _getter_type(self):
         class DataBool(Data):
@@ -123,8 +117,8 @@ class ConfigOptionDescriptorBoolean(ConfigOptionDescriptor):
 
 
 # pylint: disable=R0903
-class ConfigOptionDescriptorInt(ConfigOptionDescriptor):
-    '''ConfigOptionDescriptor returning and setting ints.'''
+class ConfigOptionFieldInt(ConfigOptionField):
+    '''ConfigOptionField returning and setting ints.'''
 
     def _getter_function(self):
         return configparser.ConfigParser.getint
@@ -134,8 +128,8 @@ class ConfigOptionDescriptorInt(ConfigOptionDescriptor):
 
 
 # pylint: disable=R0903
-class ConfigOptionDescriptorFloat(ConfigOptionDescriptor):
-    '''ConfigOptionDescriptor returning and setting floats.'''
+class ConfigOptionFieldFloat(ConfigOptionField):
+    '''ConfigOptionField returning and setting floats.'''
 
     def _getter_function(self):
         return configparser.ConfigParser.getfloat
@@ -152,30 +146,33 @@ class ConfigModel:
     '''
 
     def __init__(self, filename):
-        self.config, self._filename = configparser.ConfigParser(), filename
+        self.config, self.filename = configparser.ConfigParser(), filename
         self.config.read(filename, encoding='utf-8')
 
     def save(self):
         '''Saves configuration in its original file.'''
-        with codecs.open(self._filename, 'w', 'utf-8') as f:
+        with codecs.open(self.filename, 'w', 'utf-8') as f:
             self.config.write(f)
 
 
+def field(*args, **kwargs):
+    return ValueField(*args, **kwargs)
+
 def opt(*args, **kwargs):
-    '''Returns an instance of ConfigOptionDescriptor (manipulating string).'''
-    return ConfigOptionDescriptor(*args, **kwargs)
+    '''Returns an instance of ConfigOptionField (manipulating string).'''
+    return ConfigOptionField(*args, **kwargs)
 
 def opt_int(*args, **kwargs):
-    '''Returns an instance of ConfigOptionDescriptorInt.'''
-    return ConfigOptionDescriptorInt(*args, **kwargs)
+    '''Returns an instance of ConfigOptionFieldInt.'''
+    return ConfigOptionFieldInt(*args, **kwargs)
 
 def opt_bool(*args, **kwargs):
-    '''Returns an instance of ConfigOptionDescriptorBoolean.'''
-    return ConfigOptionDescriptorBoolean(*args, **kwargs)
+    '''Returns an instance of ConfigOptionFieldBoolean.'''
+    return ConfigOptionFieldBoolean(*args, **kwargs)
 
 def opt_float(*args, **kwargs):
-    '''Returns an instance of ConfigOptionDescriptorFloat.'''
-    return ConfigOptionDescriptorFloat(*args, **kwargs)
+    '''Returns an instance of ConfigOptionFieldFloat.'''
+    return ConfigOptionFieldFloat(*args, **kwargs)
 
 class Model:
     id = opt_int('general', 'id')
@@ -186,28 +183,40 @@ class Model:
 
     def interactive(self):
         def prompt_name(attr_name):
-            return attr.replace('_', ' ').title()
+            return attr_name.replace('_', ' ').title()
         fields = ['id'] + self._interactive_fields
         for attr_name in fields:
-            attr = getattr(self, attr_name)
             try:
-                getattr(self, 'interactive_' + attr_name)(self)
+                getattr(self, 'interactive_' + attr_name)()
             except AttributeError:
-                if isinstance(attr, cm_module.Data):
-                    prompt = getattr(attr, 'verbose_name', prompt_name(attr_name))
+                attr = getattr(self, attr_name)
+                attr_class = getattr(type(self), attr_name, None)
+                if isinstance(attr_class, BaseField):
+                    prompt = getattr(attr_class, 'verbose_name') or prompt_name(attr_name)
                     setattr(self, attr_name, ltools.input_default(
-                        prompt, attr, required=attr.required,
+                        prompt, attr, required=attr_class.required,
                     ))
                 else:
-                    vattr_name = prompt_name(attr_name)
-                    setattr(self, attr_name, ltools.input_default(vattr_name, attr))
+                    raise lpbm.exceptions.AttributeNotAFieldError(attr_name)
 
     def interactive_id(self):
-        def is_valid(val):
-            return val not in self.mod.all_objects
         if self.id is None:
-            self.id = ltools.input_default('Id', None, required=True,
+            ids = [o.id for o in self.mod.all_objects]
+            def is_valid(val):
+                try:
+                    val = int(val)
+                except ValueError:
+                    return False
+                return val not in ids
+            try:
+                default = max(ids) + 1
+            except ValueError:
+                default = 0
+            self.id = ltools.input_default('Id', default, required=True,
                                            is_valid=is_valid)
 
     def save(self):
         self.cm.save()
+
+    def delete(self):
+        self.deleted = True

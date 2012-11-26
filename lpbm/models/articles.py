@@ -26,23 +26,27 @@ class ArticleSameIdError(Exception):
 _TITLE_SEPARATOR = '=='
 _FRMT_DATE_CONF = '%Y-%m-%dT%H:%M:%S'
 
-class Article:
+class Article(cm_module.Model):
     '''
     The actual model. Articles are devided in two files. The actual article
     (written in markdown syntax) and a configuration file containing information
     for blog generation.
     '''
 
-    id = cm_module.opt_int('general', 'id', default=-1)
+    title = cm_module.field('title', required=True)
     published = cm_module.opt_bool('general', 'published', default=False)
 
     _date = cm_module.opt('general', 'date')
-    _slug = cm_module.opt('general', 'slug')
     _authors = cm_module.opt('general', 'authors', default='')
 
-    def __init__(self, filename):
-        self._filename, self.title, self._content = filename[:-9], '', ''
-        self.path = filename
+    def __init__(self, mod, mods, filename=None):
+        super().__init__(mod, mods)
+
+        self.title, self._content = '', ''
+        try:
+            self.filename, self.path = filename[:-9], filename
+        except TypeError:
+            self.filename, self.path = '', ''
 
         # Reads the content of the file, config being before SEPARATOR
         try:
@@ -57,19 +61,31 @@ class Article:
             while line:
                 self._content += line
                 line = f.readline()
-        except IOError:
+        except (IOError, TypeError):
             pass
 
-        # Parse configuration.
+        # Model configuration.
         self.cm = cm_module.ConfigModel(self._config_filename())
 
+        # Interactive fields.
+        self._interactive_fields = ['title']
+        if self.id is None:
+            self._interactive_fields += ['filename']
+        self._interactive_fields += ['authors']
+
         # Authors
-        self._authors_set = set()
-        self.add_authors(self._authors)
+        self.authors = self._authors
 
         # If creating the article, set date to now.
         if self._date is None:
             self.date = datetime.datetime.now()
+
+    def __str__(self):
+        return '"{title}" by {authors} [{published}]'.format(
+            id = self.id, title = self.title,
+            authors = self.mod._get_author_verbose(self.authors),
+            published = 'published' if self.published else 'draft',
+        )
 
     def __lt__(self, other):
         '''Articles are sorted by date'''
@@ -85,12 +101,40 @@ class Article:
             # End finally we have the content.
             f.write(self._content)
 
-        # Saving configuration
+        # Saving special fields configuration
         self._authors = ', '.join(list(self._authors_set))
-        self.cm.save()
 
-    def interactive(self):
-       self.title = ltools.input_default('Title', self.title, required=True)
+        # Finally saving everything.
+        super().save()
+
+    def interactive_filename(self):
+        def is_valid(value):
+            if ltools.slugify(value) != value:
+                print('This is not a valid slug ({}).'.format(ltools.SLUG_CHARS_DISPLAY))
+                return False
+            path = os.path.join('articles', value + '.markdown')
+            if os.path.exists(os.path.normpath(path)):
+                print('Article with this filename already exists.')
+                return False
+            return True
+        default = ltools.slugify(self.title)
+        self.filename = ltools.input_default('Filename', default, required=True,
+                                             is_valid=is_valid)
+
+        # Several paths have to be reset.
+        self.filename = os.path.join('articles', self.filename)
+        self.path = os.path.normpath(self.filename + '.markdown')
+        self.cm.filename = self._config_filename()
+
+    def interactive_authors(self):
+        #self.mods['authors'].opt_list(short=True)
+        self.authors = ltools.input_default('Please list authors (comma separated)',
+                                            self._authors, required=True,
+                                            is_valid=self.mods['authors'].is_valid)
+
+    def delete(self):
+        super().delete()
+        self.published = False
 
     @property
     def authors(self):
@@ -104,25 +148,6 @@ class Article:
         the article.
         '''
         self._authors_set = set(ltools.split_on_comma(authors))
-
-    @property
-    def slug(self):
-        '''
-        Returns the slug of the article (this is the getter of the property).
-        '''
-        return self._slug
-
-    @slug.setter
-    def slug(self, value):
-        '''
-        Sets the slug of the article, which means it won't change if the
-        article title changes. (to keep url with a slug and still be able to
-        edit article's title).
-        '''
-        if value is None:
-            self._slug = None
-        else:
-            self._slug = ltools.slugify(value)
 
     @property
     def date(self):
@@ -146,11 +171,11 @@ class Article:
 
     def _config_filename(self):
         '''Returns the filename with config's extension.'''
-        return '{filename}.cfg'.format(filename = self._filename)
+        return '{filename}.cfg'.format(filename = self.filename)
 
     def _markdown_filename(self):
         '''Returns the filename with markdown's extension.'''
-        return '{filename}.markdown'.format(filename = self._filename)
+        return '{filename}.markdown'.format(filename = self.filename)
 
     def html_filename(self):
         '''Returns the filename of the HTML file for that article.'''
