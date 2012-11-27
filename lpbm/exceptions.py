@@ -3,14 +3,6 @@
 # License: New BSD License (See LICENSE)
 
 
-class NoSuchAuthorError(Exception):
-    def __init__(self, idx):
-        self.idx = idx
-
-    def __str__(self):
-        return 'This author doesn\'t exist. (id = {})'.format(self.idx)
-
-
 class GeneralOptionError(Exception):
     def __init__(self, name):
         self.name = name
