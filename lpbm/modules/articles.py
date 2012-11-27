@@ -27,10 +27,10 @@ class Articles(lpbm.module_loader.ModelManagerModule):
     '''
 
     # pylint: disable=C0321
-    def name(self): return 'articles'
     def abstract(self): return 'Loads and manipulates articles.'
-    def object_name(self): return 'article'
     def model_cls(self): return Article
+    def name(self): return 'articles'
+    def object_name(self): return 'article'
 
     def init(self):
         super().init()

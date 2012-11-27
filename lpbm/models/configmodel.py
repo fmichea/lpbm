@@ -175,16 +175,21 @@ def opt_float(*args, **kwargs):
     return ConfigOptionFieldFloat(*args, **kwargs)
 
 class Model:
-    id = opt_int('general', 'id')
-    deleted = opt_bool('general', 'deleted', default=False)
+    id = opt_int('id')
+    deleted = opt_bool('deleted', default=False)
 
     def __init__(self, mod, mods):
         self.cm, self.mod, self.mods = None, mod, mods
+        self._interactive_fields = []
 
     def interactive(self):
         def prompt_name(attr_name):
             return attr_name.replace('_', ' ').title()
-        fields = ['id'] + self._interactive_fields
+        fields = list(self._interactive_fields)
+        try:
+            fields.insert(fields.index('section') + 1, 'id')
+        except ValueError:
+            fields = ['id'] + fields
         for attr_name in fields:
             try:
                 getattr(self, 'interactive_' + attr_name)()
@@ -220,3 +225,7 @@ class Model:
 
     def delete(self):
         self.deleted = True
+
+    @property
+    def section(self):
+        return 'general'
