@@ -50,9 +50,9 @@ class Articles(lpbm.module_loader.ModelManagerModule):
         for idx in authors:
             try:
                 res.append(self.modules['authors'][idx].nickname)
-            except lpbm.exceptions.NoSuchAuthorError:
+            except lpbm.exceptions.ModelDoesNotExistError:
                 pass
-        return ltools.join_names(res)
+        return ltools.join_names(res or ['[deleted]'])
 
     # Particular functions for command line.
     def opt_list(self, *args, **kwargs):

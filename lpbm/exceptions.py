@@ -58,3 +58,13 @@ class AttributeNotAFieldError(Exception):
                '`interactive_{attr_name}` if you want it to be interactive.'.format(
             attr_name = self.attr_name,
         )
+
+
+class ModelDoesNotExistError(Exception):
+    def __init__(self, object_name, id):
+        self.object_name, self.id = object_name, id
+
+    def __str__(self):
+        return 'There is no such {object_name} (id = {id}).'.format(
+            object_name = self.object_name, id = self.id
+        )

@@ -109,7 +109,7 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
         try:
             return self._objects[id]
         except KeyError:
-            raise lpbm.exceptions.ModelDoesNotExistError(self.__class__, id)
+            raise lpbm.exceptions.ModelDoesNotExistError(self.object_name(), id)
 
     def create_object(self, cls, *args, **kwargs):
         return cls(self, self.modules, *args, **kwargs)
