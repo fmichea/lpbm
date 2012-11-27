@@ -266,9 +266,10 @@ def load_modules(modules_, argument_parser):
                         msg = 'Command %s was correctly loaded.'
                         logger.info(msg, tmp.name())
                         modules_[tmp.name()] = tmp
-                    except TypeError:
+                    except TypeError as e:
                         msg = '  -> Failed to instanciate class %s, abstract '
                         msg += 'method or property missing?'
                         logger.debug(msg, item[0])
+                        logger.debug('    Error: ' + str(e))
         except ImportError as err:
             logger.debug('Failed to import module %s (%s).', mod_name, err)
