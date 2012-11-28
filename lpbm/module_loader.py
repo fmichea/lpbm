@@ -100,9 +100,9 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
             'delete': 'Deletes the selected {object_name}.',
             'edit': 'Edit the {object_name}.',
             'id': 'Selects an {object_name} for several options.',
-            'list': 'List all the {object_name}s.',
+            'list': 'List all the {object_name_plural}.',
             'new': 'Adds a new {object_name} interactively.',
-            'with-deleted': 'Includes deleted {object_name}s in listings.',
+            'with-deleted': 'Includes deleted {object_name_plural} in listings.',
         }
 
     def __getitem__(self, id):
@@ -130,8 +130,11 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
 
     def init(self):
         # Set correctly object name to its value.
-        self.helps = dict((k, v.format(object_name=self.object_name()))
-                          for (k, v) in self.helps.items())
+        kwargs = {
+            'object_name': self.object_name(),
+            'object_name_plural': self.object_name_plural(),
+        }
+        self.helps = dict((k, v.format(**kwargs)) for (k, v) in self.helps.items())
 
         # Default options.
         self.parser.add_argument('-i', '--id', action='store', type=int,
@@ -227,6 +230,9 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def model_cls(self):
         pass
+
+    def object_name_plural(self):
+        return self.object_name() + 's'
 
 def load_modules(modules_, argument_parser):
     """Dynamically loads all the compatible commands from modules directory"""
