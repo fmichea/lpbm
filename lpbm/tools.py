@@ -80,15 +80,14 @@ def input_default(prompt, default, required=False, is_valid=None):
             ))
             if not tmp:
                 tmp = default
-            if (not required or tmp) and (is_valid is None or is_valid(tmp)):
+            if (not required or tmp is not None) and (is_valid is None or is_valid(tmp)):
                 break
     except KeyboardInterrupt:
         sys.exit(1)
     except EOFError:
-        if not required:
-            print('Deleting field content.')
-            if ask_sure(default=True):
-                return None
+        if (not required and default != None and
+            ask_sure(prompt='Deleting field content.', default=True)):
+            return None
         sys.exit(1)
     return tmp
 
