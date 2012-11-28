@@ -20,9 +20,9 @@ class Author(cm_module.Model):
     first_name = cm_module.opt('first_name', default='')
     email = cm_module.opt('email')
 
-    def __init__(self, mod, mods, nickname, config):
+    def __init__(self, mod, mods, nickname):
         super().__init__(mod, mods)
-        self.nickname, self.cm = nickname, config
+        self.nickname, self.cm = nickname, mod.cm
 
         # Model interactive fields.
         self._interactive_fields += ['section', 'first_name', 'last_name', 'email']

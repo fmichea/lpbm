@@ -40,7 +40,7 @@ class Authors(lpbm.module_loader.ModelManagerModule):
 
         # Now loads all authors.
         for section in self.cm.config.sections():
-             self.register_object(Author, section, self.cm)
+             self.register_object(Author, section)
 
     # Random module functions internal to lpbm
     def is_valid(self, authors):
@@ -58,4 +58,4 @@ class Authors(lpbm.module_loader.ModelManagerModule):
     # Particular functions requested on command line.
     def opt_new(self):
         '''Interactively create an author.'''
-        super().opt_new(None, self.cm)
+        super().opt_new(None)
