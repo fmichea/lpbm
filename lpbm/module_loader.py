@@ -199,12 +199,17 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
     # Actions.
     def opt_list(self, short=False):
         if not short:
-            print('All {object_name}s:'.format(object_name=self.object_name()))
-        for obj in self.objects:
-            print(' {id:2d} - {obj}{deleted}'.format(
-                id=obj.id, obj=obj,
-                deleted=' [deleted]' if obj.deleted else '',
+            print('All {object_name_plural}:'.format(
+                object_name_plural=self.object_name_plural()
             ))
+        if self.objects:
+            for obj in sorted(self.objects):
+                print(' {id:2d} - {obj}{deleted}'.format(
+                    id=obj.id, obj=obj.list_verbose(),
+                    deleted=' [deleted]' if obj.deleted else '',
+                ))
+        else:
+            print(' + There is no {}.'.format(self.object_name()))
 
     def opt_new(self, *args, **kwargs):
         obj = self.create_object(self.model_cls(), *args, **kwargs)

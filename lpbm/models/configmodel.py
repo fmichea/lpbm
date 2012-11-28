@@ -179,33 +179,41 @@ class Model:
     deleted = opt_bool('deleted', default=False)
 
     def __init__(self, mod, mods):
-        self.cm, self.mod, self.mods = None, mod, mods
+        self.cm, self.mod, self.mods, self.__id = None, mod, mods, None
         self._interactive_fields = []
 
     def interactive(self):
-        def prompt_name(attr_name):
-            return attr_name.replace('_', ' ').title()
-        fields = list(self._interactive_fields)
+        fields = ['id'] + list(self._interactive_fields)
         try:
             fields.insert(fields.index('section') + 1, 'id')
         except ValueError:
-            fields = ['id'] + fields
+            pass
         for attr_name in fields:
             try:
-                getattr(self, 'interactive_' + attr_name)()
+                method = getattr(self, 'interactive_' + attr_name)
             except AttributeError:
-                attr = getattr(self, attr_name)
-                attr_class = getattr(type(self), attr_name, None)
-                if isinstance(attr_class, BaseField):
-                    prompt = getattr(attr_class, 'verbose_name') or prompt_name(attr_name)
-                    setattr(self, attr_name, ltools.input_default(
-                        prompt, attr, required=attr_class.required,
-                    ))
-                else:
-                    raise lpbm.exceptions.AttributeNotAFieldError(attr_name)
+                self._interactive_field(attr_name)
+                continue
+            method()
+
+    def _interactive_field(self, attr_name):
+        def prompt_name(attr_name):
+            return attr_name.replace('_', ' ').title()
+        attr = getattr(self, attr_name)
+        attr_class = getattr(type(self), attr_name, None)
+        if isinstance(attr_class, BaseField):
+            prompt = getattr(attr_class, 'verbose_name') or prompt_name(attr_name)
+            tmp = 'interactive_' + attr_name + '_is_valid'
+            kwargs = {
+                'required': attr_class.required,
+                'is_valid': getattr(self, tmp, None),
+            }
+            setattr(self, attr_name, ltools.input_default(prompt, attr, **kwargs))
+        else:
+            raise lpbm.exceptions.AttributeNotAFieldError(attr_name)
 
     def interactive_id(self):
-        if self.id is None:
+        if self.id is None and self.__id is None:
             ids = [o.id for o in self.mod.all_objects]
             def is_valid(val):
                 try:
@@ -217,14 +225,22 @@ class Model:
                 default = max(ids) + 1
             except ValueError:
                 default = 0
-            self.id = ltools.input_default('Id', default, required=True,
-                                           is_valid=is_valid)
+            id = ltools.input_default('Id', default, required=True, is_valid=is_valid)
+            if 'section' in self._interactive_fields:
+                self.__id = id
+            else:
+                self.id = id
+        elif self.__id is not None:
+            self.id = self.__id
 
     def save(self):
         self.cm.save()
 
     def delete(self):
         self.deleted = True
+
+    def list_verbose(self):
+        return str(self)
 
     @property
     def section(self):

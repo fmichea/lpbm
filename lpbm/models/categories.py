@@ -8,48 +8,35 @@ the categories of the blog.
 '''
 
 import lpbm.models.configmodel as cm_module
-import lpbm.tools
+import lpbm.tools as ltools
 
-class Category:
+class Category(cm_module.Model):
     '''
     Category's model in blog sources. Maps a section in an ini file containing
     all the categories of the blog. Basically, each category as a name and can
     have a parent category.
     '''
-    name = cm_module.opt('name')
+
     parent = cm_module.opt_int('parent', default=None)
 
-    def __init__(self, manager, id):
-        self.manager, self.id, self.cm = manager, int(id), manager.cm
+    def __init__(self, mod, mods, name):
+        super().__init__(mod, mods)
+        self.cm, self.name = mod.cm, name
         self._full_path, self._level = None, None
+        self._interactive_fields = ['section', 'parent']
 
     def __lt__(self, other):
         return (self.full_name() < other.full_name())
 
-    def interactive(self):
-        '''Interactively prompts the user for fields of the model.'''
-        self.name = lpbm.tools.input_default('Name', self.name, required=True)
-        self.manager.list_categories(short=True)
-        known_categories = self.manager.categories.keys()
-        def is_valid(value):
-            '''This function validates the value entered for parent cat.'''
-            try:
-                ivalue = int(value)
-            except ValueError:
-                return False
-            return (value is None or ivalue == -1 or ivalue in known_categories)
-        self.parent = lpbm.tools.input_default('Parent', self.parent,
-                                               is_valid=is_valid)
-        if self.parent == -1:
-            self.parent = None
+    def __str__(self):
+        return self.name
 
     def full_path(self):
-        if self._full_path is not None:
-            return self._full_path
-        self._full_path = []
-        if self.parent is not None:
-            self._full_path.extend(self.manager.categories[self.parent].full_path())
-        self._full_path.append(self)
+        if self._full_path is None:
+            self._full_path = []
+            if self.parent is not None:
+                self._full_path.extend(self.mod[self.parent].full_path())
+            self._full_path.append(self)
         return self._full_path
 
     def full_name(self):
@@ -58,15 +45,38 @@ class Category:
 
     def level(self):
         '''The level of the category (number of its parents).'''
-        if self._level is not None:
-            return self._level
-        if self.parent is None:
-            self._level = 0
-        else:
-            self._level = 1 + self.manager.categories[self.parent].level()
+        if self._level is None:
+            if self.parent is None:
+                self._level = 0
+            else:
+                self._level = 1 + self.mod[self.parent].level()
         return self._level
+
+    def list_verbose(self):
+        return '\r{}{id:2d} - {cat}'.format(' ' * 2 * self.level(), id = self.id, cat = str(self))
+
+    def interactive_section(self):
+        def is_valid(value):
+            f = self.mod.cm.config.has_section
+            return value == self.name or not f(value)
+        old_name = self.name
+        self.name = ltools.input_default('Name', self.name, required=True,
+                                         is_valid=is_valid)
+        if self.name != old_name:
+            self.mod.cm.config.remove_section(old_name)
+
+    def interactive_parent(self):
+        self.mod.opt_list(short=True)
+        super()._interactive_field('parent')
+
+    def interactive_parent_is_valid(self, value):
+        ids = [obj.id for obj in self.mod.objects]
+        try:
+            return value is None or int(value) in ids
+        except ValueError:
+            return False
 
     @property
     def section(self):
         '''Here for config manager.'''
-        return str(self.id)
+        return self.name
