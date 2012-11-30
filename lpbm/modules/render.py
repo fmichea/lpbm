@@ -62,10 +62,8 @@ class Render(lpbm.module_loader.Module):
         menu_header = None
         menu_path = lpbm.tools.join(args.exec_path, 'menu.markdown')
         if os.path.exists(menu_path):
-            with codecs.open(menu_path) as f:
-                menu_header = markdown.markdown(
-                    f.read().decode('utf-8')
-                )
+            with codecs.open(menu_path, 'r', 'utf-8') as f:
+                menu_header = markdown.markdown(f.read())
 
         # Jinja2 Environment Globals
         _ENV.filters.update({
