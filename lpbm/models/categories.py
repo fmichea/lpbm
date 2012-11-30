@@ -53,7 +53,11 @@ class Category(cm_module.Model):
         return self._level
 
     def list_verbose(self):
-        return '\r{}{id:2d} - {cat}'.format(' ' * 2 * self.level(), id = self.id, cat = str(self))
+        return '\r{indent}{id:2d} - {cat}'.format(
+            cat = str(self),
+            id = self.id,
+            indent = '  ' * self.level(),
+        )
 
     def interactive_section(self):
         def is_valid(value):
