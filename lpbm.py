@@ -32,12 +32,12 @@ def main():
     parser.add_argument('-b', '--backtrace', action='store_true', default=False,
                         help='print backtrace on error (default with pdb).')
     parser.add_argument('-d', '--debug', action='store_true', default=False,
-                        help='Prints debug information.')
+                        help='print debug information.')
     parser.add_argument('-p', '--exec-path', action='store', default='.',
-                        help='Path where LPBM will search the blog. ' + \
+                        help='path where lpbm will search the blog. ' + \
                              '(default: %(default)s)')
     parser.add_argument('-P', '--pdb', action='store_true', default=False,
-                        help='Starts pdb debugger on exception.')
+                        help='start pdb debugger on exception.')
     subparser = parser.add_subparsers()
 
     # Tools are loaded dynamically, so argument parser isn't complete.
