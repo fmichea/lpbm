@@ -35,8 +35,8 @@ def do_authors_list(value, mod):
     res, template = [], _get_template('authors', 'link.html')
     for author_id in value:
         try:
-            res.append(template.render({'author': mod[author_id]}))
-        except lpbm.exceptions.NoSuchAuthorError:
+            res.append(template.render({'author': mod[int(author_id)]}))
+        except (lpbm.exceptions.ModelDoesNotExistError, ValueError):
             pass
     return ltools.join_names(res)
 
@@ -188,7 +188,7 @@ class Render(lpbm.module_loader.Module):
                         email = author.email,
                         full_name = author.full_name(),
                     )
-                except lpbm.exceptions.NoSuchAuthorError:
+                except lpbm.exceptions.ModelDoesNotExistError:
                     return '[deleted]'
             authors = ltools.join_names([rss_aut(a) for a in article.authors])
             return PyRSS2Gen.RSSItem(
