@@ -127,7 +127,7 @@ class Article(cm_module.Model):
         self.cm.filename = self._config_filename()
 
     def interactive_authors(self):
-        #self.mods['authors'].opt_list(short=True)
+        self.mods['authors'].opt_list(short=True)
         self.authors = ltools.input_default('Please list authors (comma separated)',
                                             self._authors, required=True,
                                             is_valid=self.mods['authors'].is_valid)
