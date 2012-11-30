@@ -32,7 +32,6 @@ class Authors(lpbm.module_loader.ModelManagerModule):
 
     def init(self):
         super().init()
-        self.authors = dict()
 
     def load(self, modules, args):
         filename = ltools.join(args.exec_path, 'authors.cfg')
@@ -45,13 +44,14 @@ class Authors(lpbm.module_loader.ModelManagerModule):
     # Random module functions internal to lpbm
     def is_valid(self, authors):
         authors = ltools.split_on_comma(authors)
-        try:
-            authors = [int(idx) for idx in authors]
-        except ValueError:
-            return False
+        ids = [o.id for o in self.objects]
         for author in authors:
-            if author not in self.authors:
-                print('Author id {} is invalid!'.format(author))
+            try:
+                if int(author) not in ids:
+                    print('Author id {} is invalid!'.format(author))
+                    return False
+            except ValueError:
+                print('One of the ids is not a valid integer: {}'.format(author))
                 return False
         return True
 
