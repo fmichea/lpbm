@@ -18,12 +18,13 @@ class Category(cm_module.Model):
     '''
 
     parent = cm_module.opt_int('parent', default=None)
+    slug = cm_module.opt('slug', required=True)
 
     def __init__(self, mod, mods, name):
         super().__init__(mod, mods)
         self.cm, self.name = mod.cm, name
         self._full_path, self._level = None, None
-        self._interactive_fields = ['section', 'parent']
+        self._interactive_fields = ['section', 'slug', 'parent']
 
     def __lt__(self, other):
         return (self.full_name() < other.full_name())
@@ -79,6 +80,16 @@ class Category(cm_module.Model):
             return value is None or int(value) in ids
         except ValueError:
             return False
+
+    def interactive_slug(self):
+        def is_valid(value):
+            if value != ltools.slugify(value):
+                print('This is not a valid slug.')
+                return False
+            return True
+        default = self.slug or ltools.slugify(self.name)
+        self.slug = ltools.input_default('Slug', default, required=True,
+                                         is_valid=is_valid)
 
     @property
     def section(self):
