@@ -97,12 +97,12 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
         self.fgroup, self.ggroup, self.igroup = None, None, None
         self.fopts, self.gopts, self.iopts = [], [], []
         self.helps = {
-            'delete': 'Deletes the selected {object_name}.',
-            'edit': 'Edit the {object_name}.',
-            'id': 'Selects an {object_name} for several options.',
-            'list': 'List all the {object_name_plural}.',
-            'new': 'Adds a new {object_name} interactively.',
-            'with-deleted': 'Includes deleted {object_name_plural} in listings.',
+            'delete': 'delete the selected {object_name}.',
+            'edit': 'edit the {object_name}.',
+            'id': 'select an {object_name} for several options.',
+            'list': 'list all the {object_name_plural}.',
+            'new': 'add a new {object_name} interactively.',
+            'with-deleted': 'include deleted {object_name_plural} in listings.',
         }
 
     def __getitem__(self, id):
