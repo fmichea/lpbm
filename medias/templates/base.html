@@ -42,7 +42,7 @@
         {# Displays a list of the authors in the menu. #}
         <li><div id="authors"><strong>Authors</strong>
             <ul>
-                {% for author in authors_mod.authors.values()|sorted %}
+                {% for author in authors_mod.objects|sorted %}
                 <li>{% include "authors/link.html" %}</li>
                 {% endfor %}
             </ul>

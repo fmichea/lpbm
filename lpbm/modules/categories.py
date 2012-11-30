@@ -38,7 +38,7 @@ class Categories(lpbm.module_loader.ModelManagerModule):
 
     # Manipulation function
     def recursive_view(self):
-        res, cats, level = dict(), dict(self.objects), 0
+        res, cats, level = dict(), dict([(o.id, o) for o in self.objects]), 0
         while cats:
             _to_delete = []
             for cat in cats.values():

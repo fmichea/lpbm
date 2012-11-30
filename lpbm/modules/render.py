@@ -101,7 +101,7 @@ class Render(lpbm.module_loader.Module):
         return ltools.join(self.build_dir, *args)
 
     def _get_articles(self, limit=None):
-        articles = sorted(self.modules['articles'].articles.values())
+        articles = sorted(self.modules['articles'].objects)
         articles = [a for a in articles if a.published or self.args.drafts]
         articles = list(reversed(articles))
         if limit is not None:
@@ -135,7 +135,7 @@ class Render(lpbm.module_loader.Module):
     # Public functions.
     def render_articles(self):
         template = _get_template('articles', 'base.html')
-        for article in self.modules['articles'].articles.values():
+        for article in self.modules['articles'].objects:
             if not (article.published or self.args.drafts):
                 continue
             path = self._build_path('articles', article.html_filename())
