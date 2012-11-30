@@ -122,7 +122,7 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
     @property
     def objects(self):
         return [obj for obj in self._objects.values()
-                if self.args.with_deleted or not obj.deleted]
+                if getattr(self.args, 'with_deleted', False) or not obj.deleted]
 
     @property
     def all_objects(self):
