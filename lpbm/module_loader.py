@@ -152,7 +152,9 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
         self.add_id_option('-d', '--delete', help=self.helps['delete'])
 
     def _add_option(self, group, opts, args, kwargs_):
-        opts.append(kwargs_.get('dest', sorted(args, key=len)[-1][2:]))
+        def f(args):
+            return sorted(args, key=len)[-1][2:].replace('-', '_')
+        opts.append(kwargs_.get('dest', f(args)))
         kwargs = {'default': None, 'action': 'store_true'}
         kwargs.update(kwargs_)
         group.add_argument(*args, **kwargs)
