@@ -179,10 +179,8 @@ class Article(cm_module.Model):
 
     def html_filename(self):
         '''Returns the filename of the HTML file for that article.'''
-        slug = self._slug
-        if slug is None:
-            slug = ltools.slugify(self.title)
-        return '%d-%s.html' % (self.id, slug)
+        filename = os.path.basename(self.filename)
+        return '%d-%s.html' % (self.id, filename)
 
     def url(self):
         '''The direct link to the article.'''
