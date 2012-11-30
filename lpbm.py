@@ -29,6 +29,8 @@ def main():
     parser = argparse.ArgumentParser(
         description='Lightweight Personal Blog Maker'
     )
+    parser.add_argument('-b', '--backtrace', action='store_true', default=False,
+                        help='print backtrace on error (default with pdb).')
     parser.add_argument('-d', '--debug', action='store_true', default=False,
                         help='Prints debug information.')
     parser.add_argument('-p', '--exec-path', action='store', default='.',
@@ -48,10 +50,11 @@ def main():
     try:
         args.func(_MODULES, args)
     except Exception as err:
-        if args.pdb:
+        if args.backtrace or args.pdb:
             traceback.print_exc()
+        if args.pdb:
             pdb.post_mortem(sys.exc_info()[2])
-        else:
+        elif not args.backtrace:
             sys.exit('ERROR: ' + str(err))
 
 if __name__ == '__main__':
