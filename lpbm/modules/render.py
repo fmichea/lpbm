@@ -47,14 +47,8 @@ class Render(lpbm.module_loader.Module):
     def init(self):
         self.needed_modules = ['authors', 'articles', 'categories']
 
-#        self.parser.add_argument('--all', action='store_true',
-#                                 help='Renders everything.')
         self.parser.add_argument('--drafts', action='store_true', default=False,
-                                 help='Also renders drafts.')
-#        self.parser.add_argument('--articles', action='store_true',
-#                                 help='Renders all the articles.')
-#        self.parser.add_argument('--rss', action='store_true',
-#                                 help='Renders the RSS feed.')
+                                 help='also render drafts.')
 
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')

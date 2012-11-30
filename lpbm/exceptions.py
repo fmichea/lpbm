@@ -39,9 +39,11 @@ class FieldReadOnlyError(Exception):
     def __str__(self):
         return 'Can\'t assign read-only value.'
 
+
 class FieldRequiredError(Exception):
     def __str__(self):
         return 'Field is required and can\'t be set to empty value None.'
+
 
 class ConfigOptionArgsError(Exception):
     def __str__(self):
