@@ -41,20 +41,6 @@ class Authors(lpbm.module_loader.ModelManagerModule):
         for section in self.cm.config.sections():
              self.register_object(Author, section)
 
-    # Random module functions internal to lpbm
-    def is_valid(self, authors):
-        authors = ltools.split_on_comma(authors)
-        ids = [o.id for o in self.objects]
-        for author in authors:
-            try:
-                if int(author) not in ids:
-                    print('Author id {} is invalid!'.format(author))
-                    return False
-            except ValueError:
-                print('One of the ids is not a valid integer: {}'.format(author))
-                return False
-        return True
-
     # Particular functions requested on command line.
     def opt_new(self):
         '''Interactively create an author.'''
