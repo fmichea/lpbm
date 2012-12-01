@@ -2,11 +2,14 @@
 
 {% block body %}
 {% for article in articles %}
-<li id="{{ article.id }}">
-    <a href="{{ article.url() }}"><h1>{{ article.title }}</h1></a>
-    <div class="infos"><p>Written by {{ article.authors|authors_list(authors_mod) }}<br/>{{ article.date }}</p></div>
-    <p>{{ article.content|markdown }}</p>
-    <div class="infos">
+<div class="well article" id="{{ article.id }}">
+    <h1>{{ article.title }}</h1>
+    <div class="clearfix muted"><p class="pull-right">
+        <small>Written by {{ article.authors|authors_list(authors_mod) }}, {{ article.date }}</small>
+    </p></div>
+    <div>{{ article.content|markdown }}</div>
+    <div class="clearfix muted"><p class="pull-right">
+        <small>
         {% if config_mod['social.twitter_id'] and config_mod['general.url'] %}
         <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ config_mod['general.url'] }}{{ article.html_filename() }}" data-via="{{ config_mod['social.twitter_id'] }}" data-text="{{ article.title }} - {{ config_mod['general.title'] }}">Tweet</a>
         <script>
@@ -21,10 +24,8 @@
                 }(document,"script","twitter-wjs");
         </script>
         {% endif %}
-        <div class="comments-link">
-            <a href="{{ article.url() }}">Permalink & comments</a>
-        </div>
-    </div>
+        <a href="{{ article.url() }}">Permalink & comments</a></small>
+    </p></div>
 
     {% if article.comments_enabled and config_mod['general.url'] and config_mod['social.disqus_id'] %}
     <div id="disqus_thread"></div>
@@ -43,6 +44,6 @@
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
     {% endif %}
-</li>
+</div>
 {% endfor %}
 {% endblock %}
