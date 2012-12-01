@@ -91,6 +91,12 @@ class Category(cm_module.Model):
         self.slug = ltools.input_default('Slug', default, required=True,
                                          is_valid=is_valid)
 
+    def html_filename(self):
+        return 'cat/{}/index.html'.format(self.slug)
+
+    def url(self):
+        return '/{}'.format(self.html_filename())
+
     @property
     def section(self):
         '''Here for config manager.'''

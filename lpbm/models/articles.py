@@ -38,6 +38,7 @@ class Article(cm_module.Model):
 
     _date = cm_module.opt('general', 'date')
     _authors = cm_module.opt('general', 'authors', default='')
+    _categories = cm_module.opt('general', 'categories', default='')
 
     def __init__(self, mod, mods, filename=None):
         super().__init__(mod, mods)
@@ -71,10 +72,11 @@ class Article(cm_module.Model):
         self._interactive_fields = ['title']
         if self.id is None:
             self._interactive_fields += ['filename']
-        self._interactive_fields += ['authors']
+        self._interactive_fields += ['authors', 'categories']
 
         # Authors
         self.authors = self._authors
+        self.categories = self._categories
 
         # If creating the article, set date to now.
         if self._date is None:
@@ -103,6 +105,7 @@ class Article(cm_module.Model):
 
         # Saving special fields configuration
         self._authors = ', '.join(list(self._authors_set))
+        self._categories = ', '.join(list(self._categories_set))
 
         # Finally saving everything.
         super().save()
@@ -128,9 +131,17 @@ class Article(cm_module.Model):
 
     def interactive_authors(self):
         self.mods['authors'].opt_list(short=True)
-        self.authors = ltools.input_default('Please list authors (comma separated)',
-                                            self._authors, required=True,
-                                            is_valid=self.mods['authors'].is_valid)
+        self.authors = ltools.input_default(
+            'Please list authors (comma separated)', self._authors,
+            required=True, is_valid=self.mods['authors'].is_valid_list,
+        )
+
+    def interactive_categories(self):
+        self.mods['categories'].opt_list(short=True)
+        self.categories = ltools.input_default(
+            'Please list categories (comma separated)', self._categories,
+            required=True, is_valid=self.mods['categories'].is_valid_list,
+        )
 
     def delete(self):
         super().delete()
@@ -148,6 +159,14 @@ class Article(cm_module.Model):
         the article.
         '''
         self._authors_set = set(ltools.split_on_comma(authors))
+
+    @property
+    def categories(self):
+        return list(self._categories_set)
+
+    @categories.setter
+    def categories(self, value):
+        self._categories_set = set(ltools.split_on_comma(value))
 
     @property
     def date(self):
