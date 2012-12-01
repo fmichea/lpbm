@@ -2,7 +2,7 @@ Frequently Asked Questions
 ==========================
 
 Nothing in this FAQ was actually asked, but it may help some people to have
-these answers.
+these answers. Anyway you can still ask if you think should be added here.
 
 How is lpbm licensed?
 ---------------------

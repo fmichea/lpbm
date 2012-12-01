@@ -13,6 +13,8 @@ Contents:
 
     introduction
     faq
+    quick_start
+    modules
 
 Indices and tables
 ==================
