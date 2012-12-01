@@ -150,7 +150,7 @@ class Article(cm_module.Model):
     @property
     def authors(self):
         '''Returns the list of authors.'''
-        return list(self._authors_set)
+        return [int(a) for a in list(self._authors_set)]
 
     @authors.setter
     def authors(self, authors):
@@ -162,7 +162,7 @@ class Article(cm_module.Model):
 
     @property
     def categories(self):
-        return list(self._categories_set)
+        return [int(c) for c in list(self._categories_set)]
 
     @categories.setter
     def categories(self, value):

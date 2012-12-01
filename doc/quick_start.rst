@@ -115,16 +115,18 @@ created article using ``lpbm articles --id 0 -E``. You can also publish it with
 Render your new blog!
 ---------------------
 
-Now you have your blog ready for rendering! Try it now: ``lpbm render``. This
-will need a ``result`` directory or symlink to the place were you want your blog
-to be generated. you can then open ``result/index.html`` in your browser.
+Now you have your blog ready for rendering! Try it now: ``lpbm render``. If you
+don't want to publish your article right now, you can render your blog with
+``lpbm render --drafts``. Don't forget to do that in local. This will need a
+``result`` directory or a symbolic link to the place were you want your blog to
+be generated. You can then open ``result/index.html`` in your browser.
 
-I foster you to configure a simple HTTP server (no need of any dynamique
+I foster you to configure a simple HTTP server (no need of any dynamic
 language, just static files serving is fine) to see CSS and the like correctly.
 
 Random end notes
 ----------------
 
-If you find any bug agin don't hesitate to get back to me, you have my mail ;).
+If you find any bug again don't hesitate to get back to me, you have my mail ;).
 The ``touch`` and ``mkdir`` should be removed soon, and done directly in lpbm.
 Have fun!
