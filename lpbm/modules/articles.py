@@ -35,7 +35,7 @@ class Articles(lpbm.module_loader.ModelManagerModule):
     def init(self):
         super().init()
 
-        self.needed_modules = ['authors']
+        self.needed_modules = ['authors', 'categories']
 
         self.add_id_option('-p', '--publish', help='Publishes the draft.')
         self.add_id_option('-E', '--edit-content', help='Opens your $EDITOR on the article.')
