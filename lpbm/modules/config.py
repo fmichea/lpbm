@@ -33,8 +33,8 @@ _CONFIGURATION = {
         'nb_articles': (False, 'Number of articles in RSS Feed. (default: 10).'),
     }),
     'social': (False, {
-        'twitter': (False, 'Twitter id, for the mention (ex: kushou_)'),
-        'disqus': (False, 'Disqus id for comments in articles.'),
+        'twitter_id': (False, 'Twitter id, for the mention (ex: kushou_)'),
+        'disqus_id': (False, 'Disqus id for comments in articles.'),
     }),
     'logging-std': (False, {
         'level': (False, 'Level of messages logged on stderr.'),
