@@ -14,6 +14,7 @@ import os
 import sys
 
 import lpbm.logging
+import lpbm.tools as ltools
 
 class Module(metaclass=abc.ABCMeta):
     """
@@ -240,6 +241,23 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
 
     def object_name_plural(self):
         return self.object_name() + 's'
+
+    def is_valid(self, id):
+        try:
+            if int(id) not in self._objects:
+                print('{} id {} is invalid!'.format(self.object_name().title(), id))
+                return False
+        except ValueError:
+            print('One of the ids is not a valid integer: {}'.format(id))
+            return False
+        return True
+
+    def is_valid_list(self, lst):
+        lst = ltools.split_on_comma(lst)
+        for id in lst:
+            if not self.is_valid(id):
+                return False
+        return True
 
 def load_modules(modules_, argument_parser):
     """Dynamically loads all the compatible commands from modules directory"""
