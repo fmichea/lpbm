@@ -70,6 +70,8 @@ class Config(lpbm.module_loader.Module):
             self.set_var(args.set)
         elif args.unset: # We want to unset some variable.
             self.unset_var(args.unset)
+        else:
+            sys.exit('Don\'t know what to do :(')
         try:
             with open(ltools.join(args.exec_path, 'lpbm.cfg'), 'w') as f:
                 self.config.write(f)
