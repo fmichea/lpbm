@@ -30,7 +30,7 @@
         <li><div id="categories"><strong>Categories</strong>
             <ul>
                 {% for cat, children in categories_mod.recursive_view().values()|sorted recursive %}
-                <li><a href="{{ cat.url }}">{{ cat.name }}</a>
+                <li><a href="{{ cat.url() }}">{{ cat.name }}</a>
                     {% if children %}
                     <ul>{{ loop(children.values()|sorted) }}</ul>
                     {% endif %}

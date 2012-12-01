@@ -85,9 +85,8 @@ class Render(lpbm.module_loader.Module):
         })
 
         self.render_articles()
-        self.render_index()
-        self.render_pages()
         self.render_rss()
+        self.render_categories()
 
         # If full rendering completed (we are still alive), then we copy the
         # temporary directory to the output directory.
@@ -98,10 +97,12 @@ class Render(lpbm.module_loader.Module):
         lpbm.tools.mkdir_p(ltools.join(self.build_dir, *(args[:-1])))
         return ltools.join(self.build_dir, *args)
 
-    def _get_articles(self, limit=None):
+    def _get_articles(self, limit=None, filter=None):
         articles = sorted(self.modules['articles'].objects)
         articles = [a for a in articles if a.published or self.args.drafts]
         articles = list(reversed(articles))
+        if filter is not None:
+            articles = [a for a in articles if filter(a)]
         if limit is not None:
             articles = articles[:limit]
         return articles
@@ -133,32 +134,31 @@ class Render(lpbm.module_loader.Module):
     # Public functions.
     def render_articles(self):
         template = _get_template('articles', 'base.html')
-        for article in self.modules['articles'].objects:
-            if not (article.published or self.args.drafts):
-                continue
+        for article in self._get_articles():
             path = self._build_path('articles', article.html_filename())
             with codecs.open(path, 'w', 'utf-8') as f:
                 print('Writing article to', path)
                 f.write(template.render({
                     'articles': [article],
                 }))
+        self.render_index([], self._get_articles())
+        self.render_pages(['pages'], self._get_articles())
 
-    def render_index(self):
+    def render_index(self, directory, articles):
         template = _get_template('articles', 'base.html')
         limit = self.modules['config']['paginate.nb_articles'] or 5
-        articles = self._get_articles(limit)
-        with codecs.open(self._build_path('index.html'), 'w', 'utf-8') as f:
+        articles_ = articles[:limit]
+        with codecs.open(self._build_path(*(directory + ['index.html'])), 'w', 'utf-8') as f:
             print('Writing index file.')
             f.write(template.render({
-                'show_more': limit < len(self._get_articles()),
-                'articles': articles,
+                'show_more': limit < len(articles),
+                'articles': articles_,
             }))
 
-    def render_pages(self):
-        articles = self._get_articles()
+    def render_pages(self, directory, articles):
         app = self.modules['config']['paginate.nb_articles'] or 5
-        pages = int(math.ceil(len(articles) / float(app)))
         pwidth = self.modules['config']['paginate.width'] or 5
+        pages = int(math.ceil(len(articles) / float(app)))
         def left_stone(page):
             return min(max(0, page - pwidth / 2), max(0, pages - pwidth))
         def right_stone(page):
@@ -168,7 +168,7 @@ class Render(lpbm.module_loader.Module):
         for page in range(pages):
             display_page = page + 1
             tmp = 'page-{}.html'.format(display_page)
-            with codecs.open(self._build_path('pages', tmp), 'w', 'utf-8') as f:
+            with codecs.open(self._build_path(*(directory + [tmp])), 'w', 'utf-8') as f:
                 f.write(template.render({
                     'articles': articles[page * app: (page + 1) * app],
                     'cur_page': display_page,
@@ -212,3 +212,10 @@ class Render(lpbm.module_loader.Module):
         rss_path = ltools.join(self.build_dir, 'rssfeed.xml')
         with codecs.open(rss_path, 'w', 'utf-8') as f:
             rss.write_xml(f, encoding='utf-8')
+
+    def render_categories(self):
+        for cat in self.modules['categories'].objects:
+            dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
+            articles = self._get_articles(filter=lambda a: str(cat.id) in a.categories)
+            self.render_pages(dirs, articles)
+            self.render_index(dirs, articles)
