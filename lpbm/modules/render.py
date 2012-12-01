@@ -38,7 +38,7 @@ def do_authors_list(value, mod):
             res.append(template.render({'author': mod[int(author_id)]}))
         except (lpbm.exceptions.ModelDoesNotExistError, ValueError):
             pass
-    return ltools.join_names(res)
+    return ltools.join_names(sorted(res))
 
 class Render(lpbm.module_loader.Module):
     def name(self): return 'render'
