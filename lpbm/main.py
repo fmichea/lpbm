@@ -47,14 +47,15 @@ def main():
     # Every command , we can parse command line.
     args = parser.parse_args(sys.argv[1:])
 
-    try:
-        args.func(_MODULES, args)
-    except AttributeError:
+    if hasattr(args, 'func'):
+        try:
+            args.func(_MODULES, args)
+        except Exception as err:
+            if args.backtrace or args.pdb:
+                traceback.print_exc()
+            if args.pdb:
+                pdb.post_mortem(sys.exc_info()[2])
+            elif not args.backtrace:
+                sys.exit('ERROR: ' + str(err))
+    else:
         parser.print_help()
-    except Exception as err:
-        if args.backtrace or args.pdb:
-            traceback.print_exc()
-        if args.pdb:
-            pdb.post_mortem(sys.exc_info()[2])
-        elif not args.backtrace:
-            sys.exit('ERROR: ' + str(err))
