@@ -58,6 +58,3 @@ def main():
             pdb.post_mortem(sys.exc_info()[2])
         elif not args.backtrace:
             sys.exit('ERROR: ' + str(err))
-
-if __name__ == '__main__':
-    main()
