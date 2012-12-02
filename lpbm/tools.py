@@ -12,7 +12,7 @@ import sys
 # pylint: disable=W0402
 import string
 
-ROOT = os.path.join(os.path.dirname(__file__), '..')
+ROOT = os.path.dirname(__file__)
 
 def join(*args):
     '''Joins a some paths with ROOT as base path.'''

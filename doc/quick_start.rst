@@ -10,13 +10,15 @@ First go into a folder wherever you want. I personally named it
 is the root of my blog). The directory is empty.
 
 We will first need to fill few variables in the configuration. You can always
-check your configuration using ``lpbm config -k``. This is what I did::
+check your configuration using ``lpbm config -k``. This is what I did:
+
+.. code-block:: console
 
     $ touch lpbm.cfg
     $ lpbm config --set general.title="kushou's blog"
     $ lpbm config --set general.url="http://localhost:8081/"
 
-You know have the minimum configuration necessary. You can also check what other
+You now have the minimum required configuration. You can also check what other
 option is available. You can for example add a twitter account or disqus account
 for tweet button and comments.
 
