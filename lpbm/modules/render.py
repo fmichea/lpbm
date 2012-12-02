@@ -216,6 +216,6 @@ class Render(lpbm.module_loader.Module):
     def render_categories(self):
         for cat in self.modules['categories'].objects:
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
-            articles = self._get_articles(filter=lambda a: str(cat.id) in a.categories)
+            articles = self._get_articles(filter=lambda a: cat.id in a.categories)
             self.render_pages(dirs, articles)
             self.render_index(dirs, articles)
