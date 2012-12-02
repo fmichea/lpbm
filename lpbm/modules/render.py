@@ -149,7 +149,7 @@ class Render(lpbm.module_loader.Module):
         limit = self.modules['config']['paginate.nb_articles'] or 5
         articles_ = articles[:limit]
         with codecs.open(self._build_path(*(directory + ['index.html'])), 'w', 'utf-8') as f:
-            print('Writing index file.')
+            print('Writing index file for {}.'.format(os.path.join('/', *directory)))
             f.write(template.render({
                 'show_more': limit < len(articles),
                 'articles': articles_,
