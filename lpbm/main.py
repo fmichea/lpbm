@@ -49,6 +49,8 @@ def main():
 
     try:
         args.func(_MODULES, args)
+    except AttributeError:
+        parser.print_help()
     except Exception as err:
         if args.backtrace or args.pdb:
             traceback.print_exc()
