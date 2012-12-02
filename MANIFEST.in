@@ -1,2 +1,4 @@
 include README
 include AUTHORS
+
+recursive-include lpbm/medias *.css *.html
