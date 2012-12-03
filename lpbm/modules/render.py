@@ -85,8 +85,8 @@ class Render(lpbm.module_loader.Module):
         })
 
         self.render_articles()
-        self.render_rss()
         self.render_categories()
+        self.render_rss()
 
         # If full rendering completed (we are still alive), then we copy the
         # temporary directory to the output directory.
