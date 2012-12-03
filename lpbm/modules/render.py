@@ -40,6 +40,9 @@ def do_authors_list(value, mod):
             pass
     return ltools.join_names(sorted(res))
 
+def do_slugify(value):
+    return ltools.slugify(value)
+
 class Render(lpbm.module_loader.Module):
     def name(self): return 'render'
     def abstract(self): return 'Blog generation module.'
@@ -69,6 +72,7 @@ class Render(lpbm.module_loader.Module):
         _ENV.filters.update({
             'authors_list': do_authors_list,
             'markdown': do_markdown,
+            'slugify': do_slugify,
             'sorted': do_sorted,
         })
         _ENV.globals.update({
@@ -86,6 +90,7 @@ class Render(lpbm.module_loader.Module):
 
         self.render_articles()
         self.render_categories()
+        self.render_authors()
         self.render_rss()
 
         # If full rendering completed (we are still alive), then we copy the
@@ -225,5 +230,19 @@ class Render(lpbm.module_loader.Module):
         for id, articles in categories.items():
             cat = self.modules['categories'][id]
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
+            self.render_index(dirs, list(articles))
+            self.render_pages(dirs, list(articles))
+
+    def render_authors(self):
+        authors = dict()
+        for article in self._get_articles():
+            for author in article.authors:
+                try:
+                    authors[author] |= article
+                except KeyError:
+                    authors[author] = set([article])
+        for id, articles in authors.items():
+            author = self.modules['authors'][id]
+            dirs = [ltools.slugify(author.nickname)]
             self.render_index(dirs, list(articles))
             self.render_pages(dirs, list(articles))
