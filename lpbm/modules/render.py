@@ -214,8 +214,17 @@ class Render(lpbm.module_loader.Module):
             rss.write_xml(f, encoding='utf-8')
 
     def render_categories(self):
-        for cat in self.modules['categories'].objects:
+        categories = dict()
+        for article in self.modules['articles'].objects:
+            for cat in article.categories:
+                for pcat in self.modules['categories'][cat].full_path():
+                    try:
+                        categories[pcat.id] |= article.id
+                    except KeyError:
+                        categories[pcat.id] = set([article.id])
+        for id, articles in categories.items():
+            cat = self.modules['categories'][id]
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
-            articles = self._get_articles(filter=lambda a: cat.id in a.categories)
-            self.render_pages(dirs, articles)
+            articles = self._get_articles(filter=lambda a: a.id in articles)
             self.render_index(dirs, articles)
+            self.render_pages(dirs, articles)

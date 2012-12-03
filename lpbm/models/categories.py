@@ -7,6 +7,8 @@ Category's model in blog sources. Maps a section in an ini file containing all
 the categories of the blog.
 '''
 
+import os
+
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
@@ -92,7 +94,8 @@ class Category(cm_module.Model):
                                          is_valid=is_valid)
 
     def html_filename(self):
-        return 'cat/{}/index.html'.format(self.slug)
+        slugs = [cat.slug for cat in self.full_path()]
+        return 'cat/{}/index.html'.format(os.path.join(*slugs))
 
     def url(self):
         return '/{}'.format(self.html_filename())
