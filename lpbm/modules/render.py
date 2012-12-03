@@ -215,16 +215,15 @@ class Render(lpbm.module_loader.Module):
 
     def render_categories(self):
         categories = dict()
-        for article in self.modules['articles'].objects:
+        for article in self._get_articles():
             for cat in article.categories:
                 for pcat in self.modules['categories'][cat].full_path():
                     try:
-                        categories[pcat.id] |= article.id
+                        categories[pcat.id] |= article
                     except KeyError:
-                        categories[pcat.id] = set([article.id])
+                        categories[pcat.id] = set([article])
         for id, articles in categories.items():
             cat = self.modules['categories'][id]
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
-            articles = self._get_articles(filter=lambda a: a.id in articles)
-            self.render_index(dirs, articles)
-            self.render_pages(dirs, articles)
+            self.render_index(dirs, list(articles))
+            self.render_pages(dirs, list(articles))
