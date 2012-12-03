@@ -50,13 +50,13 @@ class Module(metaclass=abc.ABCMeta):
         modules['config'].module_load(modules, args)
         for mod in self.needed_modules:
             modules[mod].module_load(modules, args)
-        self.modules, self.args = modules, args
         self.module_load(modules, args)
         self.process(modules, args)
 
     def module_load(self, modules, args):
         if self.module_loaded:
             return
+        self.modules, self.args = modules, args
         self.module_loaded, self.args = True, args
         self.load(modules, args)
 
