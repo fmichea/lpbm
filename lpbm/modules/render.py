@@ -158,18 +158,20 @@ class Render(lpbm.module_loader.Module):
         self.render_index([], self._get_articles())
         self.render_pages(['pages'], self._get_articles())
 
-    def render_index(self, directory, articles):
+    def render_index(self, directory, articles, **kwargs):
         template = _get_template('articles', 'base.html')
         limit = self.modules['config']['paginate.nb_articles'] or 5
         articles_ = articles[:limit]
         with codecs.open(self._build_path(*(directory + ['index.html'])), 'w', 'utf-8') as f:
             print('Writing index file for {}.'.format(os.path.join('/', *directory)))
-            f.write(template.render({
+            kwargs_ = dict(kwargs)
+            kwargs_.update({
                 'show_more': limit < len(articles),
                 'articles': articles_,
-            }))
+            })
+            f.write(template.render(kwargs_))
 
-    def render_pages(self, directory, articles):
+    def render_pages(self, directory, articles, **kwargs):
         app = self.modules['config']['paginate.nb_articles'] or 5
         pwidth = self.modules['config']['paginate.width'] or 5
         pages = int(math.ceil(len(articles) / float(app)))
@@ -183,13 +185,15 @@ class Render(lpbm.module_loader.Module):
             display_page = page + 1
             tmp = 'page-{}.html'.format(display_page)
             with codecs.open(self._build_path(*(directory + [tmp])), 'w', 'utf-8') as f:
-                f.write(template.render({
+                kwargs_ = dict(kwargs)
+                kwargs_.update({
                     'articles': articles[page * app: (page + 1) * app],
                     'cur_page': display_page,
                     'last_page': pages,
                     'pages': display_pages[left_stone(page):right_stone(page)],
                     'paginate': True,
-                }))
+                })
+                f.write(template.render(kwargs_))
 
     def render_rss(self):
         def rss_item(article):
@@ -239,8 +243,8 @@ class Render(lpbm.module_loader.Module):
         for id, articles in categories.items():
             cat = self.modules['categories'][id]
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
-            self.render_index(dirs, list(articles))
-            self.render_pages(dirs, list(articles))
+            self.render_index(dirs, list(articles), cur_cat=cat.id)
+            self.render_pages(dirs, list(articles), cur_cat=cat.id)
 
     def render_authors(self):
         authors = dict()
@@ -253,5 +257,5 @@ class Render(lpbm.module_loader.Module):
         for id, articles in authors.items():
             author = self.modules['authors'][id]
             dirs = ['authors', ltools.slugify(author.nickname)]
-            self.render_index(dirs, list(articles))
-            self.render_pages(dirs, list(articles))
+            self.render_index(dirs, list(articles), cur_author=author.id)
+            self.render_pages(dirs, list(articles), cur_author=author.id)

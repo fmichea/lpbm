@@ -49,7 +49,8 @@
                 <ul class="nav nav-list">
                     <li class="nav-header">Categories</li>
                     {% for cat, children in categories_mod.recursive_view().values()|sorted recursive %}
-                    <li><a href="{{ cat.url() }}">{{ cat.name }}</a>
+                    <li {% if cur_cat == cat.id %}class="active"{% endif %}>
+                        <a href="{{ cat.url() }}">{{ cat.name }}</a>
                         {% if children %}
                         <ul class="nav nav-list">{{ loop(children.values()|sorted) }}</ul>
                         {% endif %}
@@ -58,7 +59,9 @@
 
                     <li class="nav-header">Authors</li>
                     {% for author in authors_mod.objects|sorted %}
-                    <li>{% include "authors/menu_link.html" %}</li>
+                    <li {% if cur_author == author.id %}class="active"{% endif %}>
+                        {% include "authors/menu_link.html" %}
+                    </li>
                     {% endfor %}
                     <li>
                 </ul>
