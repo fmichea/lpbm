@@ -25,6 +25,9 @@ _CONFIGURATION = {
         'subtitle': (False, 'Sub-title of the blog.'),
         'footer': (False, 'Footer of the blog. (default: RSS link).'),
     }),
+    'theme': (False, {
+        'name': (False, 'Name of the theme you want to use (default, bootstrap).'),
+    }),
     'paginate': (False, {
         'width': (False, 'Width of the slice for page selection (default: 5).'),
         'nb_articles': (False, 'Number of articles per page. (default: 5).'),

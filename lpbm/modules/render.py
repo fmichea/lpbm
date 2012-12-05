@@ -15,9 +15,7 @@ import tempfile
 import lpbm.module_loader
 import lpbm.tools as ltools
 
-_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    ltools.join(ltools.ROOT, 'medias', 'templates')
-))
+_ENV = None
 
 def _get_template(*args):
     return _ENV.get_template(os.path.join(*args))
@@ -61,6 +59,11 @@ class Render(lpbm.module_loader.Module):
             sys.exit('I didn\'t find directory/symbolic link named `result`'
                      ' where to put the blog.')
 
+        theme = self.modules['config']['theme.name'] or 'default'
+        self.root = ltools.join(ltools.ROOT, 'themes', theme)
+        if not os.path.exists(self.root):
+            sys.exit('I don\'t know this theme. ({})'.format(theme))
+
         # Menu header.
         menu_header = None
         menu_path = lpbm.tools.join(args.exec_path, 'menu.markdown')
@@ -69,6 +72,11 @@ class Render(lpbm.module_loader.Module):
                 menu_header = markdown.markdown(f.read())
 
         # Jinja2 Environment Globals
+        global _ENV
+        _ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            ltools.join(self.root, 'templates')
+        ))
+
         _ENV.filters.update({
             'authors_list': do_authors_list,
             'markdown': do_markdown,
@@ -127,13 +135,12 @@ class Render(lpbm.module_loader.Module):
                 ltools.copy(ltools.join(root, filename),
                             ltools.join(out_root, filename))
             return res
-        statics.extend(sub(ltools.ROOT))
-        statics.extend(sub(self.args.exec_path))
+        statics.extend(sub(self.root))
+        statics.extend(sub(ltools.join(self.args.exec_path, 'medias')))
 
     def copy_static_files(self):
         static_files = {'css': []}
-        self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'),
-                              'medias', 'css')
+        self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'), 'css')
         return static_files
 
     # Public functions.
