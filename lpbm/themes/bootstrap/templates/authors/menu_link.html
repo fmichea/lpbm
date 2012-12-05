@@ -1,0 +1,4 @@
+{%- if author.email -%}
+<span class=pull-right"><a href="mailto:{{ author.email }}" class="email-link pull-right icon-envelope"></a></span>
+{%- endif -%}
+<a href="/authors/{{ author.nickname|slugify }}/">{{ author.full_name() }}</a>

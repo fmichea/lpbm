@@ -76,7 +76,6 @@ class Render(lpbm.module_loader.Module):
         _ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
             ltools.join(self.root, 'templates')
         ))
-
         _ENV.filters.update({
             'authors_list': do_authors_list,
             'markdown': do_markdown,
@@ -130,7 +129,7 @@ class Render(lpbm.module_loader.Module):
         out_root = self._build_path(*subdirs)
         def sub(root):
             res = []
-            for root, filename in ltools.filter_files(fltr, root, *subdirs):
+            for root, filename in ltools.filter_files(fltr, root, *(subdirs[1:])):
                 res.append(ltools.join('/', *(subdirs + (filename,))))
                 ltools.copy(ltools.join(root, filename),
                             ltools.join(out_root, filename))
@@ -139,8 +138,11 @@ class Render(lpbm.module_loader.Module):
         statics.extend(sub(ltools.join(self.args.exec_path, 'medias')))
 
     def copy_static_files(self):
-        static_files = {'css': []}
-        self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'), 'css')
+        static_files = {'css': [], 'images': []}
+        self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'),
+                              'medias', 'css')
+        self._copy_static_dir(static_files['images'], lambda a: True,
+                              'medias', 'images')
         return static_files
 
     # Public functions.
@@ -250,6 +252,6 @@ class Render(lpbm.module_loader.Module):
                     authors[author] = set([article])
         for id, articles in authors.items():
             author = self.modules['authors'][id]
-            dirs = [ltools.slugify(author.nickname)]
+            dirs = ['authors', ltools.slugify(author.nickname)]
             self.render_index(dirs, list(articles))
             self.render_pages(dirs, list(articles))
