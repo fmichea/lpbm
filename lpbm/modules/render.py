@@ -181,8 +181,14 @@ class Render(lpbm.module_loader.Module):
             return max(min(pages, page + int(pwidth / 2)), min(pages, pwidth - 1))
         template = _get_template('articles', 'base.html')
         display_pages = range(1, pages + 1)
+        main_title = kwargs.get('page_title', None)
+        if main_title:
+            main_title += ' - Page {}'
+        else:
+            main_title = 'Page {}'
         for page in range(pages):
             display_page = page + 1
+            kwargs['page_title'] = main_title.format(display_page)
             tmp = 'page-{}.html'.format(display_page)
             with codecs.open(self._build_path(*(directory + [tmp])), 'w', 'utf-8') as f:
                 kwargs_ = dict(kwargs)
@@ -243,8 +249,12 @@ class Render(lpbm.module_loader.Module):
         for id, articles in categories.items():
             cat = self.modules['categories'][id]
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
-            self.render_index(dirs, list(articles), cur_cat=cat.id)
-            self.render_pages(dirs, list(articles), cur_cat=cat.id)
+            kwargs = {
+                'page_title': cat.name,
+                'cur_cat': cat.id,
+            }
+            self.render_index(dirs, list(articles), **kwargs)
+            self.render_pages(dirs, list(articles), **kwargs)
 
     def render_authors(self):
         authors = dict()
@@ -257,5 +267,9 @@ class Render(lpbm.module_loader.Module):
         for id, articles in authors.items():
             author = self.modules['authors'][id]
             dirs = ['authors', ltools.slugify(author.nickname)]
-            self.render_index(dirs, list(articles), cur_author=author.id)
-            self.render_pages(dirs, list(articles), cur_author=author.id)
+            kwargs = {
+                'page_title': '{} ({})'.format(author.full_name(), author.nickname),
+                'cur_author': author.id,
+            }
+            self.render_index(dirs, list(articles), **kwargs)
+            self.render_pages(dirs, list(articles), **kwargs)
