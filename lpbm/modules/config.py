@@ -169,7 +169,7 @@ class Config(lpbm.module_loader.Module):
 
     def set_var(self, var):
         """Set a variable in the configuration and saves the configuration."""
-        parts = var.split('=')
+        parts = var.split('=', 1)
         parts_ = parts[0].split('.')
         if len(parts) != 2 or len(parts_) != 2:
             print('Must set a variable. Syntax is `section.var=value`.',
