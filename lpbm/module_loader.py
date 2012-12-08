@@ -206,7 +206,7 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
                 object_name_plural=self.object_name_plural()
             ))
         if self.objects:
-            for obj in sorted(self.objects):
+            for obj in sorted(self.objects, key=lambda o: o.id):
                 print(' {id:2d} - {obj}{deleted}'.format(
                     id=obj.id, obj=obj.list_verbose(),
                     deleted=' [deleted]' if obj.deleted else '',
