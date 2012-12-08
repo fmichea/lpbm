@@ -237,7 +237,7 @@ class Render(lpbm.module_loader.Module):
             for cat in article.categories:
                 for pcat in self.modules['categories'][cat].full_path():
                     try:
-                        categories[pcat.id] |= article
+                        categories[pcat.id] |= set([article])
                     except KeyError:
                         categories[pcat.id] = set([article])
         for id, articles in categories.items():
@@ -251,7 +251,7 @@ class Render(lpbm.module_loader.Module):
         for article in self._get_articles():
             for author in article.authors:
                 try:
-                    authors[author] |= article
+                    authors[author] |= set([article])
                 except KeyError:
                     authors[author] = set([article])
         for id, articles in authors.items():
