@@ -28,8 +28,8 @@ class Author(cm_module.Model):
         self._interactive_fields += ['section', 'first_name', 'last_name', 'email']
 
     def __lt__(self, other):
-        return (self.last_name < other.last_name or
-                self.first_name < other.first_name)
+        return ((self.last_name.lower(), self.first_name.lower()) <
+                (other.last_name.lower(), other.first_name.lower()))
 
     def __str__(self):
         res = self.full_name()

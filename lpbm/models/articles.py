@@ -91,7 +91,7 @@ class Article(cm_module.Model):
 
     def __lt__(self, other):
         '''Articles are sorted by date'''
-        return self.date < other.date or self.id < other.id
+        return (self.date, self.id) < (other.date, other.id)
 
     def save(self):
         '''Articles' configuration is saved automatically.'''
