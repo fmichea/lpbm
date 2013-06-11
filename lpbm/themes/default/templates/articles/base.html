@@ -8,7 +8,7 @@
     <p>{{ article.content|markdown }}</p>
     <div class="infos">
         {% if config_mod['social.twitter_id'] and config_mod['general.url'] %}
-        <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ config_mod['general.url'] }}{{ article.html_filename() }}" data-via="{{ config_mod['social.twitter_id'] }}" data-text="{{ article.title }} - {{ config_mod['general.title'] }}">Tweet</a>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ config_mod['general.url'] }}articles/{{ article.html_filename() }}" data-via="{{ config_mod['social.twitter_id'] }}" data-text="{{ article.title }} - {{ config_mod['general.title'] }}">Tweet</a>
         <script>
             !function(d,s,id){
                 var js,fjs=d.getElementsByTagName(s)[0];
@@ -31,7 +31,7 @@
     <script type="text/javascript">
         var disqus_shortname = '{{ config_mod['social.disqus_id'] }}';
         var disqus_identifier = '{{ article.id }}';
-        var disqus_url = '{{ config_mod['general.url'] }}{{ article.html_filename() }}';
+        var disqus_url = '{{ config_mod['general.url'] }}articles/{{ article.html_filename() }}';
 
         /* * * DON'T EDIT BELOW THIS LINE * * */
         (function() {
