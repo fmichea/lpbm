@@ -1,4 +1,4 @@
-Jinja2==2.6
-Markdown==2.2.0
-PyRSS2Gen==1.1
-Pygments==1.5
+Jinja2>=2.6
+Markdown>=2.2.0
+PyRSS2Gen>=1.1
+Pygments>=1.5
