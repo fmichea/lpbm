@@ -176,9 +176,10 @@ class Render(lpbm.module_loader.Module):
         pwidth = self.modules['config']['paginate.width'] or 5
         pages = int(math.ceil(len(articles) / float(app)))
         def left_stone(page):
-            return min(max(0, page - int(pwidth / 2)), max(0, pages - pwidth))
+            return min(max(0, page - pwidth // 2), max(0, pages - pwidth))
         def right_stone(page):
-            return max(min(pages, page + int(pwidth / 2)), min(pages, pwidth - 1))
+            rstone = pwidth // 2 + (1 if 0 < pwidth / 2 else 0)
+            return max(min(pages, page + rstone), min(pages, pwidth))
         template = _get_template('articles', 'base.html')
         display_pages = range(1, pages + 1)
         main_title = kwargs.get('page_title', None)
