@@ -13,7 +13,7 @@ setup(
 
     # Version information.
     license='BSD',
-    version='2.0.0b1',
+    version='2.0.0a1',
 
     # Author.
     author='Franck Michea',
@@ -32,7 +32,7 @@ setup(
 
     # Categories
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: BSD License',
