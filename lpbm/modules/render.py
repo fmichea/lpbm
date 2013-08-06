@@ -53,6 +53,9 @@ class Render(lpbm.module_loader.Module):
         output_help = 'change default output directory (absolute from $PWD).'
         self.parser.add_argument('-o', '--output', action='store',
                                  metavar='directory', help=output_help)
+        noconfirm_help = 'do not confirm to empty output directory.'
+        self.parser.add_argument('-N', '--noconfirm', action='store_true',
+                                 default=False, help=noconfirm_help)
 
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')
@@ -66,6 +69,12 @@ class Render(lpbm.module_loader.Module):
             msg = 'I didn\'t find directory/symbolic link named `{path}`'
             msg += ' where to put the blog.'
             sys.exit(msg.format(path=self.output_dir))
+
+        if not args.noconfirm:
+            msg = 'Are you sure you want to generate your blog in `{path}`?\n'
+            msg += 'This action will remove all its contents!'
+            if not ltools.ask_sure(prompt=msg.format(path=self.output_dir)):
+                sys.exit('Nothing was done.')
 
         theme = self.modules['config']['theme.name'] or 'default'
         self.root = ltools.join(ltools.ROOT, 'themes', theme)
