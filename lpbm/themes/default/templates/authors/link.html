@@ -1,5 +1,1 @@
-{% if author.email %}
 <a href="/authors/{{ author.nickname|slugify }}/index.html">{{ author.full_name() }}</a>
-{% else %}
-{{ author.full_name() }}
-{% endif %}

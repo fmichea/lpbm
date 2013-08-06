@@ -238,3 +238,7 @@ a.rss {
     .paginate ul .cur_page {
       font-weight: bold;
       text-decoration: underline; }
+
+div.author_menu_link a.author_mail {
+  float: right;
+  color: #44464a; }

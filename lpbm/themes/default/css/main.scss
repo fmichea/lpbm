@@ -341,3 +341,10 @@ a.rss {
         }
     }
 }
+
+div.author_menu_link {
+    a.author_mail {
+        float: right;
+        color: $color_text_title;
+    }
+}
