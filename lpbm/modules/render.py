@@ -69,7 +69,7 @@ class Render(lpbm.module_loader.Module):
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')
 
-        if 'output' in args:
+        if args.output is not None:
             self.output_dir = ltools.abspath(args.output)
         else:
             self.output_dir = ltools.join(args.exec_path, 'result')
@@ -86,7 +86,7 @@ class Render(lpbm.module_loader.Module):
                 sys.exit('Nothing was done.')
 
         theme = self.modules['config']['theme.name'] or 'default'
-        if 'theme' in args:
+        if args.theme is not None:
             theme = args.theme
         self.root = ltools.join(ltools.ROOT, 'themes', theme)
         if not os.path.exists(self.root):
