@@ -112,19 +112,22 @@ class Render(lpbm.module_loader.Module):
         })
 
     def process(self, modules, args):
-        # Last update of environment before beginning of page generation,
-        _ENV.globals.update({
-            'static_files':  self.copy_static_files(),
-        })
+        try:
+            # Last update of environment before beginning of page generation,
+            _ENV.globals.update({
+                'static_files':  self.copy_static_files(),
+            })
 
-        self.render_articles()
-        self.render_categories()
-        self.render_authors()
-        self.render_rss()
+            self.render_articles()
+            self.render_categories()
+            self.render_authors()
+            self.render_rss()
 
-        # If full rendering completed (we are still alive), then we copy the
-        # temporary directory to the output directory.
-        self._copy_all()
+            # If full rendering completed (we are still alive), then we copy the
+            # temporary directory to the output directory.
+            self._copy_all()
+        finally:
+            shutil.rmtree(self.build_dir)
 
     # Functions for internal use.
     def _build_path(self, *args):
@@ -145,7 +148,6 @@ class Render(lpbm.module_loader.Module):
         # First big clean up of all the files.
         ltools.empty_directory(self.output_dir)
         ltools.move_content(self.build_dir, self.output_dir)
-        os.rmdir(self.build_dir)
 
     def _copy_static_dir(self, statics, fltr, *subdirs):
         out_root = self._build_path(*subdirs)
