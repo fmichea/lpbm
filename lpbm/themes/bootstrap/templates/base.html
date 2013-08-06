@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{ lang|default('en') }}">
+    <head>
+        <meta charset="utf-8">
+        <title>{{ page_title|default('Index') }} - {{ config_mod['general.title'] }}</title>
+
+        {% for css_file in static_files['css']|sorted %}
+        <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
+        {% endfor %}
+
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ config_mod['general.url']|default('/') }}rssfeed.xml" />
+    </head>
+    <body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="/">{{ config_mod['general.title'] }}</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li><a href="/">Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    {% if config_mod['general.subtitle'] %}
+    <p class="lead">
+        {{ config_mod['general.subtitle'] }}
+    </p>
+    {% endif %}
+
+    <div class="row-fluid">
+        <div class="span9">
+            {% block body %}<li>Page is empty</li>{% endblock %}
+            {% include "paginate.html" %}
+        </div>
+
+        <div class="span3">
+            {% if menu_header %}
+            <div class="well">
+            {{ menu_header }}
+            </div>
+            {% endif %}
+
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="nav-header">Categories</li>
+                    {% for cat, children in categories_mod.recursive_view().values()|sorted recursive %}
+                    <li {% if cur_cat == cat.id %}class="active"{% endif %}>
+                        <a href="{{ cat.url() }}">{{ cat.name }}</a>
+                        {% if children %}
+                        <ul class="nav nav-list">{{ loop(children.values()|sorted) }}</ul>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+
+                    <li class="nav-header">Authors</li>
+                    {% for author in authors_mod.objects|sorted %}
+                    <li {% if cur_author == author.id %}class="active"{% endif %}>
+                        {% include "authors/menu_link.html" %}
+                    </li>
+                    {% endfor %}
+                    <li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>
+            {% if config_mod['general.footer'] %}{{ config_mod['general.footer'] }} &mdash;{% endif %}
+            <a href="/rssfeed.xml">RSS Feed</a>
+        </p>
+    </div>
+</footer>
+
+    </body>
+</html>

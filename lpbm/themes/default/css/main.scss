@@ -1,0 +1,350 @@
+// main.scss - +
+
+@import url("pygments.css");
+@import url("http://fonts.googleapis.com/css?family=Oswald");
+@import url("http://fonts.googleapis.com/css?family=Droid+Sans:regular,italic,bold,bolditalic");
+
+// ************************
+// ***** Global reset *****
+// ************************
+
+// Based upon 'reset.css' in the Yahoo! User Interface Library:
+// http://developer.yahoo.com/yui
+
+*, html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form,
+label, fieldset, input, p, blockquote, th, td { margin:0; padding:0 }
+table { border-collapse:collapse; border-spacing:0 }
+fieldset, img { border:0 }
+address, caption, cite, code, dfn, em, strong, th, var { font-style:normal;
+font-weight:normal }
+ol, ul, li { list-style:none }
+caption, th { text-align:left }
+h1, h2, h3, h4, h5, h6 { font-size:100%; font-weight:normal }
+q:before, q:after { content:''}
+
+/* Global reset-RESET */
+/* The below restores some sensible defaults */
+strong { font-weight:bold }
+em { font-style:italic }
+a img { border:none } /* Gets rid of IE's blue borders */
+
+// *********************
+// ***** Variables *****
+// *********************
+
+// Color
+$color_bkg_all          : #646464;
+$color_bkg_body         : white;
+$color_bkg_main_title   : #2f3134; // dark grey
+$color_bkg_footer       : #2f3134;
+$color_bkg_code         : #f0f0f0;
+$color_border_body      : #404246;
+$color_border_header    : #404246;
+$color_border_titles    : #404246;
+$color_border_menu      : #dadce1;
+$color_border_code      : #a0a0a0;
+$color_links            : #19b7de; // clear blue
+$color_mail             : #2f3134;
+$color_main_subtitle    : #ececec; // light grey
+$color_main_title       : white;
+$color_text             : #626262; // clear grey
+$color_text_infos       : #878f9a;
+$color_text_title       : #44464a;
+$color_text_footer      : white;
+
+// Sizes
+$code_width     : 630px;
+$font_size      : 12px;
+$margin         : 10px;
+$min_width      : 800px;
+$max_width      : 1024px;
+$menu_width     : 200px;
+
+// *****************
+// ***** Rules *****
+// *****************
+
+body {
+    font : {
+        family: "Droid Sans", Arial, serif;
+        size: $font_size;
+    }
+    color: $color_text;
+    background-color: $color_bkg_all;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Oswald", Arial, serif;
+    margin-bottom: $margin;
+}
+
+h1 { font-size: $font_size + 16px; }
+h2 { font-size: $font_size + 10px; }
+h3 { font-size: $font_size + 6px; }
+h4 { font-size: $font_size + 2px; }
+h5 { font-size: $font_size; }
+
+a {
+    text-decoration: none;
+    color: $color_links;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.cAlign {
+    min-width: $min_width;
+    max-width: $max_width;
+    margin: 0 auto;
+    border-left: 1px solid $color_border_body;
+    border-right: 1px solid $color_border_body;
+}
+
+.cleaner { clear: both; }
+
+#header {
+    margin: 0 auto;
+    background-color: $color_bkg_main_title;
+    border-bottom: 1px solid $color_border_header;
+
+    h1, h2 {
+        @extend .cAlign;
+    }
+
+    h1 {
+        color: $color_main_title;
+        padding: 0px 15px;
+        vertical-align: middle;
+        height: $font_size + 16px + 8px;
+    }
+
+    h2 {
+        color: $color_main_subtitle;
+        padding: 2px 15px;
+        font-size: $font_size;
+        vertical-align: middle;
+    }
+}
+
+#main_body {
+    @extend .cAlign;
+    background-color: $color_bkg_body;
+    padding: 0px 15px;
+}
+
+.mail {
+    font-size: 7px;
+    color: $color_mail;
+    vertical-align: 40%;
+}
+
+ul#articles {
+    padding: 10px 0;
+    margin-right: $menu_width;
+    border-right: 1px solid $color_border_menu;
+
+    h1 {
+        color: $color_text_title;
+        border-bottom: 3px double $color_border_titles;
+    }
+
+    p {
+        margin-bottom: $margin;
+        text-align: justify;
+    }
+
+    > li {
+        padding-left: 10px;
+        padding-right: 25px;
+    }
+
+    div.infos {
+        font : {
+            style: italic;
+            size: 11px;
+        }
+        text-align: right;
+        color: $color_text_infos;
+
+        p {
+            margin-bottom: 0;
+        }
+
+        .twitter-share-button {
+            display: inline-block;
+        }
+
+        div.comments-link {
+            display: inline-block;
+            vertical-align: top;
+            padding-top: 4px;
+        }
+    }
+
+    li > blockquote {
+        border: 1px solid #2a762a;
+        border-left: 3px solid #2a762a;
+        max-width: 80%;
+        margin: 0 auto;
+        margin-bottom: $margin;
+    }
+
+    blockquote {
+        p {
+            margin: 0;
+        }
+
+        border-left: 3px solid #2a762a;
+        background-color: #8cbc8c;
+        color: #005000;
+        padding: 2px 5px;
+        margin-bottom: 3px;
+
+        a {
+            color: #000f00;
+        }
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+        margin: 0 auto;
+        margin-top: 10px;
+        margin-bottom: $margin;
+    }
+
+    ul {
+        display: block;
+        margin-left: $margin + 10px;
+        margin-bottom: $margin;
+
+        li {
+            list-style-type: disc;
+            margin-bottom: 2px;
+        }
+    }
+
+    // Small hack for Disqus
+    div#disqus_thread li {
+        list-style-type: none;
+    }
+}
+
+ul#menu {
+    width: $menu_width - 20px; // Reminder: Fix second rule too.
+    padding: 10px;
+    float: right;
+
+    strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    #categories, #authors {
+        > ul {
+            padding-left: 10px;
+
+            li {
+                padding: 2px 0px;
+                margin-left: 10px;
+            }
+
+            > li {
+                list-style-type: circle;
+                > ul > li {
+                    list-style-type: disc;
+
+                    > ul > li {
+                        list-style-type: square;
+                    }
+                }
+            }
+        }
+    }
+
+    li {
+        padding: 5px;
+    }
+}
+
+#footer {
+    @extend .cAlign;
+    background-color: $color_bkg_footer;
+    color: $color_text_footer;
+    font-size: $font_size - 1px;
+    text-align: center;
+    padding: 4px 15px;
+    border-radius: 0px 0px 5px 5px;
+}
+
+.codehilitetable {
+    font-size: $font_size - 1px;
+    background-color: $color_bkg_code;
+    border: 3px double $color_border_code;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    width: $code_width;
+
+    div.codehilite {
+        width: $code_width;
+        overflow: auto;
+    }
+
+    .codehilite > pre {
+        width: 100%;
+    }
+
+    td {
+        padding: 4px;
+    }
+
+    td.code {
+        width: auto;
+    }
+
+    td.linenos {
+        border-right: 1px solid $color_border_code;
+        width: 12px;
+        text-align: right;
+        vertical-align: top;
+    }
+}
+
+a.rss {
+    display: block;
+    background: url("/medias/images/feed-icon-28x28.png") no-repeat left center;
+    padding-left: 36px;
+    padding-top: 16px;
+    height: 30px;
+    font-weight: bold;
+}
+
+.paginate {
+    height: $font_size + 5px;
+
+    ul {
+        float: right;
+
+        li {
+            border: 1px solid $color_border_code;
+            background-color: $color_bkg_code;
+            padding: 3px 5px;
+            margin-right: 5px;
+            list-style-type: none !important;
+            float: left;
+        }
+
+        .cur_page {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+    }
+}
+
+div.author_menu_link {
+    a.author_mail {
+        float: right;
+        color: $color_text_title;
+    }
+}
