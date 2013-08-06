@@ -62,6 +62,8 @@ class Render(lpbm.module_loader.Module):
         output_help = 'change default output directory (absolute from $PWD).'
         self.parser.add_argument('-o', '--output', action='store',
                                  metavar='directory', help=output_help)
+        self.parser.add_argument('-i', '--id', action='store',
+                                 help='render a specific article.')
         noconfirm_help = 'do not confirm to empty output directory.'
         self.parser.add_argument('-N', '--noconfirm', action='store_true',
                                  default=False, help=noconfirm_help)
@@ -141,9 +143,15 @@ class Render(lpbm.module_loader.Module):
         return ltools.join(self.build_dir, *args)
 
     def _get_articles(self, limit=None, filter=None):
-        articles = sorted(self.modules['articles'].objects)
-        articles = [a for a in articles if a.published or self.args.drafts]
-        articles = list(reversed(articles))
+        if self.args.id is not None:
+            try:
+                articles = [self.modules['articles'][int(self.args.id)]]
+            except ValueError:
+                raise Exception('Article id must be an int.')
+        else:
+            articles = sorted(self.modules['articles'].objects)
+            articles = [a for a in articles if a.published or self.args.drafts]
+            articles = list(reversed(articles))
         if filter is not None:
             articles = [a for a in articles if filter(a)]
         if limit is not None:
