@@ -176,11 +176,11 @@ class Render(lpbm.module_loader.Module):
         statics.extend(sub(ltools.join(self.args.exec_path, 'medias')))
 
     def copy_static_files(self):
-        static_files = {'css': [], 'images': []}
+        static_files = {'css': [], 'images': [], 'data': []}
         self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'),
                               'medias', 'css')
-        self._copy_static_dir(static_files['images'], lambda a: True,
-                              'medias', 'images')
+        for n in ['images', 'data']:
+            self._copy_static_dir(static_files[n], lambda a: True, 'medias', n)
         return static_files
 
     # Public functions.
