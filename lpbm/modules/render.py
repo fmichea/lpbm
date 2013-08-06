@@ -2,15 +2,17 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
-import PyRSS2Gen
 import codecs
 import datetime
-import jinja2
-import markdown
 import math
 import os
+import shutil
 import sys
 import tempfile
+
+import PyRSS2Gen
+import jinja2
+import markdown
 
 import lpbm.module_loader
 import lpbm.tools as ltools
