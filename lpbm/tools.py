@@ -14,6 +14,10 @@ import string
 
 ROOT = os.path.dirname(__file__)
 
+def abspath(*args):
+    '''Wrapper doing nothing for now.'''
+    return os.path.abspath(*args)
+
 def join(*args):
     '''Joins a some paths with ROOT as base path.'''
     return os.path.realpath(os.path.join(*args))

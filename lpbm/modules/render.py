@@ -50,14 +50,22 @@ class Render(lpbm.module_loader.Module):
 
         self.parser.add_argument('-d', '--drafts', action='store_true',
                                  default=False, help='also render drafts.')
+        output_help = 'change default output directory (absolute from $PWD).'
+        self.parser.add_argument('-o', '--output', action='store',
+                                 metavar='directory', help=output_help)
 
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')
-        self.output_dir = ltools.join(args.exec_path, 'result')
+
+        if 'output' in args:
+            self.output_dir = ltools.abspath(args.output)
+        else:
+            self.output_dir = ltools.join(args.exec_path, 'result')
 
         if not os.path.exists(self.output_dir):
-            sys.exit('I didn\'t find directory/symbolic link named `result`'
-                     ' where to put the blog.')
+            msg = 'I didn\'t find directory/symbolic link named `{path}`'
+            msg += ' where to put the blog.'
+            sys.exit(msg.format(path=self.output_dir))
 
         theme = self.modules['config']['theme.name'] or 'default'
         self.root = ltools.join(ltools.ROOT, 'themes', theme)
