@@ -57,6 +57,8 @@ class Render(lpbm.module_loader.Module):
 
         self.parser.add_argument('-d', '--drafts', action='store_true',
                                  default=False, help='also render drafts.')
+        self.parser.add_argument('-t', '--theme', action='store',
+                                 help='Try a theme to generate the blog.')
         output_help = 'change default output directory (absolute from $PWD).'
         self.parser.add_argument('-o', '--output', action='store',
                                  metavar='directory', help=output_help)
@@ -84,6 +86,8 @@ class Render(lpbm.module_loader.Module):
                 sys.exit('Nothing was done.')
 
         theme = self.modules['config']['theme.name'] or 'default'
+        if 'theme' in args:
+            theme = args.theme
         self.root = ltools.join(ltools.ROOT, 'themes', theme)
         if not os.path.exists(self.root):
             sys.exit('I don\'t know this theme. ({})'.format(theme))
