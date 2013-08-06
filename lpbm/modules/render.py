@@ -238,7 +238,7 @@ class Render(lpbm.module_loader.Module):
             authors = ltools.join_names([rss_aut(a) for a in article.authors])
             return PyRSS2Gen.RSSItem(
                 title = article.title,
-                link = '{base_url}{html_filename}'.format(
+                link = '{base_url}articles/{html_filename}'.format(
                     base_url = self.modules['config']['general.url'],
                     html_filename = article.html_filename(),
                 ),
