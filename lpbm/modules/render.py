@@ -23,6 +23,11 @@ def _get_template(*args):
 # Miscenalleous filters for jinja2
 def do_markdown(value, code=True):
     if not code:
+        tmp = value.splitlines()
+        for idx, line in enumerate(tmp):
+            if line.startswith('\t:::') or line.startswith('    :::'):
+                tmp[idx] = ''
+        value = '\n'.join(tmp)
         return markdown.markdown(value)
     return markdown.markdown(value, ['codehilite(force_linenos=True)'])
 
@@ -239,7 +244,7 @@ class Render(lpbm.module_loader.Module):
                 ),
                 author = authors,
                 guid = str(article.id),
-                description = do_markdown(article.content),
+                description = do_markdown(article.content, code=False),
                 pubDate = article.date,
             )
         print('Generating RSS file.')
