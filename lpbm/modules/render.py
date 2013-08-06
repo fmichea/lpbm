@@ -48,8 +48,8 @@ class Render(lpbm.module_loader.Module):
     def init(self):
         self.needed_modules = ['authors', 'articles', 'categories']
 
-        self.parser.add_argument('--drafts', action='store_true', default=False,
-                                 help='also render drafts.')
+        self.parser.add_argument('-d', '--drafts', action='store_true',
+                                 default=False, help='also render drafts.')
 
     def load(self, modules, args):
         self.build_dir = tempfile.mkdtemp(prefix='lpbm_')
