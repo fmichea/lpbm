@@ -102,7 +102,7 @@ First, you have several information in the prompt::
 
 In this example, we can see that first field we fill is required. It also
 already has a default value that is write between ``[]`` brackets. Simply
-entering without filling Prompt 1 will choose default value. You should'nt
+entering without filling Prompt 1 will choose default value. You shouldn't
 be able to validate an empty value for Prompt 3 (if you can, fill a bug :P).
 
 There are also validators that will check that the values you enter are valid.
@@ -110,8 +110,8 @@ If some prompt appears twice, the value was not valid. There should be a error
 message explaining what went wrong. If it is not the case, please fill a bug.
 
 Finally if your value is not required and you want to delete the content (avoid
-selectionning default value), type Ctrl-D and answer yes to the question asking
+selecting default value), type Ctrl-D and answer yes to the question asking
 you if you want to empty the value.
 
-Any keyboard interruption should quit the interctive mode without saving
+Any keyboard interruption should quit the interactive mode without saving
 anything.

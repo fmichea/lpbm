@@ -112,23 +112,79 @@ will land in my Metal category. Lets see:
 I said yes but you can obviously say no and edit it later. You can list all
 articles with ``lpbm articles -l`` and also edit the markdown of our newly
 created article using ``lpbm articles --id 0 -E``. You can also publish it with
-``lpbm articles --publish``.
+``lpbm articles --id 0 --publish``.
 
 Render your new blog!
 ---------------------
 
-Now you have your blog ready for rendering! Try it now: ``lpbm render``. If you
-don't want to publish your article right now, you can render your blog with
-``lpbm render --drafts``. Don't forget to do that in local. This will need a
-``result`` directory or a symbolic link to the place were you want your blog to
-be generated. You can then open ``result/index.html`` in your browser.
+Now you have your blog ready for rendering! You now have multiple choices to do
+so.
 
-I foster you to configure a simple HTTP server (no need of any dynamic
-language, just static files serving is fine) to see CSS and the like correctly.
+#. Create a directory/symbolic link named ``result`` in your blog sources. This
+   directory will be used as the output for the *render* command.
+#. Precise the output directory easily.
+
+.. warning:: Be careful! LPBM will delete **everything** in the output
+             directory. Create it only for the blog, and avoid modifying it
+             directly. You've been warned.
+
+Testing setup
+^^^^^^^^^^^^^
+
+When we are writing our article, the simplest setup is probably to create a
+output directory, ``result``, and launch the simple HTTP server shipped with
+python in it. Example, in another shell:
+
+.. code-block:: console
+
+    $ mkdir result; cd result
+    $ python -m http.server
+    Serving HTTP on 0.0.0.0 port 8000 ...
+
+You can get back to your blog and render it with ``lpbm render`` command. It
+will warn you again that it will remove the contents of the directory. Say yes
+if you are sure, alternatively you can precise ``-N`` to never be asked this
+again. You know what you're doing from now on.
+
+You'll notice that the rending can take some time if you have a lot of articles,
+and if they are quite big, so you also can choose one articles to render. This
+can be done with the ``-i`` switch that takes an id as a parameter.
+
+If you want to render the whole blog, including drafts, you can finally include
+the ``--draft`` switch to do so.
+
+Production
+^^^^^^^^^^
+
+For your production setup, you won't need any fancy web server or anything. You
+will just need something that is able to serve static HTML pages. Here is an
+example configuration to serve it with ``nginx``:
+
+.. code-block:: nginx
+
+    server {
+        listen 80;
+        listen [::]:80; # If your nginx is old, you only need the IPv6 one (that
+                        # does both)
+        server_name blog.example.com;
+
+        access_log /var/log/nginx/blog.example.com.access.log;
+        error_log /var/log/nginx/blog.example.com.error.log;
+
+        location / {
+            root /srv/http/blog.example.com;
+            index index.html index.htm;
+        }
+    }
+
+Then you just need to have your blog somewhere, say ``~/blog-articles`` and do
+``lpbm -p ~/blog-articles render -N -o /srv/http/blog.example.com`` when you
+published a new article. This process can be automated if you have your blog
+articles in a *git*, etc.
 
 Random end notes
 ----------------
 
 If you find any bug again don't hesitate to get back to me, you have my mail ;).
-The ``touch`` and ``mkdir`` should be removed soon, and done directly in lpbm.
+The ``touch`` and ``mkdir`` should be removed soon, and done directly by lpbm.
 Have fun!
