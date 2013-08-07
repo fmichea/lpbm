@@ -1,0 +1,28 @@
+#! /bin/sh
+
+# WARNING: UNTESTED! If you test this, let me know if it works.
+
+CP="scp" # Change to `cp` if not installed.
+DEPLOY_BRANCH="master"
+
+# The bare git repository of your blog's sources.
+GIT_REPO=""
+# The directory served by your HTTP server.
+WWW_DIR=""
+
+# You probably don't need to touch the following.
+WORKING_DIR="`mktemp -d`"
+
+mkdir -p "${WORKING_DIR}/result"
+
+while read oldrev newrev refname ; do
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+
+    if [ "$branch" == "$DEPLOY_BRANCH" ]; then
+        git clone "$GIT_REPO" "${WORKING_DIR}/blog" -b "$DEPLOY_BRANCH"
+        lpbm -p "${WORKING_DIR}/blog" render -N -o "${WORKING_DIR}/result"
+        $CP -r "${WORKING_DIR}/result" "$WWW_DIR"
+    fi
+done
+
+rm -r "$WORKING_DIR"
