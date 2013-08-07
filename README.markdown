@@ -68,3 +68,4 @@ Other information
 
 * [Markdown Syntax](http://daringfireball.net/projects/markdown/syntax)
 * [Code Embedding](http://packages.python.org/Markdown/extensions/code_hilite.html)
+* [LPBM Documentation](http://kushou.eu/lpbm-doc/)
