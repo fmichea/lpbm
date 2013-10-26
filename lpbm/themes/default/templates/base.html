@@ -29,7 +29,7 @@
         {# Displays a list of the categories in the menu. #}
         <li><div id="categories"><strong>Categories</strong>
             <ul>
-                {% for cat, children in categories_mod.recursive_view().values()|sorted recursive %}
+                {% for cat, children in categories_menu.values()|sorted recursive %}
                 <li><a href="{{ cat.url() }}">{{ cat.name }}</a>
                     {% if children %}
                     <ul>{{ loop(children.values()|sorted) }}</ul>

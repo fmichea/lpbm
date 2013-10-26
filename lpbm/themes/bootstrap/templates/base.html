@@ -48,7 +48,7 @@
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">Categories</li>
-                    {% for cat, children in categories_mod.recursive_view().values()|sorted recursive %}
+                    {% for cat, children in categories_menu.values()|sorted recursive %}
                     <li {% if cur_cat == cat.id %}class="active"{% endif %}>
                         <a href="{{ cat.url() }}">{{ cat.name }}</a>
                         {% if children %}

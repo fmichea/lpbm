@@ -112,9 +112,16 @@ class Render(lpbm.module_loader.Module):
             'slugify': do_slugify,
             'sorted': do_sorted,
         })
+        categories_menu = self.modules['categories'].recursive_view()
+        cats_visible = self._get_categories()
+        def _categories_menu(c):
+            return dict([(i, (cat, _categories_menu(children)))
+                         for i, (cat, children) in c.items()
+                         if cat.id in cats_visible])
+        categories_menu = _categories_menu(categories_menu)
         _ENV.globals.update({
             'authors_mod': self.modules['authors'],
-            'categories_mod': self.modules['categories'],
+            'categories_menu': categories_menu,
             'config_mod': self.modules['config'],
             'menu_header': menu_header,
         })
@@ -276,7 +283,7 @@ class Render(lpbm.module_loader.Module):
         with codecs.open(rss_path, 'w', 'utf-8') as f:
             rss.write_xml(f, encoding='utf-8')
 
-    def render_categories(self):
+    def _get_categories(self):
         categories = dict()
         for article in self._get_articles():
             for cat in article.categories:
@@ -285,6 +292,10 @@ class Render(lpbm.module_loader.Module):
                         categories[pcat.id] |= set([article])
                     except KeyError:
                         categories[pcat.id] = set([article])
+        return categories
+
+    def render_categories(self):
+        categories = self._get_categories()
         for id, articles in categories.items():
             cat = self.modules['categories'][id]
             dirs = list(os.path.split(os.path.dirname(cat.html_filename())))
