@@ -198,6 +198,8 @@ class Render(lpbm.module_loader.Module):
             with codecs.open(path, 'w', 'utf-8') as f:
                 print('Writing article to', path)
                 f.write(template.render({
+                    'page_title': article.title,
+                    'comments_enabled': True,
                     'articles': [article],
                 }))
         self.render_index([], self._get_articles())
