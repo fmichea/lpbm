@@ -29,7 +29,7 @@ def filter_files(filter_fun, *path):
     for subroot, directories, files in os.walk(root):
         for filename in files:
             if filter_fun(filename):
-                yield (root, os.path.join(subroot[root_len:], filename))
+                yield (root, os.path.join(subroot[root_len + 1:], filename))
 
 def mkdir_p(path):
     '''
