@@ -31,7 +31,7 @@ def do_markdown(value, code=True):
                 tmp[idx] = ''
         value = '\n'.join(tmp)
         return markdown.markdown(value)
-    return markdown.markdown(value, ['codehilite(force_linenos=True)'])
+    return markdown.markdown(value, extensions=['codehilite(force_linenos=True)'])
 
 def do_sorted(value):
     return sorted(value)
@@ -179,14 +179,14 @@ class Render(lpbm.module_loader.Module):
                 ltools.copy(ltools.join(root, filename),
                             ltools.join(out_root, filename))
             return res
-        statics.extend(sub(self.root))
+        sub(self.root)
         statics.extend(sub(ltools.join(self.args.exec_path, 'medias')))
 
     def copy_static_files(self):
-        static_files = {'css': [], 'images': [], 'data': []}
+        static_files = {'css': [], 'js': [], 'images': [], 'data': [], 'fonts': []}
         self._copy_static_dir(static_files['css'], lambda a: a.endswith('.css'),
                               'medias', 'css')
-        for n in ['images', 'data']:
+        for n in ['images', 'data', 'js', 'fonts']:
             self._copy_static_dir(static_files[n], lambda a: True, 'medias', n)
         return static_files
 

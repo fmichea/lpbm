@@ -1,35 +1,33 @@
 {% if paginate %}
-<div class="pagination pagination-right">
-    <ul>
-        {% if cur_page == 1 %}
-        <li class="disabled"><span>
-        {% else %}
-        <li><a href="{{ directory|default('') }}/pages/page-1.html">
-        {% endif %}
-        &laquo;
-        {% if cur_page == 1 %}</span>{% else %}</a>{% endif %}
-        </li>
+<ul class="pagination pull-right">
+    {% if cur_page == 1 %}
+    <li class="disabled"><span>
+    {% else %}
+    <li><a href="{{ directory|default('') }}/pages/page-1.html">
+    {% endif %}
+    &laquo;
+    {% if cur_page == 1 %}</span>{% else %}</a>{% endif %}
+    </li>
 
-        {% for page in pages %}
-        <li {% if page == cur_page %}class="active"{% endif %}>
-            <a href="{{ directory|default('') }}/pages/page-{{ page }}.html">
-                {{ page }}
-            </a>
-        </li>
-        {% endfor %}
+    {% for page in pages %}
+    <li {% if page == cur_page %}class="active"{% endif %}>
+        <a href="{{ directory|default('') }}/pages/page-{{ page }}.html">
+            {{ page }}
+        </a>
+    </li>
+    {% endfor %}
 
-        {% if cur_page == last_page %}
-        <li class="disabled"><span>
-        {% else %}
-        <li><a href="{{ directory|default('') }}/pages/page-{{ last_page }}.html">
-        {% endif %}
-        &raquo;
-        {% if cur_page == last_page %}</span>{% else %}</a>{% endif %}
-        </li>
-    </ul>
-</div>
+    {% if cur_page == last_page %}
+    <li class="disabled"><span>
+    {% else %}
+    <li><a href="{{ directory|default('') }}/pages/page-{{ last_page }}.html">
+    {% endif %}
+    &raquo;
+    {% if cur_page == last_page %}</span>{% else %}</a>{% endif %}
+    </li>
+</ul>
 {% else %}{% if show_more %}
-<ul class="pager">
+<ul class="pagination pull-right">
     <li class="next"><a href="/pages/page-2.html">More &raquo;</a></li>
 </ul>
 {% endif %}{% endif %}

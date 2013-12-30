@@ -4,6 +4,10 @@
         <meta charset="utf-8">
         <title>{{ page_title|default('Index') }} - {{ config_mod['general.title'] }}</title>
 
+
+        <link media="screen" type="text/css" href="/medias/css/main.css" rel="stylesheet" />
+        <link media="screen" type="text/css" href="/medias/css/pygments.css" rel="stylesheet" />
+
         {% for css_file in static_files['css'] %}
         <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
         {% endfor %}

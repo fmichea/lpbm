@@ -4,6 +4,10 @@
         <meta charset="utf-8">
         <title>{{ page_title|default('Index') }} - {{ config_mod['general.title'] }}</title>
 
+        <link media="screen" type="text/css" href="/medias/css/bootstrap.min.css" rel="stylesheet" />
+        <link media="screen" type="text/css" href="/medias/css/pygments.css" rel="stylesheet" />
+        <link media="screen" type="text/css" href="/medias/css/main.css" rel="stylesheet" />
+
         {% for css_file in static_files['css']|sorted %}
         <link media="screen" type="text/css" href="{{ css_file }}" rel="stylesheet" />
         {% endfor %}
@@ -12,18 +16,51 @@
     </head>
     <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <a class="brand" href="/">{{ config_mod['general.title'] }}</a>
-            <div class="nav-collapse collapse">
-                <ul class="nav">
-                    <li><a href="/">Home</a></li>
-                </ul>
-            </div>
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#lpbm-navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">{{ config_mod['general.title'] }}</a>
+        </div>
+        <div class="navbar-collapse collapse" id="lpbm-navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Categories <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        {% for cat, children in categories_menu.values()|sorted recursive %}
+                        <li {% if children %}class="dropdown-submenu"{% endif %}>
+                            <a href="{{ cat.url() }}" {% if children %}tabindex="-1"{% endif %}>{{ cat.name }}</a>
+                            {% if children %}
+                            <ul class="dropdown-menu">
+                                {{ loop(children.values()|sorted) }}
+                            </ul>
+                            {% endif %}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Authors <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        {% for author in authors_mod.objects|sorted %}
+                        <li {% if cur_author == author.id %}class="active"{% endif %}>
+                            {% include "authors/menu_link.html" %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
+    </div>
+</nav>
 
 <div class="container">
     {% if config_mod['general.subtitle'] %}
@@ -32,53 +69,38 @@
     </p>
     {% endif %}
 
-    <div class="row-fluid">
-        <div class="span9">
+    <div class="row">
+        <div class="col-md-12">
             {% block body %}<li>Page is empty</li>{% endblock %}
-            {% include "paginate.html" %}
         </div>
+    </div>
 
-        <div class="span3">
-            {% if menu_header %}
-            <div class="well">
-            {{ menu_header }}
-            </div>
-            {% endif %}
-
-            <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                    <li class="nav-header">Categories</li>
-                    {% for cat, children in categories_menu.values()|sorted recursive %}
-                    <li {% if cur_cat == cat.id %}class="active"{% endif %}>
-                        <a href="{{ cat.url() }}">{{ cat.name }}</a>
-                        {% if children %}
-                        <ul class="nav nav-list">{{ loop(children.values()|sorted) }}</ul>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-
-                    <li class="nav-header">Authors</li>
-                    {% for author in authors_mod.objects|sorted %}
-                    <li {% if cur_author == author.id %}class="active"{% endif %}>
-                        {% include "authors/menu_link.html" %}
-                    </li>
-                    {% endfor %}
-                    <li>
-                </ul>
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% include "paginate.html" %}
         </div>
     </div>
 </div>
 
 <footer class="footer">
-    <div class="container">
-        <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>
+    <div class="container clearfix">
+        <p class="pull-right">
+            <button type="button" class="btn btn-default" id="backToTopButton">
+                Back to top
+            </button>
+        </p>
+
+        <p class="text-center">
             {% if config_mod['general.footer'] %}{{ config_mod['general.footer'] }} &mdash;{% endif %}
-            <a href="/rssfeed.xml">RSS Feed</a>
+            <a href="/rssfeed.xml"><span class="glyphicon glyphicon-rss"></span>RSS Feed</a>
         </p>
     </div>
 </footer>
+
+    <!-- Javascript files. -->
+    <script src="/medias/js/jquery.min.js"></script>
+    <script src="/medias/js/bootstrap.min.js"></script>
+    <script src="/medias/js/main.js"></script>
 
     </body>
 </html>
