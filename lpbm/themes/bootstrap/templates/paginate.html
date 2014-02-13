@@ -3,7 +3,7 @@
     {% if cur_page == 1 %}
     <li class="disabled"><span>
     {% else %}
-    <li><a href="{{ directory|default('') }}/pages/page-1.html">
+    <li><a href="{{ pages_root|default('') }}/page-1.html">
     {% endif %}
     &laquo;
     {% if cur_page == 1 %}</span>{% else %}</a>{% endif %}
@@ -11,7 +11,7 @@
 
     {% for page in pages %}
     <li {% if page == cur_page %}class="active"{% endif %}>
-        <a href="{{ directory|default('') }}/pages/page-{{ page }}.html">
+        <a href="{{ pages_root|default('') }}/page-{{ page }}.html">
             {{ page }}
         </a>
     </li>
@@ -20,7 +20,7 @@
     {% if cur_page == last_page %}
     <li class="disabled"><span>
     {% else %}
-    <li><a href="{{ directory|default('') }}/pages/page-{{ last_page }}.html">
+    <li><a href="{{ pages_root|default('') }}/page-{{ last_page }}.html">
     {% endif %}
     &raquo;
     {% if cur_page == last_page %}</span>{% else %}</a>{% endif %}
@@ -28,6 +28,6 @@
 </ul>
 {% else %}{% if show_more %}
 <ul class="pagination pull-right">
-    <li class="next"><a href="/pages/page-2.html">More &raquo;</a></li>
+    <li class="next"><a href="{{ pages_root|default('') }}/page-2.html">More &raquo;</a></li>
 </ul>
 {% endif %}{% endif %}

@@ -2,19 +2,19 @@
 <li class="paginate">
     <ul>
         {% if cur_page != 1 %}
-        <li><a href="{{ directory|default('') }}/pages/page-1.html">&laquo; First</a></li>
+        <li><a href="{{ pages_root|default('') }}/page-1.html">&laquo; First</a></li>
         {% endif %}
 
         {% for page in pages %}
         <li>
-            <a href="{{ directory|default('') }}/pages/page-{{ page }}.html"
+            <a href="{{ pages_root|default('') }}/page-{{ page }}.html"
             {% if page == cur_page %}class="cur_page"{% endif %}
             >{{ page }}</a>
         </li>
         {% endfor %}
 
         {% if cur_page != last_page %}
-        <li><a href="{{ directory|default('') }}/pages/page-{{ last_page }}.html">Last &raquo;</a></li>
+        <li><a href="{{ pages_root|default('') }}/page-{{ last_page }}.html">Last &raquo;</a></li>
         {% endif %}
     </ul>
     <div class="cleaner"></div>
@@ -22,7 +22,7 @@
 {% else %}{% if show_more %}
 <li class="paginate">
     <ul>
-        <li><a href="/pages/page-2.html">More &raquo;</a></li>
+        <li><a href="{{ pages_root|default('') }}/page-2.html">More &raquo;</a></li>
     </ul>
 </li>
 {% endif %}{% endif %}

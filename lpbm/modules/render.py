@@ -202,8 +202,11 @@ class Render(lpbm.module_loader.Module):
                     'comments_enabled': True,
                     'articles': [article],
                 }))
-        self.render_index([], self._get_articles())
-        self.render_pages(['pages'], self._get_articles())
+        kwds = {
+            'pages_root': '/pages',
+        }
+        self.render_index([], self._get_articles(), **kwds)
+        self.render_pages(['pages'], self._get_articles(), **kwds)
 
     def render_index(self, directory, articles, **kwargs):
         template = _get_template('articles', 'base.html')
@@ -304,6 +307,7 @@ class Render(lpbm.module_loader.Module):
             kwargs = {
                 'page_title': cat.name,
                 'cur_cat': cat.id,
+                'pages_root': os.path.join(*(['/'] + dirs)),
             }
             self.render_index(dirs, list(articles), **kwargs)
             self.render_pages(dirs, list(articles), **kwargs)
@@ -322,6 +326,7 @@ class Render(lpbm.module_loader.Module):
             kwargs = {
                 'page_title': '{} ({})'.format(author.full_name(), author.nickname),
                 'cur_author': author.id,
+                'pages_root': os.path.join(*(['/'] + dirs)),
             }
             self.render_index(dirs, list(articles), **kwargs)
             self.render_pages(dirs, list(articles), **kwargs)
