@@ -13,7 +13,7 @@ setup(
 
     # Version information.
     license='BSD',
-    version='2.0.0a8',
+    version='2.0.0a9',
 
     # Author.
     author='Franck Michea',
