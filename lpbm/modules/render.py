@@ -31,7 +31,9 @@ def do_markdown(value, code=True):
                 tmp[idx] = ''
         value = '\n'.join(tmp)
         return markdown.markdown(value)
-    return markdown.markdown(value, extensions=['codehilite(force_linenos=True)'])
+    return markdown.markdown(value, extensions=[
+        'markdown.extensions.codehilite(linenums=True)'
+    ])
 
 def do_sorted(value):
     return sorted(value)
