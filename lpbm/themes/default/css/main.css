@@ -242,3 +242,28 @@ a.rss {
 div.author_menu_link a.author_mail {
   float: right;
   color: #44464a; }
+
+div.panel {
+  border: 1px solid #a0a0a0;
+  margin: 15px; }
+  div.panel div.panel-heading {
+    color: white;
+    background-color: #2f3134;
+    border: 1px solid #a0a0a0;
+    padding: 5px; }
+  div.panel div.panel-body {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px; }
+
+div.lpbm-collapser-heading {
+  text-align: center; }
+  div.lpbm-collapser-heading div.lpbm-collapser-button {
+    color: #aaaaaa;
+    font-size: 11px;
+    cursor: pointer; }
+  div.lpbm-collapser-heading div.lpbm-collapser-button-collapse {
+    display: none; }
+
+div.lpbm-collapser-body {
+  display: none; }

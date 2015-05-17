@@ -85,4 +85,10 @@ $(document).ready(function () {
     $('#backToTopButton').click(function () {
         $(window).scrollTop(0);
     });
+
+    $('.lpbm-collapser-button').click(function () {
+      $('> .lpbm-collapser-button-elapse', this).toggle();
+      $('> .lpbm-collapser-button-collapse', this).toggle();
+      $('> .lpbm-collapser-body', $(this).parent().parent()).toggle();
+    });
 });
