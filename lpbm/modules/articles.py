@@ -9,7 +9,6 @@ pair of two files. One is a markdown file, the other one an ini file.
 
 import os
 import subprocess
-import sys
 
 import lpbm.exceptions
 import lpbm.logging
@@ -18,7 +17,9 @@ import lpbm.tools as ltools
 
 from lpbm.models.articles import Article
 
+
 _LOGGER = lpbm.logging.get()
+
 
 class Articles(lpbm.module_loader.ModelManagerModule):
     '''
@@ -26,10 +27,12 @@ class Articles(lpbm.module_loader.ModelManagerModule):
     pair of two files. One is a markdown file, the other one an ini file.
     '''
 
-    # pylint: disable=C0321
     def abstract(self): return 'Loads and manipulates articles.'
+
     def model_cls(self): return Article
+
     def name(self): return 'articles'
+
     def object_name(self): return 'article'
 
     def init(self):
@@ -41,8 +44,10 @@ class Articles(lpbm.module_loader.ModelManagerModule):
         self.add_id_option('-E', '--edit-content', help='Opens your $EDITOR on the article.')
 
     def load(self, modules, args):
-        f = lambda a: a.endswith('.markdown')
-        for root, filename in ltools.filter_files(f, self.args.exec_path, 'articles'):
+        def filter_fn(a):
+            return a.endswith('.markdown')
+
+        for root, filename in ltools.filter_files(filter_fn, self.args.exec_path, 'articles'):
             self.register_object(Article, ltools.join(root, filename))
 
     def _get_author_verbose(self, authors):
@@ -75,8 +80,8 @@ class Articles(lpbm.module_loader.ModelManagerModule):
         article.publish()
         article.save()
         print('Article "{title}" by {authors} was published.'.format(
-            title = article.title,
-            authors = self._get_author_verbose(article.authors),
+            title=article.title,
+            authors=self._get_author_verbose(article.authors),
         ))
 
     def opt_new(self):
@@ -94,6 +99,6 @@ class Articles(lpbm.module_loader.ModelManagerModule):
         '''Opens editor to modify its content.'''
         article = self[id]
         subprocess.call('{editor} "{filename}"'.format(
-            editor = os.environ.get('EDITOR', 'vim'),
-            filename = article.path,
+            editor=os.environ.get('EDITOR', 'vim'),
+            filename=article.path,
         ), shell=True)

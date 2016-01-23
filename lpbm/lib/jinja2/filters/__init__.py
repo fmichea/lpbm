@@ -1,6 +1,6 @@
 import lpbm.tools
 
-from lpbm.lib.jinja2.filters.markdown import *  # noqa
+from lpbm.lib.jinja2.filters.markdown import do_markdown  # noqa
 
 
 def do_sorted(value):

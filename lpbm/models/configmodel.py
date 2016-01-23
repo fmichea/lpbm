@@ -13,6 +13,7 @@ import configparser
 import lpbm.tools as ltools
 import lpbm.exceptions
 
+
 class BaseField:
     def __init__(self, **kwargs):
         # Options all fields should have,
@@ -46,7 +47,6 @@ class ValueField(BaseField):
         return '_{}_{}'.format(self.__class__, self._name)
 
 
-# pylint: disable=R0903
 class ConfigOptionField(BaseField):
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)
@@ -57,7 +57,7 @@ class ConfigOptionField(BaseField):
         elif len(args) == 2:
             self._section, self._option = args
         else:
-            raise lpbm.exception.ConfigOptionArgsError(text)
+            raise lpbm.exception.ConfigOptionArgsError()
 
     def __set__(self, instance, val):
         cfg = instance.cm.config
@@ -87,7 +87,6 @@ class ConfigOptionField(BaseField):
             value = self.default
         return value
 
-    # pylint: disable=R0201
     def _getter_function(self):
         '''
         Override this method to change the configparser's function getting
@@ -95,50 +94,32 @@ class ConfigOptionField(BaseField):
         '''
         return None
 
-# pylint: disable=R0903
+
 class ConfigOptionFieldBoolean(ConfigOptionField):
     '''ConfigOptionField returning and setting booleans.'''
 
     def _getter_function(self):
         return configparser.ConfigParser.getboolean
 
-    # pylint: disable=E1002
     def __set__(self, obj, val):
         val = 'yes' if val else 'no'
         super(ConfigOptionFieldBoolean, self).__set__(obj, val)
 
-    def _getter_type(self):
-        class DataBool(Data):
-            def __init__(self, val):
-                self._value = val
-            def __bool__(self):
-                return self._value
-        return DataBool
 
-
-# pylint: disable=R0903
 class ConfigOptionFieldInt(ConfigOptionField):
     '''ConfigOptionField returning and setting ints.'''
 
     def _getter_function(self):
         return configparser.ConfigParser.getint
 
-    def _getter_type(self):
-        return data_factory(int)
 
-
-# pylint: disable=R0903
 class ConfigOptionFieldFloat(ConfigOptionField):
     '''ConfigOptionField returning and setting floats.'''
 
     def _getter_function(self):
         return configparser.ConfigParser.getfloat
 
-    def _getter_type(self):
-        return data_factory(float)
 
-
-# pylint: disable=R0903
 class ConfigModel:
     '''
     This is the actual class, which instances contain a configuration. It's
@@ -158,21 +139,26 @@ class ConfigModel:
 def field(*args, **kwargs):
     return ValueField(*args, **kwargs)
 
+
 def opt(*args, **kwargs):
     '''Returns an instance of ConfigOptionField (manipulating string).'''
     return ConfigOptionField(*args, **kwargs)
+
 
 def opt_int(*args, **kwargs):
     '''Returns an instance of ConfigOptionFieldInt.'''
     return ConfigOptionFieldInt(*args, **kwargs)
 
+
 def opt_bool(*args, **kwargs):
     '''Returns an instance of ConfigOptionFieldBoolean.'''
     return ConfigOptionFieldBoolean(*args, **kwargs)
 
+
 def opt_float(*args, **kwargs):
     '''Returns an instance of ConfigOptionFieldFloat.'''
     return ConfigOptionFieldFloat(*args, **kwargs)
+
 
 class Model:
     id = opt_int('id')
@@ -215,12 +201,14 @@ class Model:
     def interactive_id(self):
         if self.id is None and self.__id is None:
             ids = [o.id for o in self.mod.all_objects]
+
             def is_valid(val):
                 try:
                     val = int(val)
                 except ValueError:
                     return False
                 return val not in ids
+
             try:
                 default = max(ids) + 1
             except ValueError:

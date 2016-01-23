@@ -11,6 +11,7 @@ import os
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
+
 class ArticleSameIdError(Exception):
     '''Exception raised when two articles are found with the same id.'''
 
@@ -23,8 +24,10 @@ class ArticleSameIdError(Exception):
             self.art1.title, self.art2.title
         )
 
+
 _TITLE_SEPARATOR = '=='
 _FRMT_DATE_CONF = '%Y-%m-%dT%H:%M:%S'
+
 
 class Article(cm_module.Model):
     '''
@@ -84,9 +87,10 @@ class Article(cm_module.Model):
 
     def __str__(self):
         return '"{title}" by {authors} [{published}]'.format(
-            id = self.id, title = self.title,
-            authors = self.mod._get_author_verbose(self.authors),
-            published = 'published' if self.published else 'draft',
+            id=self.id,
+            title=self.title,
+            authors=self.mod._get_author_verbose(self.authors),
+            published=('published' if self.published else 'draft'),
         )
 
     def __lt__(self, other):
@@ -190,11 +194,11 @@ class Article(cm_module.Model):
 
     def _config_filename(self):
         '''Returns the filename with config's extension.'''
-        return '{filename}.cfg'.format(filename = self.filename)
+        return '{filename}.cfg'.format(filename=self.filename)
 
     def _markdown_filename(self):
         '''Returns the filename with markdown's extension.'''
-        return '{filename}.markdown'.format(filename = self.filename)
+        return '{filename}.markdown'.format(filename=self.filename)
 
     def html_filename(self):
         '''Returns the filename of the HTML file for that article.'''

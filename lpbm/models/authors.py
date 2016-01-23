@@ -10,6 +10,7 @@ authors of the blog.
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
+
 class Author(cm_module.Model):
     '''
     Author's model in blog sources. Maps a section in an ini file containing
@@ -28,15 +29,16 @@ class Author(cm_module.Model):
         self._interactive_fields += ['section', 'first_name', 'last_name', 'email']
 
     def __lt__(self, other):
-        return ((self.last_name.lower(), self.first_name.lower()) <
-                (other.last_name.lower(), other.first_name.lower()))
+        def fn(obj):
+            return (obj.last_name.lower(), obj.first_name.lower())
+        return fn(self) < fn(other)
 
     def __str__(self):
         res = self.full_name()
         if res != self.nickname:
-            res += ' a.k.a. {nickname}'.format(nickname = self.nickname)
+            res += ' a.k.a. {nickname}'.format(nickname=self.nickname)
         if self.email is not None:
-            res += ' [{email}]'.format(email = self.email)
+            res += ' [{email}]'.format(email=self.email)
         return res
 
     def full_name(self):

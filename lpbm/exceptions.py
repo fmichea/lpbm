@@ -8,9 +8,8 @@ class GeneralOptionError(Exception):
         self.name = name
 
     def __str__(self):
-        return 'Couldn\'t find or call any function for `--{}` options.'.format(
-            self.name
-        )
+        msg = 'Could not find or call any function for `--{}` options.'
+        return msg.format(self.name)
 
 
 class IdOptionError(GeneralOptionError):
@@ -35,31 +34,37 @@ class ObjectNotFound(Exception):
 
 # Field Errors
 
+
 class FieldReadOnlyError(Exception):
     def __str__(self):
-        return 'Can\'t assign read-only value.'
+        return 'Cannot assign read-only value.'
 
 
 class FieldRequiredError(Exception):
     def __str__(self):
-        return 'Field is required and can\'t be set to empty value None.'
+        return 'Field is required and cannot be set to empty value None.'
 
 
 class ConfigOptionArgsError(Exception):
     def __str__(self):
-        return 'ConfigOptionField.__init__ takes one or two arguments. See ' \
-               'documentation for more details.'
+        msgs = [
+            'ConfigOptionField.__init__ takes one or two arguments.',
+            'See documentation for more details.',
+        ]
+        return ' '.join(msgs)
+
 
 # Model Errors
+
+
 class AttributeNotAFieldError(Exception):
     def __init__(self, attr_name):
         self.attr_name = attr_name
 
     def __str__(self):
-        return 'Attribute `{attr_name}` is not a field. You must implement ' \
-               '`interactive_{attr_name}` if you want it to be interactive.'.format(
-            attr_name = self.attr_name,
-        )
+        msg = 'Attribute `{attr_name}` is not a field. You must implement '
+        msg += '`interactive_{attr_name}` if you want it to be interactive.'
+        return msg.format(attr_name=self.attr_name)
 
 
 class ModelDoesNotExistError(Exception):
@@ -68,5 +73,5 @@ class ModelDoesNotExistError(Exception):
 
     def __str__(self):
         return 'There is no such {object_name} (id = {id}).'.format(
-            object_name = self.object_name, id = self.id
+            object_name=self.object_name, id=self.id
         )

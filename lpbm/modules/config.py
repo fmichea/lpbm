@@ -44,14 +44,15 @@ _CONFIGURATION = {
     }),
 }
 
+
 class Config(lpbm.module_loader.Module):
     '''
     Configuration can be manipulated with this module, so that use should never
     have to change the file by hand.
     '''
 
-    # pylint: disable=C0321
     def name(self): return 'config'
+
     def abstract(self): return 'Manipulates blog configuration.'
 
     def init(self):
@@ -65,16 +66,21 @@ class Config(lpbm.module_loader.Module):
                                  help='Unset an option (section.option).')
 
     def process(self, modules, args):
-        if args.list: # We must show all available options.
+        # We must show all available options.
+        if args.list:
             self.list_options()
-        elif args.check: # Check if the file is of the good format.
+        # Check if the file is of the good format.
+        elif args.check:
             self.check_options()
-        elif args.set: # We must set the variable.
+        # We must set the variable.
+        elif args.set:
             self.set_var(args.set)
-        elif args.unset: # We want to unset some variable.
+        # We want to unset some variable.
+        elif args.unset:
             self.unset_var(args.unset)
         else:
             self.parser.print_help()
+
         try:
             with open(ltools.join(args.exec_path, 'lpbm.cfg'), 'w') as f:
                 self.config.write(f)
@@ -112,7 +118,6 @@ class Config(lpbm.module_loader.Module):
         return self.config.get(section, option, fallback=None)
 
     # Particular functions for configuration.
-    # pylint: disable=R0201
     def list_options(self):
         """
         List all the avilable options with an abstract of their meaning.
@@ -121,7 +126,7 @@ class Config(lpbm.module_loader.Module):
         for section in sorted(_CONFIGURATION.keys()):
             required, options = _CONFIGURATION[section]
             print('Section: {section} - Required: {required}'.format(
-                section = section, required = required
+                section=section, required=required
             ))
             for option in sorted(options.keys()):
                 required, desc = options[option]

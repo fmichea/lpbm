@@ -7,13 +7,12 @@ Categories manager, getting authors configuration in blog sources and loading
 all the categories.
 '''
 
-import sys
-
 import lpbm.models.configmodel as cm_module
 import lpbm.module_loader
 import lpbm.tools as ltools
 
 from lpbm.models.categories import Category
+
 
 class Categories(lpbm.module_loader.ModelManagerModule):
     '''
@@ -21,11 +20,14 @@ class Categories(lpbm.module_loader.ModelManagerModule):
     loading all the categories.
     '''
 
-    # pylint: disable=C0321
     def abstract(self): return 'Loads and manipulates categories.'
+
     def name(self): return 'categories'
+
     def object_name(self): return 'category'
+
     def object_name_plural(self): return 'categories'
+
     def model_cls(self): return Category
 
     def load(self, modules, args):
@@ -34,7 +36,7 @@ class Categories(lpbm.module_loader.ModelManagerModule):
 
         # Now we load all the categories.
         for section in self.cm.config.sections():
-            obj = self.register_object(Category, section)
+            self.register_object(Category, section)
 
     # Manipulation function
     def recursive_view(self):
@@ -71,8 +73,8 @@ class Categories(lpbm.module_loader.ModelManagerModule):
         print('All categories to be deleted:')
         for cat in categories.values():
             print('{level} - {name}'.format(
-                name = cat.name,
-                level = '  ' * (cat.level() - categories[id].level())
+                name=cat.name,
+                level=('  ' * (cat.level() - categories[id].level()))
             ))
         if ltools.ask_sure():
             for cat in categories.values():

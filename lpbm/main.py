@@ -14,34 +14,31 @@ import pdb
 import sys
 import traceback
 
-# pylint: disable=E0611
 import lpbm.logging
 import lpbm.module_loader
 
+
 _MODULES = dict()
+
 
 def main():
     '''Initialization of logging module and parser. Calls module_loader.'''
-    # pylint: disable=E1101
     lpbm.logging.init()
 
     # Command line arguments.
-    parser = argparse.ArgumentParser(
-        description='Lightweight Personal Blog Maker'
-    )
+    parser = argparse.ArgumentParser(description='Lightweight Personal Blog Maker')
     parser.add_argument('-b', '--backtrace', action='store_true', default=False,
                         help='print backtrace on error (default with pdb).')
     parser.add_argument('-d', '--debug', action='store_true', default=False,
                         help='print debug information.')
-    parser.add_argument('-p', '--exec-path', action='store', default='.',
-                        help='path where lpbm will search the blog. ' + \
-                             '(default: %(default)s)')
+
+    _help = 'path where lpbm will search the blog. (default: %(default)s)'
+    parser.add_argument('-p', '--exec-path', action='store', default='.', help=_help)
     parser.add_argument('-P', '--pdb', action='store_true', default=False,
                         help='start pdb debugger on exception.')
     subparser = parser.add_subparsers()
 
     # Tools are loaded dynamically, so argument parser isn't complete.
-    # pylint: disable=E1101
     lpbm.module_loader.load_modules(_MODULES, subparser)
 
     # Every command , we can parse command line.

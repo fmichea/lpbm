@@ -16,6 +16,7 @@ import sys
 import lpbm.logging
 import lpbm.tools as ltools
 
+
 class Module(metaclass=abc.ABCMeta):
     """
     This is the base class of all modules. You can find documentation for every
@@ -172,6 +173,7 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
     def process(self, modules, args):
         def option_mangle(opt):
             return opt.replace('-', '_')
+
         def option_states(opts):
             return dict((k, getattr(args, option_mangle(k))) for k in opts)
 
@@ -258,6 +260,7 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
             if not self.is_valid(id):
                 return False
         return True
+
 
 def load_modules(modules_, argument_parser):
     """Dynamically loads all the compatible commands from modules directory"""

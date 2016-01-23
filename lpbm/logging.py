@@ -25,6 +25,7 @@ _LEVELS = {
 
 _FORMATTER = logging.Formatter(_LOGGER_BASIC_CONFIG['format'])
 
+
 class WaitingConfigurationHandler(logging.handlers.MemoryHandler):
     '''This class keeps logs in memory until we have a configuration.'''
 
@@ -33,12 +34,10 @@ class WaitingConfigurationHandler(logging.handlers.MemoryHandler):
         logging.handlers.MemoryHandler.__init__(self, 3)
         self.targets = []
 
-# pylint: disable=C0103
     def setTargets(self, targets):
         '''We can reset targets whenever we want.'''
         self.targets = targets
 
-# pylint: disable=C0103
     def flushAll(self):
         '''For all targets, we send the buffer.'''
         for target in self.targets:
@@ -49,11 +48,14 @@ class WaitingConfigurationHandler(logging.handlers.MemoryHandler):
     def flush(self):
         pass
 
+
 _TEMP_HANDLER = WaitingConfigurationHandler()
+
 
 def get():
     '''Returns global logger to be used everywhere.'''
     return logging.getLogger(_LOGGER_NAME)
+
 
 def init():
     '''
@@ -65,6 +67,7 @@ def init():
 
     logger.addHandler(_TEMP_HANDLER)
     _TEMP_HANDLER.setLevel(_LOGGER_BASIC_CONFIG['level'])
+
 
 def configure(config):
     '''

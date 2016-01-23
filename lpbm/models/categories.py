@@ -12,6 +12,7 @@ import os
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
+
 class Category(cm_module.Model):
     '''
     Category's model in blog sources. Maps a section in an ini file containing
@@ -57,9 +58,9 @@ class Category(cm_module.Model):
 
     def list_verbose(self):
         return '\r{indent}{id:2d} - {cat}'.format(
-            cat = str(self),
-            id = self.id,
-            indent = '  ' * self.level(),
+            cat=str(self),
+            id=self.id,
+            indent='  ' * self.level(),
         )
 
     def interactive_section(self):

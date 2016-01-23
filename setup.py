@@ -24,7 +24,7 @@ setup(
     packages=find_packages(exclude=['test', 'doc']),
     package_data={'': ['*.css', '*.html']},
     include_package_data=True,
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'lpbm = lpbm.main:main',
         ],

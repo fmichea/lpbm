@@ -17,13 +17,19 @@ import markdown
 import lpbm.module_loader
 import lpbm.tools as ltools
 
-from lpbm.lib.jinja2.filters import *
-from lpbm.lib.markdown import do_markdown
+from lpbm.lib.jinja2.filters import (
+    do_markdown,
+    do_slugify,
+    do_sorted,
+)
+
 
 _ENV = None
 
+
 def _get_template(*args):
     return _ENV.get_template(os.path.join(*args))
+
 
 def do_authors_list(value, mod):
     res, template = [], _get_template('authors', 'link.html')
@@ -35,9 +41,9 @@ def do_authors_list(value, mod):
     return lpbm.tools.join_names(sorted(res))
 
 
-# Miscenalleous filters for jinja2
 class Render(lpbm.module_loader.Module):
     def name(self): return 'render'
+
     def abstract(self): return 'Blog generation module.'
 
     def init(self):
@@ -102,10 +108,14 @@ class Render(lpbm.module_loader.Module):
         })
         categories_menu = self.modules['categories'].recursive_view()
         cats_visible = self._get_categories()
+
         def _categories_menu(c):
-            return dict([(i, (cat, _categories_menu(children)))
-                         for i, (cat, children) in c.items()
-                         if cat.id in cats_visible])
+            return dict(
+                (i, (cat, _categories_menu(children)))
+                for i, (cat, children) in c.items()
+                if cat.id in cats_visible
+            )
+
         categories_menu = _categories_menu(categories_menu)
         _ENV.globals.update({
             'authors_mod': self.modules['authors'],
@@ -160,6 +170,7 @@ class Render(lpbm.module_loader.Module):
 
     def _copy_static_dir(self, statics, fltr, *subdirs):
         out_root = self._build_path(*subdirs)
+
         def sub(root):
             res = []
             for root, filename in ltools.filter_files(fltr, root, *(subdirs[1:])):
@@ -167,6 +178,7 @@ class Render(lpbm.module_loader.Module):
                 ltools.copy(ltools.join(root, filename),
                             ltools.join(out_root, filename))
             return res
+
         sub(self.root)
         statics.extend(sub(ltools.join(self.args.exec_path, 'medias')))
 
@@ -213,11 +225,14 @@ class Render(lpbm.module_loader.Module):
         app = self.modules['config']['paginate.nb_articles'] or 5
         pwidth = self.modules['config']['paginate.width'] or 5
         pages = int(math.ceil(len(articles) / float(app)))
+
         def left_stone(page):
             return min(max(0, page - pwidth // 2), max(0, pages - pwidth))
+
         def right_stone(page):
             rstone = pwidth // 2 + (1 if 0 < pwidth / 2 else 0)
             return max(min(pages, page + rstone), min(pages, pwidth))
+
         template = _get_template('articles', 'base.html')
         display_pages = range(1, pages + 1)
         main_title = kwargs.get('page_title', None)
@@ -246,31 +261,31 @@ class Render(lpbm.module_loader.Module):
                 try:
                     author = self.modules['authors'][author_id]
                     return '{email} ({full_name})'.format(
-                        email = author.email,
-                        full_name = author.full_name(),
+                        email=author.email,
+                        full_name=author.full_name(),
                     )
                 except lpbm.exceptions.ModelDoesNotExistError:
                     return '[deleted]'
             authors = ltools.join_names([rss_aut(a) for a in article.authors])
             return PyRSS2Gen.RSSItem(
-                title = article.title,
-                link = '{base_url}articles/{html_filename}'.format(
-                    base_url = self.modules['config']['general.url'],
-                    html_filename = article.html_filename(),
+                title=article.title,
+                link='{base_url}articles/{html_filename}'.format(
+                    base_url=self.modules['config']['general.url'],
+                    html_filename=article.html_filename(),
                 ),
-                author = authors,
-                guid = str(article.id),
-                description = do_markdown(article.content, code=False),
-                pubDate = article.date,
+                author=authors,
+                guid=str(article.id),
+                description=do_markdown(article.content, code=False),
+                pubDate=article.date,
             )
         print('Generating RSS file.')
         articles = self._get_articles(self.modules['config']['rss.nb_articles'] or 10)
         rss = PyRSS2Gen.RSS2(
-            title = self.modules['config']['general.title'],
-            link = self.modules['config']['general.url'],
-            description = self.modules['config']['general.subtitle'],
-            lastBuildDate = datetime.datetime.now(),
-            items = [rss_item(a) for a in articles],
+            title=self.modules['config']['general.title'],
+            link=self.modules['config']['general.url'],
+            description=self.modules['config']['general.subtitle'],
+            lastBuildDate=datetime.datetime.now(),
+            items=[rss_item(a) for a in articles],
         )
         rss_path = ltools.join(self.build_dir, 'rssfeed.xml')
         with codecs.open(rss_path, 'w', 'utf-8') as f:
