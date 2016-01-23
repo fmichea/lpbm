@@ -348,3 +348,39 @@ div.author_menu_link {
         color: $color_text_title;
     }
 }
+
+div.panel {
+  border: 1px solid $color_border_code;
+  margin: 15px;
+
+  div.panel-heading {
+    color: $color_main_title;
+    background-color: $color_bkg_main_title;
+    border: 1px solid $color_border_code;
+    padding: 5px;
+  }
+
+  div.panel-body {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+div.lpbm-collapser-heading {
+  text-align: center;
+
+  div.lpbm-collapser-button {
+    color: #aaaaaa;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  div.lpbm-collapser-button-collapse {
+    display: none;
+  }
+}
+
+div.lpbm-collapser-body {
+  display: none;
+}

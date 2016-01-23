@@ -19,3 +19,21 @@
 .twitter-share-button {
     margin-bottom: -4px;
 }
+
+.lpbm-collapser-heading {
+  text-align: center;
+}
+
+.lpbm-collapser-button {
+  color: #aaaaaa;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.lpbm-collapser-button-collapse {
+  display: none;
+}
+
+.lpbm-collapser-body {
+  display: none;
+}

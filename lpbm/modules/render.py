@@ -17,26 +17,13 @@ import markdown
 import lpbm.module_loader
 import lpbm.tools as ltools
 
+from lpbm.lib.jinja2.filters import *
+from lpbm.lib.markdown import do_markdown
+
 _ENV = None
 
 def _get_template(*args):
     return _ENV.get_template(os.path.join(*args))
-
-# Miscenalleous filters for jinja2
-def do_markdown(value, code=True):
-    if not code:
-        tmp = value.splitlines()
-        for idx, line in enumerate(tmp):
-            if line.startswith('\t:::') or line.startswith('    :::'):
-                tmp[idx] = ''
-        value = '\n'.join(tmp)
-        return markdown.markdown(value)
-    return markdown.markdown(value, extensions=[
-        'markdown.extensions.codehilite(linenums=True)'
-    ])
-
-def do_sorted(value):
-    return sorted(value)
 
 def do_authors_list(value, mod):
     res, template = [], _get_template('authors', 'link.html')
@@ -45,11 +32,10 @@ def do_authors_list(value, mod):
             res.append(template.render({'author': mod[int(author_id)]}))
         except (lpbm.exceptions.ModelDoesNotExistError, ValueError):
             pass
-    return ltools.join_names(sorted(res))
+    return lpbm.tools.join_names(sorted(res))
 
-def do_slugify(value):
-    return ltools.slugify(value)
 
+# Miscenalleous filters for jinja2
 class Render(lpbm.module_loader.Module):
     def name(self): return 'render'
     def abstract(self): return 'Blog generation module.'
