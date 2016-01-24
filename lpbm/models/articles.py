@@ -11,6 +11,11 @@ import os
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
+from lpbm.lib.slugify import (
+    SLUG_CHARS_DISPLAY as _SLUG_CHARS_DISPLAY,
+    slugify as _slugify,
+)
+
 
 class ArticleSameIdError(Exception):
     '''Exception raised when two articles are found with the same id.'''
@@ -116,17 +121,17 @@ class Article(cm_module.Model):
 
     def interactive_filename(self):
         def is_valid(value):
-            if ltools.slugify(value) != value:
-                print('This is not a valid slug ({}).'.format(ltools.SLUG_CHARS_DISPLAY))
+            if _slugify(value) != value:
+                print('This is not a valid slug ({}).'.format(_SLUG_CHARS_DISPLAY))
                 return False
             path = os.path.join('articles', value + '.markdown')
             if os.path.exists(os.path.normpath(path)):
                 print('Article with this filename already exists.')
                 return False
             return True
-        default = ltools.slugify(self.title)
-        self.filename = ltools.input_default('Filename', default, required=True,
-                                             is_valid=is_valid)
+        default = _slugify(self.title)
+        self.filename = ltools.input_default(
+            'Filename', default, required=True, is_valid=is_valid)
 
         # Several paths have to be reset.
         self.filename = os.path.join('articles', self.filename)

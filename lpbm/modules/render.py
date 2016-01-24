@@ -22,6 +22,7 @@ from lpbm.lib.jinja2.filters import (
     do_slugify,
     do_sorted,
 )
+from lpbm.lib.slugify import slugify as _slugify
 
 
 _ENV = None
@@ -325,7 +326,7 @@ class Render(lpbm.module_loader.Module):
                     authors[author] = set([article])
         for id, articles in authors.items():
             author = self.modules['authors'][id]
-            dirs = ['authors', ltools.slugify(author.nickname)]
+            dirs = ['authors', _slugify(author.nickname)]
             kwargs = {
                 'page_title': '{} ({})'.format(author.full_name(), author.nickname),
                 'cur_author': author.id,

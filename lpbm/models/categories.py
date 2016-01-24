@@ -12,6 +12,8 @@ import os
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
 
+from lpbm.lib.slugify import slugify as _slugify
+
 
 class Category(cm_module.Model):
     '''
@@ -86,13 +88,13 @@ class Category(cm_module.Model):
 
     def interactive_slug(self):
         def is_valid(value):
-            if value != ltools.slugify(value):
+            if value != _slugify(value):
                 print('This is not a valid slug.')
                 return False
             return True
-        default = self.slug or ltools.slugify(self.name)
-        self.slug = ltools.input_default('Slug', default, required=True,
-                                         is_valid=is_valid)
+        default = self.slug or _slugify(self.name)
+        self.slug = ltools.input_default(
+            'Slug', default, required=True, is_valid=is_valid)
 
     def html_filename(self):
         slugs = [cat.slug for cat in self.full_path()]
