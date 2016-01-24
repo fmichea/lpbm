@@ -52,7 +52,7 @@ setup(
     # General information.
     name='lpbm',
     description='Lightweight personal blog maker',
-    url='http://bitbucket.org/kushou/lpbm',
+    url='http://github.com/fmichea/lpbm',
 
     # Version information.
     license='BSD',
