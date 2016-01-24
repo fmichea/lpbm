@@ -1,9 +1,52 @@
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    import distribute_setup
-    distribute_setup.use_setuptools()
-    from setuptools import setup, find_packages
+import os
+import shlex
+import sys
+
+from setuptools import find_packages
+from setuptools import setup
+from setuptools.command.test import test as TestCommand
+
+
+_ROOT = os.path.abspath(os.path.dirname(__file__))
+
+
+class PyTest(TestCommand):
+    user_options = [
+        ('args=', 'a', 'Additional arguments to pass to py.test'),
+        ('debug=', 'D', 'Enable debugging of test suite (on, first, off)'),
+        ('coverage=', 'C', 'Enable coverage of the test project (on, keep-file, off)'),
+    ]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.args, self.debug, self.coverage = [], 'off', 'on'
+
+    def run(self):
+        import pytest
+        args = []
+        if self.debug in ['first', 'on']:
+            if self.debug == 'first':
+                args.append('-x')
+            args.extend(['--pdb', '-vv'])
+        if self.coverage in ['on', 'keep-result']:
+            args.extend([
+                '--cov-config', os.path.join(_ROOT, '.coveragerc'),
+                '--cov', 'lpbm',
+                '--cov-report', 'term-missing',
+                '--no-cov-on-fail',
+            ])
+        if self.args:
+            args.extend(shlex.split(self.args))
+        args.append(os.path.join(_ROOT, 'tests'))
+        print('execute: py.test', ' '.join(shlex.quote(arg) for arg in args))
+        try:
+            errno = pytest.main(args)
+        finally:
+            cov_file = os.path.join(_ROOT, '.coverage')
+            if self.coverage != 'keep-result' and os.path.exists(cov_file):
+                os.unlink(cov_file)
+        sys.exit(errno)
+
 
 setup(
     # General information.
@@ -28,6 +71,9 @@ setup(
         'console_scripts': [
             'lpbm = lpbm.main:main',
         ],
+    },
+    cmdclass={
+        'test': PyTest,
     },
 
     # Categories

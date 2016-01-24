@@ -9,6 +9,7 @@ import re
 import shutil
 import string
 import sys
+import unicodedata
 
 
 ROOT = os.path.dirname(__file__)
@@ -74,7 +75,8 @@ _SLUG_SIZE = 50
 
 def slugify(text):
     '''Returns the slug of a string (that can be used in an URL for example.'''
-    slug = text.lower().replace(' ', '-')
+    slug = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore')
+    slug = slug.decode('utf-8').lower().replace(' ', '-')
     slug = ''.join(c for c in slug if c in _SLUG_CHARS)
     return slug[:_SLUG_SIZE]
 
