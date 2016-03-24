@@ -4,7 +4,7 @@
 LPBM Module
 ===========
 
-This module cntains the complete package for lpbm blog generator. Basically,
+This module contains the complete package for lpbm blog generator. Basically,
 You will find 3 sub-modules and some helper files:
 
   * Datas: contains models for the objects the blog manipulates.
