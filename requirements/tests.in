@@ -1,0 +1,4 @@
+-r command.in
+flake8
+pytest
+pytest-cov
