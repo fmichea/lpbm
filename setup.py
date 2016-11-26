@@ -14,7 +14,7 @@ class PyTest(TestCommand):
     user_options = [
         ('args=', 'a', 'Additional arguments to pass to py.test'),
         ('debug=', 'D', 'Enable debugging of test suite (on, first, off)'),
-        ('coverage=', 'C', 'Enable coverage of the test project (on, keep-file, off)'),
+        ('coverage=', 'C', 'Enable coverage of the test project (on, keep-result, off)'),
     ]
 
     def initialize_options(self):
@@ -31,7 +31,7 @@ class PyTest(TestCommand):
         if self.coverage in ['on', 'keep-result']:
             args.extend([
                 '--cov-config', os.path.join(_ROOT, '.coveragerc'),
-                '--cov', 'lpbm',
+                '--cov', 'lpbm.v3',
                 '--cov-report', 'term-missing',
                 '--no-cov-on-fail',
             ])
@@ -70,6 +70,7 @@ setup(
     entry_points={
         'console_scripts': [
             'lpbm = lpbm.main:main',
+            'lpbm-v3 = lpbm.v3.main:main',
         ],
     },
     cmdclass={
