@@ -1,0 +1,2 @@
+class LPBMException(Exception):
+    pass
