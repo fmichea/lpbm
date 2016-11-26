@@ -1,5 +1,7 @@
 *.pyc
-.sass-cache
 .cache
-result
+.coverage
+.sass-cache
 doc/_*
+htmlcov
+result
