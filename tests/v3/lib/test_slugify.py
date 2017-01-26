@@ -1,6 +1,6 @@
 import pytest
 
-import lpbm.lib.slugify as mod
+import lpbm.v3.lib.slugify as mod
 
 
 @pytest.mark.parametrize('text,slug', [
