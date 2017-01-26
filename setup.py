@@ -28,7 +28,7 @@ class PyTest(TestCommand):
         if self.debug in ['first', 'on']:
             if self.debug == 'first':
                 args.append('-x')
-            args.extend(['--pdb', '-vv'])
+            args.extend(['--pdb', '-vv', '-s'])
         if self.coverage in ['on', 'keep-result']:
             args.extend([
                 '--cov-config', os.path.join(_ROOT, '.coveragerc'),
