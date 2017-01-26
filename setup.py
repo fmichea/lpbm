@@ -15,11 +15,12 @@ class PyTest(TestCommand):
         ('args=', 'a', 'Additional arguments to pass to py.test'),
         ('debug=', 'D', 'Enable debugging of test suite (on, first, off)'),
         ('coverage=', 'C', 'Enable coverage of the test project (on, keep-result, off)'),
+        ('exec-only=', 'k', 'Filter tests by test name or filename'),
     ]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
-        self.args, self.debug, self.coverage = [], 'off', 'on'
+        self.args, self.debug, self.coverage, self.exec_only = [], 'off', 'on', ''
 
     def run(self):
         import pytest
@@ -35,6 +36,8 @@ class PyTest(TestCommand):
                 '--cov-report', 'term-missing',
                 '--no-cov-on-fail',
             ])
+        if self.exec_only:
+            args.append('-k{}'.format(self.exec_only))
         if self.args:
             args.extend(shlex.split(self.args))
         args.append(os.path.join(_ROOT, 'tests'))
