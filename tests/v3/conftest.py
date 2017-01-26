@@ -14,9 +14,9 @@ class LPBMClient(object):
     def __init__(self, runner):
         self._runner = runner
 
-    def run(self, cmd, inp=None):
+    def run(self, cmd, inp=None, catch_exception=True):
         result = self._runner.invoke(_CMD, args=shlex.split(cmd), input=inp)
-        if result.exit_code == -1:
+        if catch_exception and result.exit_code == -1:
             lines = ['Exception while calling command:\n']
             lines.extend(traceback.format_exception(*result.exc_info))
             assert False, ''.join(lines).strip()
