@@ -1,70 +1,132 @@
 import inspect
 import os
 import uuid
-
 import yaml
 
 import lpbm.v3.lib.path as lpath
 
+from voluptuous import (
+    Schema as _Schema,
+    Marker as _Marker,
+    Required,
+    Optional,
+    Email,
+    Boolean,
+    Any,
+    UNDEFINED as _UNDEFINED,
+)
+from voluptuous.error import MultipleInvalid
+
+
+def _new_uuid():
+    return str(uuid.uuid4())
+
 
 _NOT_SET = object()
+
+_SCHEMA_TO_MODEL_MAP = dict()
 
 
 class _BaseModel(object):
     pass
 
 
+def is_model(v):
+    return isinstance(v, type) and issubclass(v, _BaseModel)
+
+
+def is_model_instance(v):
+    return isinstance(v, _BaseModel)
+
+
+def _build_real_schema(schema):
+    if is_model(schema):
+        return schema._schema()
+    if isinstance(schema, dict):
+        return {
+            key: _build_real_schema(val)
+            for key, val in schema.items()
+        }
+    if isinstance(schema, list):
+        assert len(schema) == 1
+        return [_build_real_schema(schema[0])]
+    return schema
+
+
+def _build_marker_index(d, prefix=None):
+    markers, types = dict(), dict()
+    for key, val in d.items():
+        path = str(key)
+        if prefix:
+            path = '{0}.{1}'.format(prefix, path)
+        # markers.
+        if isinstance(key, _Marker):
+            markers[path] = key
+        # types.
+        if isinstance(val, dict):
+            tmp1, tmp2 = _build_marker_index(val, prefix=path)
+            markers.update(tmp1)
+            types.update(tmp2)
+        elif is_model(val):
+            types[path] = val
+        elif isinstance(val, list) and is_model(val[0]):
+            types[path] = val
+        elif any(val is t for t in (bool, int, float, str)):
+            types[path] = val
+    return markers, types
+
+
+class Schema(_Schema):
+    def __init__(self, schema, **kw):
+        super().__init__(_build_real_schema(schema), **kw)
+        self.model_schema = schema
+        # For ModelField we need to have easy access to the Markers.
+        self.markers, self.types = _build_marker_index(self.model_schema)
+
+    def extend(self, other):
+        self.schema = super(Schema, self).extend(_build_real_schema(other)).schema
+        self._compiled = self._compile(self.schema)
+
+        self.model_schema.update(other)
+
+        tmp1, tmp2 = _build_marker_index(other)
+        self.markers.update(tmp1)
+        self.types.update(tmp2)
+
+
+class ModelFieldMissingError(Exception):
+    pass
+
+
 class ModelField(object):
-    def __init__(self, path, **kw):
-        self.path = path
-        self._type = kw.get('type', None)
-        self._value_type = kw.get('value_type', None)
-        if self._type is list:
-            assert self._value_type != None
-        # Default value can be a constant or a function that will be called.
-        self._default = kw.get('default', _NOT_SET)
-
-    def has_default(self):
-        return self._default is not _NOT_SET
-
-    def default(self):
-        if inspect.isfunction(self._default):
-            return self._default()
-        return self._default
-
-    def _type_cast(self, val):
-        if issubclass(self._type, _BaseModel):
-            return self._type.new(val)
-        if not isinstance(val, self._type):
-            raise
-        return val
-
-    def _value_type_cast(self, val):
-        if self._value_type is None:
-            return val
-        if isinstance(val, self._value_type):
-            return val
-        if issubclass(self._value_type, _BaseModel):
-            return self._value_type.new(val)
-        return self._value_type(val)
+    def __init__(self, path):
+        self.path, self.path_sp = path, path.split('.')
 
     def __get__(self, instance, type=None):
         if instance is None:
             return self
+
+        marker = instance._schema().markers.get(self.path)
+        types = instance._schema().types.get(self.path)
+
         prev_d = d = instance.data
         try:
-            for k in self.path.split('.'):
+            for k in self.path_sp:
                 prev_d = d
                 d = d[k]
-            if self._type is not None:
-                d = self._type_cast(d)
-            if isinstance(d, list):
-                d = [self._value_type_cast(d1) for d1 in d]
-                prev_d[k] = d
-        except Exception as exc:
-            if not self.has_default():
-                raise
-            d = self.default()
+            if types is not None:
+                if is_model(types) and isinstance(d, dict):
+                    d = types(data=d)
+                elif isinstance(types, list) and is_model(types[0]):
+                    d = [x if is_model_instance(x) else types[0](x) for x in d]
+                elif types is not None and not isinstance(d, types):
+                    raise TypeError('invalid type for model field')
+            prev_d[k] = d
+        except KeyError:
+            if marker is None or marker.default is _UNDEFINED:
+                msg = 'field not found {0}'.format(self.path)
+                raise ModelFieldMissingError(msg)
+            d = marker.default()
             self.__set__(instance, d)
         return d
 
@@ -76,21 +138,51 @@ class ModelField(object):
             data = data.setdefault(k, {})
         data[last_key] = value
 
-    def __delete__(self):
-        pass
+    def __delete__(self, instance):
+        def delete_key_from_dict(d, path):
+            # for last key, we get None as path.
+            if path is None:
+                return
+            # split on first dot of path.
+            try:
+                key, subpath = path.split('.', 1)
+            except ValueError:
+                key, subpath = path, None
+            # if key is not in dict, then we do not have anything to delete.
+            if key not in d:
+                return
+            # delete subpath from sub-directory.
+            delete_key_from_dict(d[key], subpath)
+            # if sub-directory is empty or we are on last key, delete value.
+            if not d[key] or subpath is None:
+                del d[key]
+
+        delete_key_from_dict(instance.data, self.path)
 
 
 class _ModelMeta(type):
     def __new__(cls, name, bases, namespace, **kw):
         kw = dict(namespace)
 
-        if '__lpbm_config__' not in kw:
-            raise Exception('shit')
+        if '__lpbm_config__' not in kw or not isinstance(kw['__lpbm_config__'], dict):
+            err = 'model {class_name} must provide dict __lpbm_config__'
+            raise TypeError(err.format(class_name=name))
 
         if 'schema' not in kw['__lpbm_config__']:
-            raise Exception('shit2')
+            err = 'model {class_name} must provide a data schema in __lpbm_config__'
+            raise TypeError(err.format(class_name=name))
 
-        return super().__new__(cls, name, bases, namespace)
+        schema = kw['__lpbm_config__']['schema']
+        if schema is not None:
+            if isinstance(schema, dict):
+                schema = Schema(schema)
+            if 'filename_pattern' in kw['__lpbm_config__']:
+                schema.extend({
+                    Required('uuid', default=_new_uuid): str,
+                })
+            kw['__lpbm_config__']['schema'] = schema
+
+        return super().__new__(cls, name, bases, kw)
 
 
 class Model(_BaseModel, metaclass=_ModelMeta):
@@ -99,8 +191,17 @@ class Model(_BaseModel, metaclass=_ModelMeta):
         'filename_pattern': None,
     }
 
-    def __init__(self, uuid, data):
-        self.uuid, self.data = uuid, data
+    def __init__(self, data=None):
+        if data is not None:
+            self.uuid, self.data = data.get('uuid'), data
+        else:
+            self.uuid, self.data = None, {}
+
+        if self.uuid is None:
+            self.uuid = _new_uuid()
+
+        if self._schema().markers.get('uuid') is not None:
+            self.data.setdefault('uuid', self.uuid)
 
     def __eq__(self, other):
         return (
@@ -117,7 +218,7 @@ class Model(_BaseModel, metaclass=_ModelMeta):
             if isinstance(val, list):
                 return [_simple_value(v) for v in val]
             return val
-        return self.__schema(_simple_value(self.data))
+        return _simple_value(self._schema()(_simple_value(self.data)))
 
     def save(self):
         contents = yaml.safe_dump(self.as_dict(), default_flow_style=False)
@@ -125,34 +226,23 @@ class Model(_BaseModel, metaclass=_ModelMeta):
 
         path = lpath.in_blog_join(filename)
         broot = os.path.dirname(path)
-        import lpbm.tools as ltools; ltools.mkdir_p(broot)
+        lpath.mkdir_p(broot)
 
         with open(path, 'w') as fd:
             fd.write(contents)
 
     def delete(self):
         filename = self.__lpbm_config__['filename_pattern'].format(uuid=self.uuid)
-        path = lpath.in_blog_join(filename)
-        import os; os.remove(path)
+        lpath.remove(lpath.in_blog_join(filename))
 
     @classmethod
     def load_all(cls):
-        def full_split(path):
-            parts, head = [], None
-            while head != '':
-                head, tail = os.path.split(path)
-                parts.append(tail)
-                path = head
-            return parts
+        parts = lpath.full_split(cls.__lpbm_config__['filename_pattern'])
 
-        parts = full_split(cls.__lpbm_config__['filename_pattern'])
-
-        root = parts.pop()
-        while True:
-            part = parts.pop()
-            if part == '{uuid}':
-                break
+        root, part = '', parts.pop()
+        while part != '{uuid}':
             root = os.path.join(root, part)
+            part = parts.pop()
 
         assert len(parts) == 1
 
@@ -162,24 +252,18 @@ class Model(_BaseModel, metaclass=_ModelMeta):
 
         if os.path.exists(broot):
             for uuid in os.listdir(broot):
-                filename = os.path.join(root, uuid, parts[0])
+                filename = os.path.join(broot, uuid, *parts)
                 if not os.path.exists(filename):
                     continue
                 result.append(cls.load_from_file(uuid, filename))
         return result
 
     @classmethod
-    def new(cls, data=None):
-        if data is None:
-            data = {}
-        return cls(str(uuid.uuid4()), data)
-
-    @classmethod
     def load_from_file(cls, uuid, filename):
         with open(filename) as fd:
             data = yaml.safe_load(fd.read())
-        return cls(uuid, cls.__schema(data))
+        return cls(cls._schema()(data))
 
     @classmethod
-    def __schema(cls, data):
-        return cls.__lpbm_config__['schema'](data)
+    def _schema(cls):
+        return cls.__lpbm_config__['schema']
