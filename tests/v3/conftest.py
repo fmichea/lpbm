@@ -1,10 +1,30 @@
 import shlex
+import shutil
+import tempfile
 import traceback
 
 import pytest
 import click.testing
 
 from lpbm.v3.main import LPBMRootCommand
+
+
+@pytest.yield_fixture(autouse=True, scope='session')
+def testsuite_tempdir():
+    root = tempfile.mkdtemp(prefix='tmp-lpbm-testsuite-')
+    try:
+        yield root
+    finally:
+        shutil.rmtree(root)
+
+
+@pytest.yield_fixture()
+def test_tempdir(testsuite_tempdir):
+    root = tempfile.mkdtemp(prefix='tmp-test-', dir=testsuite_tempdir)
+    try:
+        yield root
+    finally:
+        shutil.rmtree(root)
 
 
 _CMD = LPBMRootCommand('lpbm-test')
