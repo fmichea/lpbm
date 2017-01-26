@@ -1,70 +1,57 @@
 import os
 
-from voluptuous import Schema, Required, Optional, Email, Boolean, Any
-
-from lpbm.v3.lib.models import Model, ModelField
+import lpbm.v3.lib.models as _mod
 
 
 AUTHOR_EMAIL_LABELS = ('personal', 'business')
 
 
-AUTHOR_EMAIL_SCHEMA = Schema({
-    Required('email'): Email(),
-    Optional('label', default='personal'): Any(*AUTHOR_EMAIL_LABELS),
-    Optional('is_primary', default=False): Boolean(),
-})
-
-
-AUTHOR_TWITTER_SCHEMA = Schema({
-    Optional('handle'): str,
-})
-
-
-AUTHOR_SCHEMA = Schema({
-    Required('identity'): {
-        Required('handles'): {
-            Required('current'): str,
-            Optional('archive'): list,
+class AuthorTwitter(_mod.Model):
+    __lpbm_config__ = {
+        'schema': {
+            _mod.Optional('handle'): str,
         },
-        Optional('name'): str,
-        Optional('short-name'): str,
-    },
-    Optional('email-accounts'): [AUTHOR_EMAIL_SCHEMA],
-    Optional('social'): {
-        Optional('twitter'): AUTHOR_TWITTER_SCHEMA,
-    },
-})
-
-
-class AuthorTwitter(Model):
-    __lpbm_config__ = {
-        'schema': AUTHOR_TWITTER_SCHEMA,
     }
 
-    handle = ModelField('handle')
+    handle = _mod.ModelField('handle')
 
 
-class AuthorEmail(Model):
+class AuthorEmail(_mod.Model):
     __lpbm_config__ = {
-        'schema': AUTHOR_EMAIL_SCHEMA,
+        'schema': {
+            _mod.Required('email'): _mod.Email(),
+            _mod.Optional('label', default='personal'): _mod.Any(*AUTHOR_EMAIL_LABELS),
+            _mod.Optional('is_primary', default=False): _mod.Boolean(),
+        },
     }
 
-    email = ModelField('email')
-    label = ModelField('label')
-    is_primary = ModelField('is_primary')
+    email = _mod.ModelField('email')
+    label = _mod.ModelField('label')
+    is_primary = _mod.ModelField('is_primary')
 
 
-class Author(Model):
+class Author(_mod.Model):
     __lpbm_config__ = {
-        'schema': AUTHOR_SCHEMA,
+        'schema': {
+            _mod.Required('identity'): {
+                _mod.Required('handles'): {
+                    _mod.Required('current'): str,
+                    'archive': list,
+                },
+                _mod.Optional('name', default=''): str,
+                _mod.Optional('short-name', default=''): str,
+            },
+            _mod.Optional('email-accounts', default=list): [AuthorEmail],
+            'social': {
+                'twitter': AuthorTwitter,
+            },
+        },
         'filename_pattern': 'authors/{uuid}/author.yaml',
     }
 
-    name = ModelField('identity.name', default=None)
-    handle = ModelField('identity.handles.current')
-
-    email_accounts = ModelField(
-        'email-accounts', default=lambda: [], value_type=AuthorEmail)
+    name = _mod.ModelField('identity.name')
+    handle = _mod.ModelField('identity.handles.current')
+    email_accounts = _mod.ModelField('email-accounts')
 
 
 def load_author_by_handle(ctx, handle):

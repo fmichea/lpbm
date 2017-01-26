@@ -36,7 +36,7 @@ def author__create(ctx, handle):
     if author is not None:
         raise click.ClickException('Author already exists.')
 
-    author = Author.new()
+    author = Author()
     author.handle = handle
     author.save()
 
@@ -71,7 +71,7 @@ def author__info(ctx, handle):
 
     click.echo('Handle: {0}'.format(author.handle))
 
-    if author.name is not None:
+    if author.name != '':
         click.echo('Name: {0}'.format(author.name))
 
     if author.email_accounts:
@@ -116,7 +116,7 @@ def author__edit__email__add(ctx, email):
     if any(author_email.email == email for author_email in author_emails):
         raise click.ClickException('Email already exists.')
 
-    author_email = AuthorEmail.new()
+    author_email = AuthorEmail()
     author_email.email = email
 
     author_emails.append(author_email)
