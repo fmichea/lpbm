@@ -206,7 +206,7 @@ class Model(_BaseModel, metaclass=_ModelMeta):
     def __eq__(self, other):
         return (
             self.__class__ is other.__class__ and
-            self.data == other.data
+            self.as_dict() == other.as_dict()
         )
 
     def as_dict(self):

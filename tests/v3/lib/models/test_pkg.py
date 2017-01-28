@@ -243,3 +243,23 @@ def test_model__test_save_and_load(monkeypatch, test_tempdir):
 
     objects = A.load_all()
     assert not objects
+
+
+def test_mode__test_model_equality_based_on_data():
+    class A(mod.Model):
+        __lpbm_config__ = {
+            'schema': {
+                'name': str,
+            },
+        }
+
+        name = mod.ModelField('name')
+
+    a1, a2 = A(), A()
+    assert a1 == a2
+
+    a1.name = 'foo'
+    assert a1 != a2
+
+    a2.name = 'foo'
+    assert a1 == a2
