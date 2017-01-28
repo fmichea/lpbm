@@ -1,4 +1,5 @@
 import os
+import warnings
 
 
 _EXEC_PATH = None
@@ -39,3 +40,5 @@ def remove(path):
         os.remove(path)
     elif os.path.isdir(path):
         os.rmdir(path)
+    else:
+        warnings.warn('got unknown file or unexpected file type.')
