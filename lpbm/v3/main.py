@@ -30,5 +30,4 @@ class LPBMRootCommand(click.BaseCommand):
             sys.exit(1)
 
 
-def main():
-    return LPBMRootCommand('lpbm').main()
+main = LPBMRootCommand('lpbm').main
