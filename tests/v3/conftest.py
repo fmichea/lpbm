@@ -34,12 +34,16 @@ class LPBMClient(object):
     def __init__(self, runner):
         self._runner = runner
 
-    def run(self, cmd, inp=None, catch_exception=True):
+    def run(self, cmd, inp=None, exit_code=None, catch_exception=True):
         result = self._runner.invoke(_CMD, args=shlex.split(cmd), input=inp)
         if catch_exception and result.exit_code == -1:
             lines = ['Exception while calling command:\n']
             lines.extend(traceback.format_exception(*result.exc_info))
             assert False, ''.join(lines).strip()
+        if exit_code is not None:
+            output = 'Exit code was {0} (expected {1}); output:\n{2}'
+            output = output.format(result.exit_code, exit_code, result.output)
+            assert result.exit_code == exit_code, output
         return result
 
 
