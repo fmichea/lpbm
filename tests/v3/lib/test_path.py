@@ -16,3 +16,8 @@ def test_remove_works_on_directory(test_tempdir):
 
     mod.mkdir_p(fname)
     mod.remove(fname)
+
+
+def test_remove_warns_if_other_file_type(test_tempdir):
+    fname = os.path.join(test_tempdir, 'foo')
+    mod.remove(fname)
