@@ -7,7 +7,7 @@ from lpbm.v3.lib.models.author import (
 
 @main_command.group('author')
 def author():
-    """internal data information and migration"""
+    """authors management commands"""
     pass
 
 
@@ -88,6 +88,7 @@ def author__info(ctx, handle):
 @click.argument('handle')
 @click.pass_context
 def author__edit(ctx, handle):
+    """edit author information"""
     ctx.obj['author'] = load_author_by_handle(ctx, handle)
     if ctx.obj['author'] is None:
         raise click.ClickException('Author does not exist.')
@@ -97,6 +98,7 @@ def author__edit(ctx, handle):
 @click.argument('name')
 @click.pass_context
 def author__edit__set_name(ctx, name):
+    """change the name of an author"""
     ctx.obj['author'].name = name
     ctx.obj['author'].save()
     click.echo('Success!')
@@ -104,6 +106,7 @@ def author__edit__set_name(ctx, name):
 
 @author__edit.group('email')
 def author__edit__email():
+    """edit email for author"""
     pass
 
 
@@ -111,6 +114,7 @@ def author__edit__email():
 @click.argument('email')
 @click.pass_context
 def author__edit__email__add(ctx, email):
+    """add email for author"""
     author_emails = ctx.obj['author'].email_accounts
 
     if any(author_email.email == email for author_email in author_emails):
@@ -144,6 +148,7 @@ def author__edit__email__edit(ctx, email):
 @author__edit__email__edit.command('set-primary')
 @click.pass_context
 def author__edit__email__edit__set_primary(ctx):
+    """makes email primary email for author"""
     for author_email in ctx.obj['author-emails']:
         author_email.is_primary = False
 
@@ -157,6 +162,7 @@ def author__edit__email__edit__set_primary(ctx):
 @click.argument('label')
 @click.pass_context
 def author__edit__email__edit__set_label(ctx, label):
+    """sets the label for email (personal, business, ...)"""
     if label not in AUTHOR_EMAIL_LABELS:
         msg = 'not a valid label value. Values available: {0}'
         msg = msg.format(', '.join(AUTHOR_EMAIL_LABELS))
@@ -172,6 +178,7 @@ def author__edit__email__edit__set_label(ctx, label):
 @click.argument('email')
 @click.pass_context
 def author__edit__email__delete(ctx, email):
+    """delete email from author"""
     author = ctx.obj['author']
 
     author_emails = [
