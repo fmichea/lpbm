@@ -7,16 +7,13 @@ from lpbm.v3.lib.models.author import (
 
 @main_command.group('author')
 def author():
-    """authors management commands"""
+    """author management commands"""
     pass
 
 
 @author.command('list')
-@click.pass_context
-def author__list(ctx):
+def author__list():
     """list all the blog authors"""
-    #authors = author_mod.load_all_authors(ctx)
-
     authors = Author.load_all()
 
     if authors:
