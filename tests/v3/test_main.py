@@ -1,6 +1,7 @@
 import os
 
 import click.testing
+import pytest
 
 import lpbm.v3.main as mod
 
@@ -19,7 +20,9 @@ def _test_exception_main(*a, **kw):
 def test_main__lpbm_debug_on_with_no_debug(lpbm_client, monkeypatch):
     monkeypatch.setattr(mod.main_command, 'main', _test_exception_main)
 
-    lpbm_client.run('--version', exit_code=-1, catch_exception=False)
+    with pytest.raises(Exception) as exc:
+        lpbm_client.run('--version')
+    assert str(exc.value) == 'test exceptions'
 
 
 def test_main__lpbm_debug_on_exception_triggers_post_mortem(lpbm_client, monkeypatch):
@@ -27,4 +30,4 @@ def test_main__lpbm_debug_on_exception_triggers_post_mortem(lpbm_client, monkeyp
     monkeypatch.setitem(os.environ, 'LPBM_DEBUG', '1')
     monkeypatch.setattr(mod.pdb, 'post_mortem', lambda x: x)
 
-    lpbm_client.run('--version', exit_code=1, catch_exception=False)
+    lpbm_client.run('--version', exit_code=1)
