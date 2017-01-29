@@ -24,8 +24,6 @@ def _new_uuid():
 
 _NOT_SET = object()
 
-_SCHEMA_TO_MODEL_MAP = dict()
-
 
 class _BaseModel(object):
     pass
