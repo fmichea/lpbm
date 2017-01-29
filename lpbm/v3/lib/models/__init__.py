@@ -107,7 +107,7 @@ class ModelField(object):
         marker = instance._schema().markers.get(self.path)
         types = instance._schema().types.get(self.path)
 
-        prev_d = d = instance.data
+        prev_d = d = instance._data
         try:
             for k in self.path_sp:
                 prev_d = d
@@ -129,7 +129,7 @@ class ModelField(object):
         return d
 
     def __set__(self, instance, value):
-        data = instance.data
+        data = instance._data
         keys = self.path.split('.')
         last_key = keys.pop()
         for k in keys:
@@ -155,7 +155,7 @@ class ModelField(object):
             if not d[key] or subpath is None:
                 del d[key]
 
-        delete_key_from_dict(instance.data, self.path)
+        delete_key_from_dict(instance._data, self.path)
 
 
 class _ModelMeta(type):
@@ -178,6 +178,7 @@ class _ModelMeta(type):
                 schema.extend({
                     Required('uuid', default=_new_uuid): str,
                 })
+                kw['uuid'] = ModelField('uuid')
             kw['__lpbm_config__']['schema'] = schema
 
         return super().__new__(cls, name, bases, kw)
@@ -190,16 +191,9 @@ class Model(_BaseModel, metaclass=_ModelMeta):
     }
 
     def __init__(self, data=None):
-        if data is not None:
-            self.uuid, self.data = data.get('uuid'), data
-        else:
-            self.uuid, self.data = None, {}
-
-        if self.uuid is None:
-            self.uuid = _new_uuid()
-
-        if self._schema().markers.get('uuid') is not None:
-            self.data.setdefault('uuid', self.uuid)
+        if data is None:
+            data = dict()
+        self._data = data
 
     def __eq__(self, other):
         return (
@@ -216,7 +210,9 @@ class Model(_BaseModel, metaclass=_ModelMeta):
             if isinstance(val, list):
                 return [_simple_value(v) for v in val]
             return val
-        return _simple_value(self._schema()(_simple_value(self.data)))
+        # We save the data to the model so generated values are kept.
+        self._data = _simple_value(self._schema()(_simple_value(self._data)))
+        return self._data
 
     def save(self):
         contents = yaml.safe_dump(self.as_dict(), default_flow_style=False)
