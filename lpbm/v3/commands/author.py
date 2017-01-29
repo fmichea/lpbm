@@ -32,7 +32,7 @@ def author__list(ctx):
 @click.pass_context
 def author__create(ctx, handle):
     """create a new author"""
-    author = load_author_by_handle(ctx, handle)
+    author = load_author_by_handle(handle)
     if author is not None:
         raise click.ClickException('Author already exists.')
 
@@ -48,7 +48,7 @@ def author__create(ctx, handle):
 @click.pass_context
 def author__delete(ctx, handle):
     """delete an author by handle"""
-    author = load_author_by_handle(ctx, handle)
+    author = load_author_by_handle(handle)
     if author is None:
         raise click.ClickException('Author does not exist.')
 
@@ -65,7 +65,7 @@ def author__delete(ctx, handle):
 @click.pass_context
 def author__info(ctx, handle):
     """get information about author"""
-    author = load_author_by_handle(ctx, handle)
+    author = load_author_by_handle(handle)
     if author is None:
         raise click.ClickException('Author does not exist.')
 
@@ -89,7 +89,7 @@ def author__info(ctx, handle):
 @click.pass_context
 def author__edit(ctx, handle):
     """edit author information"""
-    ctx.obj['author'] = load_author_by_handle(ctx, handle)
+    ctx.obj['author'] = load_author_by_handle(handle)
     if ctx.obj['author'] is None:
         raise click.ClickException('Author does not exist.')
 

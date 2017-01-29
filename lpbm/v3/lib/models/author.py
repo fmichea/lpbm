@@ -54,7 +54,7 @@ class Author(_mod.Model):
     email_accounts = _mod.ModelField('email-accounts')
 
 
-def load_author_by_handle(ctx, handle):
+def load_author_by_handle(handle):
     authors = [
         author for author in Author.load_all()
         if author.handle == handle
