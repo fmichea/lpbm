@@ -5,6 +5,7 @@ import click
 import lpbm.v3.lib.path as lpath
 
 from lpbm.v3.meta.version import __version__
+from lpbm.v3.lib.model import SESSION, scoped_session_rw
 
 
 @click.group()
@@ -15,4 +16,23 @@ from lpbm.v3.meta.version import __version__
 @click.pass_context
 def main_command(ctx, exec_path):
     ctx.obj['exec-path'] = exec_path
-    lpath.initialize(ctx)
+    SESSION.initialize(exec_path)
+
+
+def _session_result_func(result):
+    if result:
+        click.secho('Success!', fg='green')
+    else:
+        click.secho('Failure', fg='red')
+
+
+class command_with_commit(object):
+    def __init__(self, **options):
+        self._options = options
+        self._options.setdefault('result_func', _session_result_func)
+
+    def __call__(self, func):
+        def wrapper(*args, **kwargs):
+            with scoped_session_rw(session=SESSION, **self._options):
+                return func(*args, **kwargs)
+        return wrapper

@@ -6,7 +6,16 @@ import traceback
 import pytest
 import click.testing
 
+from lpbm.v3.lib.model import SESSION
 from lpbm.v3.main import LPBMRootCommand
+
+
+@pytest.yield_fixture(autouse=True, scope='function')
+def test_session_reset():
+    try:
+        yield
+    finally:
+        SESSION.rollback()
 
 
 @pytest.yield_fixture(autouse=True, scope='session')
@@ -25,6 +34,13 @@ def test_tempdir(testsuite_tempdir):
         yield root
     finally:
         shutil.rmtree(root)
+
+
+@pytest.yield_fixture(autouse=True, scope='function')
+def model_name_to_class_mapping_reset(monkeypatch):
+    import lpbm.v3.lib.model.data as mod
+    monkeypatch.setattr(mod, 'MODEL_NAME_TO_CLASS', dict())
+    yield
 
 
 _CMD = LPBMRootCommand('lpbm-test')

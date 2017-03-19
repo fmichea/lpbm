@@ -2,19 +2,6 @@ import os
 import warnings
 
 
-_EXEC_PATH = None
-
-
-def initialize(ctx):
-    global _EXEC_PATH
-    _EXEC_PATH = ctx.obj['exec-path']
-
-
-def in_blog_join(*args):
-    assert _EXEC_PATH is not None
-    return os.path.join(_EXEC_PATH, *args)
-
-
 def full_split(path):
     parts, head = [], None
     while head != '':

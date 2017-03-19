@@ -1,8 +1,10 @@
 import click
 
-from lpbm.v3.commands.root import main_command
-from lpbm.v3.lib.models.author import (
-    AUTHOR_EMAIL_LABELS, Author, AuthorEmail, load_author_by_handle)
+from lpbm.v3.commands.root import main_command, command_with_commit
+from lpbm.v3.lib.model import ModelFieldMissingError
+from lpbm.v3.lib.model import SESSION
+from lpbm.v3.models.author import (
+    AUTHOR_EMAIL_LABELS, Author, AuthorEmail, load_author_by_uid)
 
 
 @main_command.group('author')
@@ -14,7 +16,7 @@ def author():
 @author.command('list')
 def author__list():
     """list all the blog authors"""
-    authors = Author.load_all()
+    authors = SESSION.query(Author).all()
 
     if authors:
         click.echo('Authors ({0}):'.format(len(authors)))
@@ -27,42 +29,41 @@ def author__list():
 @author.command('create')
 @click.argument('handle')
 @click.pass_context
+@command_with_commit()
 def author__create(ctx, handle):
     """create a new author"""
-    author = load_author_by_handle(handle)
+    author = load_author_by_uid(handle)
     if author is not None:
         raise click.ClickException('Author already exists.')
 
     author = Author()
     author.handle = handle
-    author.save()
 
-    click.echo('Success!')
+    SESSION.add(author)
 
 
 @author.command('delete')
-@click.argument('handle')
+@click.argument('uid')
 @click.pass_context
-def author__delete(ctx, handle):
+@command_with_commit()
+def author__delete(ctx, uid):
     """delete an author by handle"""
-    author = load_author_by_handle(handle)
+    author = load_author_by_uid(uid)
     if author is None:
         raise click.ClickException('Author does not exist.')
 
     message = 'Are you sure you want to delete {handle}?'
     click.confirm(message.format(handle=author.handle), abort=True)
 
-    author.delete()
-
-    click.echo('Success!')
+    SESSION.delete(author)
 
 
 @author.command('info')
-@click.argument('handle')
+@click.argument('uid')
 @click.pass_context
-def author__info(ctx, handle):
+def author__info(ctx, uid):
     """get information about author"""
-    author = load_author_by_handle(handle)
+    author = load_author_by_uid(uid)
     if author is None:
         raise click.ClickException('Author does not exist.')
 
@@ -82,11 +83,11 @@ def author__info(ctx, handle):
 
 
 @author.group('edit')
-@click.argument('handle')
+@click.argument('uid')
 @click.pass_context
-def author__edit(ctx, handle):
+def author__edit(ctx, uid):
     """edit author information"""
-    ctx.obj['author'] = load_author_by_handle(handle)
+    ctx.obj['author'] = load_author_by_uid(uid)
     if ctx.obj['author'] is None:
         raise click.ClickException('Author does not exist.')
 
@@ -94,11 +95,10 @@ def author__edit(ctx, handle):
 @author__edit.command('set-name')
 @click.argument('name')
 @click.pass_context
+@command_with_commit()
 def author__edit__set_name(ctx, name):
     """change the name of an author"""
     ctx.obj['author'].name = name
-    ctx.obj['author'].save()
-    click.echo('Success!')
 
 
 @author__edit.group('email')
@@ -110,6 +110,7 @@ def author__edit__email():
 @author__edit__email.command('add')
 @click.argument('email')
 @click.pass_context
+@command_with_commit()
 def author__edit__email__add(ctx, email):
     """add email for author"""
     author_emails = ctx.obj['author'].email_accounts
@@ -117,14 +118,10 @@ def author__edit__email__add(ctx, email):
     if any(author_email.email == email for author_email in author_emails):
         raise click.ClickException('Email already exists.')
 
-    author_email = AuthorEmail()
+    author_email = AuthorEmail(parent=ctx.obj['author'])
     author_email.email = email
 
-    author_emails.append(author_email)
-
-    ctx.obj['author'].save()
-
-    click.echo('Success!')
+    SESSION.add(author_email)
 
 
 @author__edit__email.group('edit')
@@ -144,20 +141,19 @@ def author__edit__email__edit(ctx, email):
 
 @author__edit__email__edit.command('set-primary')
 @click.pass_context
+@command_with_commit()
 def author__edit__email__edit__set_primary(ctx):
     """makes email primary email for author"""
     for author_email in ctx.obj['author-emails']:
         author_email.is_primary = False
 
     ctx.obj['author-emails-selected'].is_primary = True
-    ctx.obj['author'].save()
-
-    click.echo('Success!')
 
 
 @author__edit__email__edit.command('set-label')
 @click.argument('label')
 @click.pass_context
+@command_with_commit()
 def author__edit__email__edit__set_label(ctx, label):
     """sets the label for email (personal, business, ...)"""
     if label not in AUTHOR_EMAIL_LABELS:
@@ -166,29 +162,27 @@ def author__edit__email__edit__set_label(ctx, label):
         raise click.ClickException(msg)
 
     ctx.obj['author-emails-selected'].label = label
-    ctx.obj['author'].save()
-
-    click.echo('Success!')
 
 
 @author__edit__email.command('delete')
 @click.argument('email')
 @click.pass_context
+@command_with_commit()
 def author__edit__email__delete(ctx, email):
     """delete email from author"""
     author = ctx.obj['author']
 
-    author_emails = [
-        author_email for author_email in ctx.obj['author'].email_accounts
-        if author_email.email != email
-    ]
-    if author_emails == ctx.obj['author'].email_accounts:
+    author_emails = (
+        SESSION.query(AuthorEmail)
+            .parent(author)
+            .filter(AuthorEmail.email == email)
+            .all()
+    )
+
+    if not author_emails:
         raise click.ClickException('Email does not exist.')
 
     message = 'Are you sure you want to delete {email} from {handle}?'
     click.confirm(message.format(handle=author.handle, email=email), abort=True)
 
-    ctx.obj['author'].email_accounts = author_emails
-    ctx.obj['author'].save()
-
-    click.echo('Success!')
+    SESSION.delete(author_emails[0])
