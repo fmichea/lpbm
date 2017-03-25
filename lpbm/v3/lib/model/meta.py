@@ -1,20 +1,14 @@
-import re
 import os
+import re
 
-from voluptuous import (
-    Required,
-)
+from voluptuous import Required
 
 import lpbm.v3.lib.path as lpath
-
 from lpbm.v3.lib.model import data as lmdata
 from lpbm.v3.lib.model.field import ModelField
 from lpbm.v3.lib.model.schema import ModelSchema as _ModelSchema
-from lpbm.v3.lib.model.uuid import (
-    UUID as _UUID,
-    new_uuid as _new_uuid,
-)
-
+from lpbm.v3.lib.model.uuid import UUID as _UUID
+from lpbm.v3.lib.model.uuid import new_uuid as _new_uuid
 
 _CLSNAME_RE = re.compile('([A-Z][a-z]*)')
 

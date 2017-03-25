@@ -1,7 +1,6 @@
 import re
 import uuid
 
-
 UUID_RE_S = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
 UUID_RE = re.compile('^{uuid_re}$'.format(uuid_re=UUID_RE_S))
 

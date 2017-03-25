@@ -5,12 +5,11 @@ import os
 import yaml
 
 import lpbm.v3.lib.path as lpath
-
-from lpbm.v3.lib.model.query import Query
 from lpbm.v3.lib.model.errors import (
     ModelSessionBlogLockedError,
     ModelSessionReadOnlyError,
 )
+from lpbm.v3.lib.model.query import Query
 
 
 class _scoped_lock(object):

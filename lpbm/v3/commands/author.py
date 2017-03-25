@@ -1,9 +1,13 @@
 import click
 
-from lpbm.v3.commands.root import main_command, command_with_commit
+from lpbm.v3.commands.root import command_with_commit, main_command
 from lpbm.v3.lib.model import SESSION
 from lpbm.v3.models.author import (
-    AUTHOR_EMAIL_LABELS, Author, AuthorEmail, load_author_by_uid)
+    AUTHOR_EMAIL_LABELS,
+    Author,
+    AuthorEmail,
+    load_author_by_uid,
+)
 
 
 @main_command.group('author')

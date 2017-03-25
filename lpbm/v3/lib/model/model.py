@@ -1,7 +1,6 @@
 from voluptuous.error import MultipleInvalid as _MultipleInvalid
 
-import lpbm.v3.lib.dict_utils as _dict_utils
-
+from lpbm.v3.lib import dict_utils as _dict_utils
 from lpbm.v3.lib.model.base import BaseModel, is_model, model_name
 from lpbm.v3.lib.model.errors import ModelInvalidError
 from lpbm.v3.lib.model.meta import ModelMeta

@@ -1,7 +1,6 @@
 import operator
 
-import lpbm.v3.lib.dict_utils as _dict_utils
-
+from lpbm.v3.lib import dict_utils as _dict_utils
 from lpbm.v3.lib.model.errors import (
     ModelFieldMissingError,
     ModelFieldReadOnlyError,

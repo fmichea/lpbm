@@ -1,18 +1,13 @@
 from collections import namedtuple
 
-import lpbm.v3.lib.dict_utils as _dict_utils
+from voluptuous import UNDEFINED as _UNDEFINED
+from voluptuous import Marker as _Marker
+from voluptuous import Schema as _Schema
 
-from voluptuous import (
-    Schema as _Schema,
-    Marker as _Marker,
-    UNDEFINED as _UNDEFINED,
-)
-
+from lpbm.v3.lib import dict_utils as _dict_utils
 from lpbm.v3.lib.model.base import is_model
-from lpbm.v3.lib.model.ref import (
-    is_model_ref,
-    MODEL_REF_SCHEMA as _MODEL_REF_SCHEMA,
-)
+from lpbm.v3.lib.model.ref import MODEL_REF_SCHEMA as _MODEL_REF_SCHEMA
+from lpbm.v3.lib.model.ref import is_model_ref
 
 
 def _build_real_schema(d):

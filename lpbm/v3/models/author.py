@@ -1,7 +1,5 @@
 import lpbm.v3.lib.model as _mod
-
 from lpbm.v3.lib.model import SESSION
-
 
 AUTHOR_EMAIL_LABELS = ('personal', 'business')
 

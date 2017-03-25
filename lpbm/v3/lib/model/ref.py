@@ -1,20 +1,14 @@
-from voluptuous import (
-    Schema as _Schema,
-    Required as _Required,
-    ALLOW_EXTRA as _ALLOW_EXTRA,
-)
+from voluptuous import ALLOW_EXTRA as _ALLOW_EXTRA
+from voluptuous import Required as _Required
+from voluptuous import Schema as _Schema
 
 from lpbm.v3.lib.model import data
-from lpbm.v3.lib.model.base import (
-    is_model,
-    model_name,
-)
+from lpbm.v3.lib.model.base import is_model, model_name
 from lpbm.v3.lib.model.errors import (
     ModelRefInvalidClassError,
     ModelRefInvalidDefinitionError,
 )
 from lpbm.v3.lib.model.uuid import UUID as _UUID
-
 
 MODEL_REF_SCHEMA = _Schema({
     _Required('clsname'): str,
