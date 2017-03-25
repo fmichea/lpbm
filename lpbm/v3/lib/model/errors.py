@@ -1,3 +1,6 @@
+from lpbm.v3.lib.model.base import model_name
+
+
 class ModelFieldMissingError(Exception):
     pass
 
@@ -20,7 +23,7 @@ class ModelInvalidError(Exception):
         self._err = fmt.format(**kw)
 
     def __str__(self):
-        res = '{clsname}'.format(clsname=self._model.__class__.__name__)
+        res = '{clsname}'.format(clsname=model_name(self._model))
         if hasattr(self._model, 'uuid'):
             res += ' uuid={uuid}'.format(uuid=self._model.uuid)
         res += ': {err}'.format(err=self._err)

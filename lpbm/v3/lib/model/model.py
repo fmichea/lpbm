@@ -2,7 +2,7 @@ from voluptuous.error import MultipleInvalid as _MultipleInvalid
 
 import lpbm.v3.lib.dict_utils as _dict_utils
 
-from lpbm.v3.lib.model.base import BaseModel, is_model
+from lpbm.v3.lib.model.base import BaseModel, is_model, model_name
 from lpbm.v3.lib.model.errors import ModelInvalidError
 from lpbm.v3.lib.model.meta import ModelMeta
 from lpbm.v3.lib.model.ref import is_model_ref
@@ -48,7 +48,7 @@ class Model(BaseModel, metaclass=ModelMeta):
             assert isinstance(parent, parent_cfg['class'])
         self.parent = parent
 
-        self._ref = {'clsname': self.__class__.__name__}
+        self._ref = {'clsname': model_name(self)}
 
     def __repr__(self):
         val = super().__repr__()
@@ -62,7 +62,7 @@ class Model(BaseModel, metaclass=ModelMeta):
 
     def ref(self):
         self._ref.update({
-            'clsname': self.__class__.__name__,
+            'clsname': model_name(self),
             'uuid': self.uuid,
         })
         self._ref.update(self._parents_refs_uuid())
