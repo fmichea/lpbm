@@ -23,6 +23,8 @@ from lpbm.v3.lib.model.errors import (
     ModelQueryParentAlreadySetError,
     ModelQueryParentWrongTypeError,
     ModelQueryTooManyObjectsError,
+    ModelRefInvalidClassError,
+    ModelRefInvalidDefinitionError,
     ModelSessionBlogLockedError,
     ModelSessionReadOnlyError,
 )

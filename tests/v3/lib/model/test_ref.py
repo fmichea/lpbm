@@ -1,4 +1,22 @@
+import pytest
+
 import lpbm.v3.lib.model as mod
+
+
+def test_ref__needs_to_be_given_classes():
+    with pytest.raises(mod.ModelRefInvalidDefinitionError):
+        mod.ModelRef()
+
+
+def test_ref__invalid_type_for_class_names():
+    with pytest.raises(mod.ModelRefInvalidDefinitionError):
+        mod.ModelRef(True)
+
+
+def test_ref__invalid_deref():
+    ref = mod.ModelRef('foo')
+    with pytest.raises(mod.ModelRefInvalidClassError):
+        ref.deref(None, {'clsname': 'bar'})
 
 
 def test_ref__can_be_written_then_loaded(test_tempdir):

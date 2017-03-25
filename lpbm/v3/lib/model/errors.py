@@ -57,3 +57,11 @@ class ModelQueryNoParentError(ModelQueryError):
 
 class ModelQueryParentWrongTypeError(ModelQueryError):
     pass
+
+
+class ModelRefInvalidClassError(ModelQueryError):
+    pass
+
+
+class ModelRefInvalidDefinitionError(ModelQueryError):
+    pass
