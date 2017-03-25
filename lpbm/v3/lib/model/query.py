@@ -66,12 +66,10 @@ class Query(object):
 
         return self
 
-    def get(self, uuid):
-        self._filename_uuids['uuid'] = uuid
-        models = self.all()
-        if not models:
-            raise ModelQueryNoObjectFoundError()
-        return models[0]
+    def get(self, uuid, **uuids):
+        uuids.update({'uuid': uuid})
+        self._filename_uuids.update(uuids)
+        return self.one()
 
     def all(self):
         full_pattern = self._model._filename_pattern('full_pattern')
