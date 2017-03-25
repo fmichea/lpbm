@@ -4,8 +4,12 @@
 #
 #    pip-compile --output-file requirements/command.txt requirements/command.in
 #
-click==6.6
+appdirs==1.4.3            # via setuptools
+click==6.7
+packaging==16.8           # via setuptools
+pyparsing==2.2.0          # via packaging
 PyYAML==3.12
+six==1.10.0               # via packaging, setuptools
 voluptuous==0.9.3
 
 # The following packages are considered to be unsafe in a requirements file:
