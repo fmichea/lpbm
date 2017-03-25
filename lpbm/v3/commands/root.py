@@ -1,8 +1,4 @@
-import os
-
 import click
-
-import lpbm.v3.lib.path as lpath
 
 from lpbm.v3.meta.version import __version__
 from lpbm.v3.lib.model import SESSION, scoped_session_rw

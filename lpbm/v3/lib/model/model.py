@@ -1,16 +1,11 @@
-import os
-import yaml
-
-import lpbm.v3.lib.path as lpath
-import lpbm.v3.lib.dict_utils as _dict_utils
-
 from voluptuous.error import MultipleInvalid as _MultipleInvalid
+
+import lpbm.v3.lib.dict_utils as _dict_utils
 
 from lpbm.v3.lib.model.base import BaseModel, is_model
 from lpbm.v3.lib.model.errors import ModelInvalidError
 from lpbm.v3.lib.model.meta import ModelMeta
 from lpbm.v3.lib.model.ref import is_model_ref
-from lpbm.v3.lib.model.uuid import UUID_RE
 
 
 class Model(BaseModel, metaclass=ModelMeta):

@@ -1,5 +1,3 @@
-import os
-
 import lpbm.v3.lib.model as _mod
 
 from lpbm.v3.lib.model import SESSION
@@ -41,7 +39,7 @@ class Author(_mod.Model):
 
     @property
     def email_accounts(self):
-        return (
+        return (  # noqa: E131
             SESSION.query(AuthorEmail)
                 .parent(self)
                 .order_by(AuthorEmail.email)

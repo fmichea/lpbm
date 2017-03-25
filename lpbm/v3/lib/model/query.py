@@ -4,7 +4,6 @@ import yaml
 
 from lpbm.v3.lib.model.uuid import UUID_RE_S, UUID_RE
 from lpbm.v3.lib.model.errors import (
-    ModelFieldBoolOpError,
     ModelQueryInvalidCriterionError,
     ModelQueryNoObjectFoundError,
     ModelQueryNoParentError,
@@ -76,10 +75,13 @@ class Query(object):
 
     def all(self):
         full_pattern = self._model._filename_pattern('full_pattern')
-        # First build the uuid 
+        # First build the path with known uuids.
         path = full_pattern.format(**self._filename_uuids)
         filename = re.compile('^{0}$'.format(path))
-        filter_func = lambda x: filename.match(x) is not None
+
+        def filter_func(x):
+            return filename.match(x) is not None
+
         filenames = self._session.filter_filenames(filter_func)
         # Load all objects from their file.
         result = [
@@ -92,7 +94,9 @@ class Query(object):
             result = [model for model in result if filter_func.test(model)]
         # Ordering the objects.
         if self._order_by_criteria:
-            keyfunc = lambda inst: tuple(field.get(inst) for field in self._order_by_criteria)
+            def keyfunc(inst):
+                return tuple(field.get(inst) for field in self._order_by_criteria)
+
             result = sorted(result, key=keyfunc)
         # All good.
         return result

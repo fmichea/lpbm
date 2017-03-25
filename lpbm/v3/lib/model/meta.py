@@ -89,8 +89,6 @@ class ModelMeta(type):
 
             @classmethod
             def inline_model(cls, pth):
-                cfg = cls.__lpbm_config__['filename_pattern']
-
                 clsname = [it for it in _CLSNAME_RE.split(cls.__name__) if it]
                 clsname = '_'.join(clsname).lower()
 

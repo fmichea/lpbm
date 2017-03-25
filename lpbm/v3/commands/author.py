@@ -1,7 +1,6 @@
 import click
 
 from lpbm.v3.commands.root import main_command, command_with_commit
-from lpbm.v3.lib.model import ModelFieldMissingError
 from lpbm.v3.lib.model import SESSION
 from lpbm.v3.models.author import (
     AUTHOR_EMAIL_LABELS, Author, AuthorEmail, load_author_by_uid)
@@ -172,7 +171,7 @@ def author__edit__email__delete(ctx, email):
     """delete email from author"""
     author = ctx.obj['author']
 
-    author_emails = (
+    author_emails = (  # noqa: E131
         SESSION.query(AuthorEmail)
             .parent(author)
             .filter(AuthorEmail.email == email)
