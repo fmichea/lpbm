@@ -68,3 +68,10 @@ class ModelRefInvalidClassError(ModelQueryError):
 
 class ModelRefInvalidDefinitionError(ModelQueryError):
     pass
+
+
+class ModelTypeError(TypeError):
+    """
+    ModelTypeError is raised by the Model meta-class during Model definition
+    when there is an issue with the model.
+    """

@@ -27,6 +27,7 @@ from lpbm.v3.lib.model.errors import (
     ModelRefInvalidDefinitionError,
     ModelSessionBlogLockedError,
     ModelSessionReadOnlyError,
+    ModelTypeError,
 )
 from lpbm.v3.lib.model.field import ModelField
 from lpbm.v3.lib.model.field_bool_op import (

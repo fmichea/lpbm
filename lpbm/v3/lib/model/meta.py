@@ -3,8 +3,9 @@ import re
 
 from voluptuous import Required
 
-import lpbm.v3.lib.path as lpath
+from lpbm.v3.lib import path as lpath
 from lpbm.v3.lib.model import data as lmdata
+from lpbm.v3.lib.model.errors import ModelTypeError
 from lpbm.v3.lib.model.field import ModelField
 from lpbm.v3.lib.model.schema import ModelSchema as _ModelSchema
 from lpbm.v3.lib.model.uuid import UUID as _UUID
@@ -20,7 +21,7 @@ class ModelMeta(type):
         # Model names must be unique for ModelRef to work.
         if name in lmdata.MODEL_NAME_TO_CLASS:
             err = 'Invalid model name {clsname} used for two models'
-            raise TypeError(err.format(clsname=name))
+            raise ModelTypeError(err.format(clsname=name))
 
         # All the attributes
         kw = dict(namespace)
@@ -32,7 +33,7 @@ class ModelMeta(type):
             not isinstance(kw[ModelMeta.CONFIG_ATTR], dict)
         ):
             err = 'model {clsname} must provide dict __lpbm_config__'
-            raise TypeError(err.format(clsname=name))
+            raise ModelTypeError(err.format(clsname=name))
 
         cfg = kw[ModelMeta.CONFIG_ATTR]
 
@@ -41,11 +42,11 @@ class ModelMeta(type):
         schema = cfg.get('schema')
         if schema is None:
             err = 'model {clsname} must provide a data schema in {attr}'
-            raise TypeError(err.format(clsname=name, attr=ModelMeta.CONFIG_ATTR))
+            raise ModelTypeError(err.format(clsname=name, attr=ModelMeta.CONFIG_ATTR))
 
         if not isinstance(schema, dict):
             err = 'model {clsname} must provide data schema as a dict'
-            raise TypeError(err.format(clsname=name))
+            raise ModelTypeError(err.format(clsname=name))
 
         # If filename_pattern is defined, Model can be referenced through a
         # file, and will be uniquely identified using a UUID4.

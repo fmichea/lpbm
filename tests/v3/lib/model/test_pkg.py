@@ -5,7 +5,7 @@ import lpbm.v3.lib.path as lpath
 
 
 def test_model__lpbm_config_required_for_model():
-    with pytest.raises(TypeError) as exc:
+    with pytest.raises(mod.ModelTypeError) as exc:
         class A(mod.Model):
             pass
 
@@ -13,7 +13,7 @@ def test_model__lpbm_config_required_for_model():
 
 
 def test_model__lpbm_config_must_be_a_dictionary():
-    with pytest.raises(TypeError) as exc:
+    with pytest.raises(mod.ModelTypeError) as exc:
         class A(mod.Model):
             __lpbm_config__ = None
 
@@ -21,7 +21,7 @@ def test_model__lpbm_config_must_be_a_dictionary():
 
 
 def test_model__lpbm_config_without_schema_is_not_allowed():
-    with pytest.raises(TypeError) as exc:
+    with pytest.raises(mod.ModelTypeError) as exc:
         class A(mod.Model):
             __lpbm_config__ = {}
 
@@ -29,7 +29,7 @@ def test_model__lpbm_config_without_schema_is_not_allowed():
 
 
 def test_model__test_schema_must_be_dict():
-    with pytest.raises(TypeError) as exc:
+    with pytest.raises(mod.ModelTypeError) as exc:
         class A(mod.Model):
             __lpbm_config__ = {
                 'schema': 1,
@@ -54,7 +54,7 @@ def test_model__test_no_two_classes_with_same_name():
     class A(mod.Model):
         __lpbm_config__ = {'schema': {}}
 
-    with pytest.raises(TypeError) as exc:
+    with pytest.raises(mod.ModelTypeError) as exc:
         class A(mod.Model):
             __lpbm_config__ = {'schema': {}}
 
