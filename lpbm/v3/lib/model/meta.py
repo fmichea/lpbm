@@ -5,6 +5,7 @@ from voluptuous import Required
 
 from lpbm.v3.lib import path as lpath
 from lpbm.v3.lib.model import data as lmdata
+from lpbm.v3.lib.model.base import BaseModel
 from lpbm.v3.lib.model.errors import ModelTypeError
 from lpbm.v3.lib.model.field import ModelField
 from lpbm.v3.lib.model.schema import ModelSchema as _ModelSchema
@@ -22,6 +23,9 @@ class ModelMeta(type):
         if name in lmdata.MODEL_NAME_TO_CLASS:
             err = 'Invalid model name {clsname} used for two models'
             raise ModelTypeError(err.format(clsname=name))
+
+        # Base model is the class all models inherit from.
+        is_base_model = (name == 'Model' and bases == (BaseModel,))
 
         # All the attributes
         kw = dict(namespace)
@@ -46,6 +50,10 @@ class ModelMeta(type):
 
         if not isinstance(schema, dict):
             err = 'model {clsname} must provide data schema as a dict'
+            raise ModelTypeError(err.format(clsname=name))
+
+        if not is_base_model and 'parent' in kw:
+            err = 'model {clsname} cannot have a parent attribute'
             raise ModelTypeError(err.format(clsname=name))
 
         # If filename_pattern is defined, Model can be referenced through a

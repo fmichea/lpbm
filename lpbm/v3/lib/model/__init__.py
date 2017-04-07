@@ -14,9 +14,15 @@ from lpbm.v3.lib.model.base import (
 )
 from lpbm.v3.lib.model.errors import (
     ModelFieldBoolOpError,
+    ModelFieldError,
     ModelFieldMissingError,
     ModelFieldReadOnlyError,
     ModelInvalidError,
+    ModelNoParentDefinedError,
+    ModelParentAlreadySetError,
+    ModelParentError,
+    ModelParentTypeError,
+    ModelQueryError,
     ModelQueryInvalidCriterionError,
     ModelQueryNoObjectFoundError,
     ModelQueryNoParentError,
@@ -26,6 +32,7 @@ from lpbm.v3.lib.model.errors import (
     ModelRefInvalidClassError,
     ModelRefInvalidDefinitionError,
     ModelSessionBlogLockedError,
+    ModelSessionError,
     ModelSessionReadOnlyError,
     ModelTypeError,
 )

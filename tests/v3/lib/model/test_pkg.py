@@ -38,6 +38,18 @@ def test_model__test_schema_must_be_dict():
     assert str(exc.value) == 'model A must provide data schema as a dict'
 
 
+def test_model__cannot_have_a_parents_attribute():
+    with pytest.raises(mod.ModelTypeError) as exc:
+        class A(mod.Model):
+            __lpbm_config__ = {
+                'schema': {},
+            }
+
+            parent = 1
+
+    assert str(exc.value) == 'model A cannot have a parent attribute'
+
+
 def test_model__test_simple_empty_model_no_field():
     class A(mod.Model):
         __lpbm_config__ = {
@@ -94,6 +106,10 @@ def test_model__setting_field_adds_value_to_as_dict(a_model):
     a = a_model({})
     a.name = 'ahah'
     assert a.as_dict() == {'name': 'ahah'}
+
+
+def test_model__no_filename_pattern_still_allows_get_to_none(a_model):
+    assert a_model._filename_pattern('prefix') is None
 
 
 def test_model__test_simple_with_default_value_for_field_and_read_only():
@@ -277,16 +293,6 @@ def test_model__test_save_and_load(monkeypatch, test_tempdir):
 
         name = mod.ModelField('name')
 
-    class B(mod.Model):
-        __lpbm_config__ = {
-            'schema': {
-                mod.Required('label'): str,
-            },
-            'filename_pattern': A.inline_model('bs/{uuid}/this.yaml'),
-        }
-
-        label = mod.ModelField('label')
-
     with mod.scoped_session_rw(rootdir=test_tempdir) as session:
         objects = session.query(A).all()
         assert not objects
@@ -396,3 +402,44 @@ def test_model__pformat_and_pprint(capsys):
     mod.model_pprint(a)
     out, _ = capsys.readouterr()
     assert out == (val + '\n')
+
+
+def test_inline_model__test_safety_on_parent():
+    class A(mod.Model):
+        __lpbm_config__ = {
+            'schema': {
+                mod.Required('name'): str,
+            },
+            'filename_pattern': 'as/{uuid}/state.yaml',
+        }
+
+        name = mod.ModelField('name')
+
+    class B(mod.Model):
+        __lpbm_config__ = {
+            'schema': {
+                mod.Required('label'): str,
+            },
+            'filename_pattern': A.inline_model('bs/{uuid}/this.yaml'),
+        }
+
+        label = mod.ModelField('label')
+
+    a = A()
+    a.name = 'fooooo'
+
+    b = B(parent=a)
+    b.label = 'eheheh'
+
+    with pytest.raises(mod.ModelParentAlreadySetError) as exc:
+        b.parent = None
+    assert str(exc.value) == 'model B: parent already set'
+
+    with pytest.raises(mod.ModelNoParentDefinedError) as exc:
+        a.parent = b
+    assert str(exc.value) == 'model A: no parent defined'
+
+    b2 = B()
+    with pytest.raises(mod.ModelParentTypeError) as exc:
+        b2.parent = b
+    assert str(exc.value) == 'model B: type B is not expected parent type A'

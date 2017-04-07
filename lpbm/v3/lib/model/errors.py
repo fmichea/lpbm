@@ -1,15 +1,23 @@
 from lpbm.v3.lib.model.base import model_name
 
 
-class ModelFieldMissingError(Exception):
+class ModelFieldError(Exception):
     pass
 
 
-class ModelFieldReadOnlyError(Exception):
+class ModelFieldMissingError(ModelFieldError):
     pass
 
 
-class ModelSessionBlogLockedError(Exception):
+class ModelFieldReadOnlyError(ModelFieldError):
+    pass
+
+
+class ModelSessionError(Exception):
+    pass
+
+
+class ModelSessionBlogLockedError(ModelSessionError):
     pass
 
 
@@ -74,4 +82,37 @@ class ModelTypeError(TypeError):
     """
     ModelTypeError is raised by the Model meta-class during Model definition
     when there is an issue with the model.
+    """
+
+
+class ModelError(Exception):
+    def __init__(self, model, msg):
+        super().__init__('model {0}: {1}'.format(model_name(model), msg))
+
+
+class ModelParentError(ModelError):
+    """
+    ModelParentError is a super-class of all exceptions raised when errors
+    happen with parents of inline models
+    """
+
+
+class ModelParentAlreadySetError(ModelParentError):
+    """
+    ModelParentAlreadySetError is raised when an attempt is made to change the
+    parent of an inline model that already has a parent.
+    """
+
+
+class ModelNoParentDefinedError(ModelParentError):
+    """
+    ModelNoParentDefinedError is raised when an attempt is made to change the
+    parent of an object that is not inlined and has no parent.
+    """
+
+
+class ModelParentTypeError(ModelParentError):
+    """
+    ModelParentTypeError is raised when an attempt to set the parent of an
+    inline object is made with a parent of the wrong type.
     """

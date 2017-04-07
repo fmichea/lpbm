@@ -2,7 +2,12 @@ from voluptuous.error import MultipleInvalid as _MultipleInvalid
 
 from lpbm.v3.lib import dict_utils as _dict_utils
 from lpbm.v3.lib.model.base import BaseModel, is_model, model_name
-from lpbm.v3.lib.model.errors import ModelInvalidError
+from lpbm.v3.lib.model.errors import (
+    ModelInvalidError,
+    ModelNoParentDefinedError,
+    ModelParentAlreadySetError,
+    ModelParentTypeError,
+)
 from lpbm.v3.lib.model.meta import ModelMeta
 from lpbm.v3.lib.model.ref import is_model_ref
 
@@ -42,12 +47,28 @@ class Model(BaseModel, metaclass=ModelMeta):
 
         self._data = data
 
-        parent_cfg = self._filename_pattern('parent')
-        if parent_cfg is not None and parent is not None:
-            assert isinstance(parent, parent_cfg['class'])
-        self.parent = parent
+        self._parent = None
+        if parent is not None:
+            self.parent = parent
 
         self._ref = {'clsname': model_name(self)}
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, val):
+        if self._parent is not None:
+            raise ModelParentAlreadySetError(self, 'parent already set')
+        parent_cfg = self._filename_pattern('parent')
+        if parent_cfg is None:
+            raise ModelNoParentDefinedError(self, 'no parent defined')
+        if not isinstance(val, parent_cfg['class']):
+            err = 'type {0} is not expected parent type {1}'
+            err = err.format(type(val).__name__, parent_cfg['class'].__name__)
+            raise ModelParentTypeError(self, err)
+        self._parent = val
 
     def __repr__(self):
         val = super().__repr__()
