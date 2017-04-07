@@ -4,7 +4,7 @@ import os
 
 import yaml
 
-import lpbm.v3.lib.path as lpath
+from lpbm.v3.lib import path as lpath
 from lpbm.v3.lib.model.errors import (
     ModelSessionBlogLockedError,
     ModelSessionReadOnlyError,
@@ -142,9 +142,9 @@ class ModelSession(object):
         return os.path.join(self.rootdir, *args)
 
     def _model_save(self, inst):
-        contents = yaml.safe_dump(inst.as_dict(), default_flow_style=False)
-
         filename = inst._model_filename()
+
+        contents = yaml.safe_dump(inst.as_dict(), default_flow_style=False)
 
         path = self.in_blog_join(filename)
         lpath.mkdir_p(os.path.dirname(path))
