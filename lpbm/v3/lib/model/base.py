@@ -11,6 +11,15 @@ def is_model_instance(v):
 
 
 def model_name(v):
+    if v is None:
+        return 'None'
     if is_model_instance(v):
         return model_name(v.__class__)
     return v.__name__
+
+
+def model_name_id(v):
+    res = model_name(v)
+    if hasattr(v, 'uuid'):
+        res += '(uuid={uuid})'.format(uuid=v.uuid)
+    return res

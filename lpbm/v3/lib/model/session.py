@@ -125,7 +125,7 @@ class ModelSession(object):
             raise ModelSessionReadOnlyError()
         # First we check that all instances are valid.
         for inst in self.instances.values():
-            inst.validate()
+            inst.validate(session=self)
         # We can save all the instances now.
         for inst in self.instances.values():
             self._model_save(inst)
@@ -141,10 +141,17 @@ class ModelSession(object):
     def in_blog_join(self, *args):
         return os.path.join(self.rootdir, *args)
 
+    def is_in(self, *instances):
+        for instance in instances:
+            if instance.uuid not in self.instances:
+                return False
+        return True
+
     def _model_save(self, inst):
         filename = inst._model_filename()
+        dict_content = inst.as_dict(session=self)
 
-        contents = yaml.safe_dump(inst.as_dict(), default_flow_style=False)
+        contents = yaml.safe_dump(dict_content, default_flow_style=False)
 
         path = self.in_blog_join(filename)
         lpath.mkdir_p(os.path.dirname(path))

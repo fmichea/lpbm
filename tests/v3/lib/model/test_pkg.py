@@ -4,6 +4,10 @@ import lpbm.v3.lib.model as mod
 import lpbm.v3.lib.path as lpath
 
 
+def test_model__model_name_on_none_is_none():
+    assert mod.model_name(None) == 'None'
+
+
 def test_model__lpbm_config_required_for_model():
     with pytest.raises(mod.ModelTypeError) as exc:
         class A(mod.Model):
@@ -164,7 +168,7 @@ def test_model__test_simple_model_with_required_field():
         b.as_dict()
 
     exc_str = str(exc.value)
-    assert exc_str.startswith('B uuid={0}:'.format(b.uuid))
+    assert exc_str.startswith('B(uuid={0}):'.format(b.uuid))
 
 
 def test_model__test_model_field_nested_struct_various_actions():
@@ -433,13 +437,13 @@ def test_inline_model__test_safety_on_parent():
 
     with pytest.raises(mod.ModelParentAlreadySetError) as exc:
         b.parent = None
-    assert str(exc.value) == 'model B: parent already set'
+    assert str(exc.value).endswith('parent already set')
 
     with pytest.raises(mod.ModelNoParentDefinedError) as exc:
         a.parent = b
-    assert str(exc.value) == 'model A: no parent defined'
+    assert str(exc.value).endswith('no parent defined')
 
     b2 = B()
     with pytest.raises(mod.ModelParentTypeError) as exc:
         b2.parent = b
-    assert str(exc.value) == 'model B: type B is not expected parent type A'
+    assert str(exc.value).endswith('type B is not expected parent type A')

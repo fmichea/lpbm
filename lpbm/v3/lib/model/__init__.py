@@ -11,6 +11,7 @@ from voluptuous import (
 from lpbm.v3.lib.model.base import (
     is_model,
     is_model_instance,
+    model_name,
 )
 from lpbm.v3.lib.model.errors import (
     ModelFieldBoolOpError,
@@ -29,8 +30,11 @@ from lpbm.v3.lib.model.errors import (
     ModelQueryParentAlreadySetError,
     ModelQueryParentWrongTypeError,
     ModelQueryTooManyObjectsError,
+    ModelRefDefinitionError,
+    ModelRefError,
     ModelRefInvalidClassError,
-    ModelRefInvalidDefinitionError,
+    ModelRefNoSessionError,
+    ModelRefNotInSessionError,
     ModelSessionBlogLockedError,
     ModelSessionError,
     ModelSessionReadOnlyError,
@@ -42,7 +46,7 @@ from lpbm.v3.lib.model.field_bool_op import (
     or_,
 )
 from lpbm.v3.lib.model.model import Model
-from lpbm.v3.lib.model.ref import ModelRef
+from lpbm.v3.lib.model.ref import ModelRef, model_ref_name_id
 from lpbm.v3.lib.model.session import (
     ModelSession,
     SESSION,

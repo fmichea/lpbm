@@ -4,22 +4,45 @@ import lpbm.v3.lib.model as mod
 
 
 def test_ref__needs_to_be_given_classes():
-    with pytest.raises(mod.ModelRefInvalidDefinitionError):
+    with pytest.raises(mod.ModelRefDefinitionError) as exc:
         mod.ModelRef()
+
+    assert str(exc.value) == 'no class names provided'
 
 
 def test_ref__invalid_type_for_class_names():
-    with pytest.raises(mod.ModelRefInvalidDefinitionError):
+    with pytest.raises(mod.ModelRefDefinitionError) as exc:
         mod.ModelRef(True)
 
+    assert str(exc.value) == 'expected string or model, but got True'
 
-def test_ref__invalid_deref():
+
+def test_ref__invalid_ref_and_deref(test_tempdir):
     ref = mod.ModelRef('foo')
-    with pytest.raises(mod.ModelRefInvalidClassError):
-        ref.deref(None, {'clsname': 'bar'})
+
+    assert mod.model_ref_name_id(ref) == 'ModelRef(definition=foo)'
+
+    class fooo:
+        __name__ = 'fooo'
+
+    with pytest.raises(mod.ModelRefNoSessionError) as exc:
+        ref.deref(None, fooo(), {})
+
+    with pytest.raises(mod.ModelRefNoSessionError) as exc:
+        ref.ref(None, fooo(), {})
+
+    assert str(exc.value).endswith('no session provided when (de)referencing')
+
+    with mod.scoped_session_ro(rootdir=test_tempdir) as session:
+        with pytest.raises(mod.ModelRefInvalidClassError) as exc:
+            ref.deref(session, fooo(), {'clsname': 'fooo'})
+
+        exc_str = str(exc.value)
+        assert exc_str.endswith('object of type "fooo" is not in "foo"')
 
 
-def test_ref__can_be_written_then_loaded(test_tempdir):
+@pytest.fixture()
+def ab_klasses():
     class A(mod.Model):
         __lpbm_config__ = {
             'schema': {
@@ -44,6 +67,12 @@ def test_ref__can_be_written_then_loaded(test_tempdir):
         a_main_ref = mod.ModelField('a_main_ref')
         a_refs = mod.ModelField('a_refs')
 
+    return A, B
+
+
+def test_ref__can_be_written_then_loaded(ab_klasses, test_tempdir):
+    A, B = ab_klasses
+
     with mod.scoped_session_rw(rootdir=test_tempdir) as session:
         a = A()
         a.name = 'wedwed'
@@ -60,3 +89,40 @@ def test_ref__can_be_written_then_loaded(test_tempdir):
         b = session.query(B).one()
         assert isinstance(b.a_main_ref, A)
         assert b.a_main_ref.uuid == a_uuid
+
+
+@pytest.mark.parametrize('setter', [
+    (lambda b, a: setattr(b, 'a_main_ref', a)),
+    (lambda b, a: setattr(b, 'a_refs', [a])),
+])
+def test_ref__test_ref_to_unknown_object_not_accepted(ab_klasses, setter, test_tempdir):
+    A, B = ab_klasses
+
+    with pytest.raises(mod.ModelRefNotInSessionError) as exc:
+        with mod.scoped_session_rw(rootdir=test_tempdir) as session:
+            a = A()
+            a.name = 'bloupbloup'
+
+            b = B()
+            b.name = 'blah'
+            setter(b, a)
+
+            session.add(b)
+
+    exc_str = str(exc.value)
+    assert 'object referenced is not in session' in exc_str
+
+
+def test_ref__cannot_use_wrong_type(ab_klasses, test_tempdir):
+    A, B = ab_klasses
+
+    with pytest.raises(mod.ModelRefInvalidClassError) as exc:
+        with mod.scoped_session_rw(rootdir=test_tempdir) as session:
+            b = B()
+            b.name = 'blah'
+            b.a_main_ref = b
+
+            session.add(b)
+
+    exc_str = str(exc.value)
+    assert exc_str.endswith('object of type "B" is not in "A"')

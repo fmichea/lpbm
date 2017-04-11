@@ -32,9 +32,9 @@ class Model(BaseModel, metaclass=ModelMeta):
                 elif isinstance(type_, list) and is_model(type_[0]):
                     return [type_[0](x) for x in val]
                 elif is_model_ref(type_):
-                    return type_.deref(session, val)
+                    return type_.deref(session, self, val)
                 elif isinstance(type_, list) and is_model_ref(type_[0]):
-                    return [type_[0].deref(session, x) for x in val]
+                    return [type_[0].deref(session, self, v) for v in val]
                 return val
             try:
                 data = _dict_utils.map(self._schema()(data), _translate_from_raw_data)
@@ -76,9 +76,8 @@ class Model(BaseModel, metaclass=ModelMeta):
             val = '{0} with uuid={1}>'.format(val[:-1], self.uuid)
         return val
 
-    def validate(self):
-        # needs to validate
-        self.as_dict()
+    def validate(self, session=None):
+        self.as_dict(session=session)
 
     def ref(self):
         self._ref.update({
@@ -94,7 +93,7 @@ class Model(BaseModel, metaclass=ModelMeta):
             self.as_dict() == other.as_dict()
         )
 
-    def as_dict(self):
+    def as_dict(self, session=None):
         """
         This function returns the on-disk representation of this model. It is
         not safe to modify the value returned by this function in any way. This
@@ -110,9 +109,9 @@ class Model(BaseModel, metaclass=ModelMeta):
             elif isinstance(type_, list) and is_model(type_[0]):
                 return [v.as_dict() for v in val]
             elif is_model_ref(type_) and val is not None:
-                return val.ref()
+                return type_.ref(session, self, val)
             elif isinstance(type_, list) and is_model_ref(type_[0]):
-                return [v.ref() for v in val]
+                return [type_[0].ref(session, self, v) for v in val]
             return val
         tmp = _dict_utils.map(self._data, _translate_to_raw_data)
 
