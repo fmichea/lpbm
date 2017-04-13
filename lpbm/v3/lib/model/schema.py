@@ -6,16 +6,15 @@ from voluptuous import Schema as _Schema
 
 from lpbm.v3.lib import dict_utils as _dict_utils
 from lpbm.v3.lib.model.base import is_model
-from lpbm.v3.lib.model.ref import MODEL_REF_SCHEMA as _MODEL_REF_SCHEMA
-from lpbm.v3.lib.model.ref import is_model_ref
+from lpbm.v3.lib.model.types.base import is_custom_type
 
 
 def _build_real_schema(d):
     def _extract_real_schema_data(full_path, key, val):
         if is_model(val):
             return val._schema()
-        if is_model_ref(val):
-            return _MODEL_REF_SCHEMA
+        if is_custom_type(val):
+            return val.schema()
         if isinstance(val, list):
             assert len(val) == 1
             return [_extract_real_schema_data(None, None, val[0])]
@@ -30,9 +29,9 @@ def _build_key_info(d):
     def _extract_key_info(full_path, key, val):
         if (
             is_model(val) or
-            is_model_ref(val) or
+            is_custom_type(val) or
             (isinstance(val, list) and is_model(val[0])) or
-            (isinstance(val, list) and is_model_ref(val[0])) or
+            (isinstance(val, list) and is_custom_type(val[0])) or
             any(val is t for t in (bool, int, float, str))
         ):
             return _ModelKeyInfo(marker=key, T=val)
@@ -50,10 +49,6 @@ def _build_data_defaults(d):
     return _dict_utils.flatten(_dict_utils.clear(tmp) or {})
 
 
-def _build_reference_keys(d):
-    return [key for key, val in d.items() if is_model_ref(val.T)]
-
-
 class ModelSchema(_Schema):
     def __init__(self, schema, **kw):
         super().__init__(_build_real_schema(schema), **kw)
@@ -62,4 +57,3 @@ class ModelSchema(_Schema):
 
         self.key_info = _build_key_info(self.model_schema)
         self.data_defaults = _build_data_defaults(self.model_schema)
-        self.reference_keys = _build_reference_keys(self.key_info)

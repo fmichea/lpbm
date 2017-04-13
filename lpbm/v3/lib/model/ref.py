@@ -19,6 +19,7 @@ from lpbm.v3.lib.model.errors import (
     ModelRefNoSessionError,
     ModelRefNotInSessionError,
 )
+from lpbm.v3.lib.model.types.base import BaseType
 from lpbm.v3.lib.model.uuid import UUID as _UUID
 
 MODEL_REF_SCHEMA = _Schema({
@@ -27,7 +28,7 @@ MODEL_REF_SCHEMA = _Schema({
 }, extra=_ALLOW_EXTRA)
 
 
-class ModelRef(BaseModelRef):
+class ModelRef(BaseModelRef, BaseType):
     def __init__(self, *clsnames):
         if not clsnames:
             raise ModelRefDefinitionError('no class names provided')
@@ -41,7 +42,20 @@ class ModelRef(BaseModelRef):
                 raise ModelRefDefinitionError(err.format(clsname))
             self._clsnames.add(clsname)
 
-    def ref(self, session, owner, val):
+    def schema(self):
+        return MODEL_REF_SCHEMA
+
+    def load(self, session, owner, val):
+        if session is None:
+            raise ModelRefNoSessionError(owner, val)
+
+        clsname = val.get('clsname')
+        if clsname not in self._clsnames:
+            raise ModelRefInvalidClassError(owner, val, clsname, self._clsnames)
+
+        return session.query(data.MODEL_NAME_TO_CLASS[clsname]).get(**val)
+
+    def dump(self, session, owner, val):
         if session is None:
             raise ModelRefNoSessionError(owner, val)
 
@@ -55,13 +69,3 @@ class ModelRef(BaseModelRef):
             raise ModelRefInvalidClassError(owner, val, clsname, self._clsnames)
 
         return ref
-
-    def deref(self, session, owner, val):
-        if session is None:
-            raise ModelRefNoSessionError(owner, val)
-
-        clsname = val.get('clsname')
-        if clsname not in self._clsnames:
-            raise ModelRefInvalidClassError(owner, val, clsname, self._clsnames)
-
-        return session.query(data.MODEL_NAME_TO_CLASS[clsname]).get(**val)

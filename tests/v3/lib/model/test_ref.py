@@ -17,7 +17,7 @@ def test_ref__invalid_type_for_class_names():
     assert str(exc.value) == 'expected string or model, but got True'
 
 
-def test_ref__invalid_ref_and_deref(test_tempdir):
+def test_ref__invalid_load_and_dump(test_tempdir):
     ref = mod.ModelRef('foo')
 
     assert mod.model_ref_name_id(ref) == 'ModelRef(definition=foo)'
@@ -26,16 +26,16 @@ def test_ref__invalid_ref_and_deref(test_tempdir):
         __name__ = 'fooo'
 
     with pytest.raises(mod.ModelRefNoSessionError) as exc:
-        ref.deref(None, fooo(), {})
+        ref.load(None, fooo(), {})
 
     with pytest.raises(mod.ModelRefNoSessionError) as exc:
-        ref.ref(None, fooo(), {})
+        ref.dump(None, fooo(), {})
 
     assert str(exc.value).endswith('no session provided when (de)referencing')
 
     with mod.scoped_session_ro(rootdir=test_tempdir) as session:
         with pytest.raises(mod.ModelRefInvalidClassError) as exc:
-            ref.deref(session, fooo(), {'clsname': 'fooo'})
+            ref.load(session, fooo(), {'clsname': 'fooo'})
 
         exc_str = str(exc.value)
         assert exc_str.endswith('object of type "fooo" is not in "foo"')

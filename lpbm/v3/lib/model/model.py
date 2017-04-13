@@ -10,6 +10,7 @@ from lpbm.v3.lib.model.errors import (
 )
 from lpbm.v3.lib.model.meta import ModelMeta
 from lpbm.v3.lib.model.ref import is_model_ref
+from lpbm.v3.lib.model.types.base import is_custom_type
 
 
 class Model(BaseModel, metaclass=ModelMeta):
@@ -31,10 +32,10 @@ class Model(BaseModel, metaclass=ModelMeta):
                     return type_(data=val)
                 elif isinstance(type_, list) and is_model(type_[0]):
                     return [type_[0](x) for x in val]
-                elif is_model_ref(type_):
-                    return type_.deref(session, self, val)
-                elif isinstance(type_, list) and is_model_ref(type_[0]):
-                    return [type_[0].deref(session, self, v) for v in val]
+                elif is_custom_type(type_):
+                    return type_.load(session, self, val)
+                elif isinstance(type_, list) and is_custom_type(type_[0]):
+                    return [type_[0].load(session, self, v) for v in val]
                 return val
             try:
                 data = _dict_utils.map(self._schema()(data), _translate_from_raw_data)
@@ -108,10 +109,10 @@ class Model(BaseModel, metaclass=ModelMeta):
                 return val.as_dict()
             elif isinstance(type_, list) and is_model(type_[0]):
                 return [v.as_dict() for v in val]
-            elif is_model_ref(type_) and val is not None:
-                return type_.ref(session, self, val)
-            elif isinstance(type_, list) and is_model_ref(type_[0]):
-                return [type_[0].ref(session, self, v) for v in val]
+            elif is_custom_type(type_) and val is not None:
+                return type_.dump(session, self, val)
+            elif isinstance(type_, list) and is_custom_type(type_[0]):
+                return [type_[0].dump(session, self, v) for v in val]
             return val
         tmp = _dict_utils.map(self._data, _translate_to_raw_data)
 
