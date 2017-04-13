@@ -106,9 +106,9 @@ class Model(BaseModel, metaclass=ModelMeta):
                 return val
             type_ = key_info.T
             if is_model(type_):
-                return val.as_dict()
+                return val.as_dict(session=session)
             elif isinstance(type_, list) and is_model(type_[0]):
-                return [v.as_dict() for v in val]
+                return [v.as_dict(session=session) for v in val]
             elif is_custom_type(type_) and val is not None:
                 return type_.dump(session, self, val)
             elif isinstance(type_, list) and is_custom_type(type_[0]):
