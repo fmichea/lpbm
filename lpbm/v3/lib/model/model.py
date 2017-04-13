@@ -78,7 +78,8 @@ class Model(BaseModel, metaclass=ModelMeta):
         return val
 
     def validate(self, session=None):
-        self.as_dict(session=session)
+        # FIXME: self.as_dict(session=session)
+        pass
 
     def ref(self):
         self._ref.update({
