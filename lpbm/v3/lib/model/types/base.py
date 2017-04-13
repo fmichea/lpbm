@@ -4,15 +4,22 @@ import abc
 class BaseType(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def schema(self):
-        pass
+        """
+        BaseType.schema returns the schema for this type.
+        """
 
     @abc.abstractmethod
-    def load(self, session, owner, value):
-        pass
+    def load(self, session, owners, value):
+        """
+        BaseType.load takes raw data and returns values from that data.
+        """
 
     @abc.abstractmethod
-    def dump(self, session, owner, value):
-        pass
+    def dump(self, session, owners, value):
+        """
+        BaseType.dump takes data and translates it to raw data so it can be
+        dumped to files.
+        """
 
 
 def is_custom_type(val):

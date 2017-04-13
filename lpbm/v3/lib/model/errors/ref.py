@@ -8,14 +8,14 @@ class ModelRefError(Exception):
     including at definition and when referencing and de-referencing.
     """
 
-    def __init__(self, owner, ref):
+    def __init__(self, owners, ref):
         super().__init__()
-        self._owner = owner
+        self._owners = owners
         self._ref = ref
 
     def __str__(self):
         return '{owner}: error with reference {ref}'.format(
-            owner=model_name_id(self._owner),
+            owner=' > '.join(model_name_id(owner) for owner in self._owners),
             ref=model_ref_name_id(self._ref),
         )
 

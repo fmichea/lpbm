@@ -19,7 +19,11 @@ class Model(BaseModel, metaclass=ModelMeta):
         'filename_pattern': None,
     }
 
-    def __init__(self, data=None, session=None, parent=None):
+    def __init__(self, data=None, session=None, owners=None, parent=None):
+        if owners is None:
+            owners = []
+        owners.append(self)
+
         if data is not None:
             # Raw data given to model must pass schema check. We need to
             # translate all the data into in-memory format.
@@ -29,9 +33,9 @@ class Model(BaseModel, metaclass=ModelMeta):
                     return val
                 type_ = key_info.T
                 if is_model(type_):
-                    return type_(data=val)
+                    return type_(data=val, owners=owners)
                 elif isinstance(type_, list) and is_model(type_[0]):
-                    return [type_[0](x) for x in val]
+                    return [type_[0](data=x, owners=owners) for x in val]
                 elif is_custom_type(type_):
                     return type_.load(session, self, val)
                 elif isinstance(type_, list) and is_custom_type(type_[0]):
@@ -95,25 +99,29 @@ class Model(BaseModel, metaclass=ModelMeta):
             self.as_dict() == other.as_dict()
         )
 
-    def as_dict(self, session=None):
+    def as_dict(self, session=None, owners=None):
         """
         This function returns the on-disk representation of this model. It is
         not safe to modify the value returned by this function in any way. This
         function is mostly internal and should be avoided.
         """
+        if owners is None:
+            owners = []
+        owners.append(self)
+
         def _translate_to_raw_data(full_path, key, val):
             key_info = self._schema().key_info.get(full_path)
             if key_info is None:
                 return val
             type_ = key_info.T
             if is_model(type_):
-                return val.as_dict(session=session)
+                return val.as_dict(session=session, owners=owners)
             elif isinstance(type_, list) and is_model(type_[0]):
-                return [v.as_dict(session=session) for v in val]
+                return [v.as_dict(session=session, owners=owners) for v in val]
             elif is_custom_type(type_) and val is not None:
-                return type_.dump(session, self, val)
+                return type_.dump(session, owners, val)
             elif isinstance(type_, list) and is_custom_type(type_[0]):
-                return [type_[0].dump(session, self, v) for v in val]
+                return [type_[0].dump(session, owners, v) for v in val]
             return val
         tmp = _dict_utils.map(self._data, _translate_to_raw_data)
 

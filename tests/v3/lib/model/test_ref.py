@@ -26,16 +26,16 @@ def test_ref__invalid_load_and_dump(test_tempdir):
         __name__ = 'fooo'
 
     with pytest.raises(mod.ModelRefNoSessionError) as exc:
-        ref.load(None, fooo(), {})
+        ref.load(None, [fooo()], {})
 
     with pytest.raises(mod.ModelRefNoSessionError) as exc:
-        ref.dump(None, fooo(), {})
+        ref.dump(None, [fooo()], {})
 
     assert str(exc.value).endswith('no session provided when (de)referencing')
 
     with mod.scoped_session_ro(rootdir=test_tempdir) as session:
         with pytest.raises(mod.ModelRefInvalidClassError) as exc:
-            ref.load(session, fooo(), {'clsname': 'fooo'})
+            ref.load(session, [fooo()], {'clsname': 'fooo'})
 
         exc_str = str(exc.value)
         assert exc_str.endswith('object of type "fooo" is not in "foo"')
