@@ -1,3 +1,11 @@
+# command line argument parsing
 click
+
+# data validation through schemas
 voluptuous
+
+# YAML library for data layer encoding/decoding
 PyYAML
+
+# file watches
+watchdog

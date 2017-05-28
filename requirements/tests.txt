@@ -5,21 +5,24 @@
 #    pip-compile --output-file requirements/tests.txt requirements/tests.in
 #
 appdirs==1.4.3            # via setuptools
+argh==0.26.2              # via watchdog
 click==6.7
-coverage==4.3.4           # via pytest-cov
+coverage==4.4.1           # via pytest-cov
 flake8==3.3.0
 isort==4.2.5
 mccabe==0.6.1             # via flake8
 packaging==16.8           # via setuptools
+pathtools==0.1.2          # via watchdog
 py==1.4.33                # via pytest
 pycodestyle==2.3.1        # via flake8
 pyflakes==1.5.0           # via flake8
 pyparsing==2.2.0          # via packaging
-pytest-cov==2.4.0
+pytest-cov==2.5.1
 pytest==3.0.7
-PyYAML==3.12
+PyYAML==3.12              # via watchdog
 six==1.10.0               # via packaging, setuptools
-voluptuous==0.9.3
+voluptuous==0.10.5
+watchdog==0.8.3
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools                # via pytest, voluptuous
+# setuptools                # via pytest
