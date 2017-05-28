@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 import lpbm.v3.lib.model as mmod
@@ -16,6 +18,28 @@ def test_session__scoped_rw_can_be_double_scoped(test_tempdir):
     with mmod.scoped_session_rw(rootdir=test_tempdir) as session:
         with mmod.scoped_session_rw(session=session):
             pass
+
+
+_FILE_LIST = [
+    'a/b/c.yaml',
+    'a/b/contents.txt',
+    'a/c/b/wed.do',
+    'a/c/contents.txt',
+    'a/c/foo.yaml',
+]
+
+
+@pytest.mark.parametrize('pattern,result', [
+    ('^.*$', _FILE_LIST),
+    ('^.*\.yaml$', ['a/b/c.yaml', 'a/c/foo.yaml']),
+    ('^a/b/.*$', ['a/b/c.yaml', 'a/b/contents.txt']),
+])
+def test_session__file_filtering_works(pattern, result):
+    session = mod.ModelSession()
+    session.file_list = _FILE_LIST
+
+    func = lambda val: re.match(pattern, val) is not None
+    assert sorted(session.filter_filenames(func)) == result
 
 
 def test_session__scoped_rw_rollback_when_exception_happens(test_tempdir, monkeypatch):
