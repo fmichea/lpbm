@@ -46,14 +46,14 @@ from lpbm.v3.lib.model.field_bool_op import (
     or_,
 )
 from lpbm.v3.lib.model.model import Model
+from lpbm.v3.lib.model.pprint import (
+    model_pformat,
+    model_pprint,
+)
 from lpbm.v3.lib.model.ref import ModelRef, model_ref_name_id
 from lpbm.v3.lib.model.session import (
     ModelSession,
     SESSION,
     scoped_session_ro,
     scoped_session_rw,
-)
-from lpbm.v3.lib.model.pprint import (
-    model_pformat,
-    model_pprint,
 )

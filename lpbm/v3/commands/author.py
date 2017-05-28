@@ -13,7 +13,6 @@ from lpbm.v3.models.author import (
 @main_command.group('author')
 def author():
     """author management commands"""
-    pass
 
 
 @author.command('list')

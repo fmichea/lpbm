@@ -24,7 +24,8 @@ class ModelMeta(type):
             err = 'Invalid model name {clsname} used for two models'
             raise ModelTypeError(err.format(clsname=name))
 
-        # Base model is the class all models inherit from.
+        # Base model is the class all models inherit from, we do not want to
+        # apply all of the meta actions on it.
         is_base_model = (name == 'Model' and bases == (BaseModel,))
 
         # All the attributes
@@ -48,24 +49,24 @@ class ModelMeta(type):
             err = 'model {clsname} must provide a data schema in {attr}'
             raise ModelTypeError(err.format(clsname=name, attr=ModelMeta.CONFIG_ATTR))
 
+        # Models must have a schema which validates the data they contain.
         if not isinstance(schema, dict):
             err = 'model {clsname} must provide data schema as a dict'
             raise ModelTypeError(err.format(clsname=name))
 
-        if not is_base_model and 'parent' in kw:
-            err = 'model {clsname} cannot have a parent attribute'
-            raise ModelTypeError(err.format(clsname=name))
+        # Only BaseModel can define the uuid or parent attribute (a property).
+        if not is_base_model:
+            for attr_name in 'uuid,parent'.split(','):
+                if attr_name in kw:
+                    err = 'model {clsname} cannot have a {attr_name} attribute'
+                    raise ModelTypeError(err.format(clsname=name, attr_name=attr_name))
+
+        filename_pattern = cfg.get('filename_pattern')
 
         # If filename_pattern is defined, Model can be referenced through a
         # file, and will be uniquely identified using a UUID4.
-        if 'filename_pattern' in cfg:
-            schema[Required('uuid', default=_new_uuid)] = _UUID
-
-        # Modified schema is saved to the model configuration.
-        cfg['schema'] = _ModelSchema(schema)
-
-        filename_pattern = cfg.get('filename_pattern')
         if filename_pattern is not None:
+            schema[Required('uuid', default=_new_uuid)] = _UUID
             kw['uuid'] = ModelField('uuid', read_only=True)
 
             def _split_filename_pattern(ptrn):
@@ -108,6 +109,14 @@ class ModelMeta(type):
 
             kw['inline_model'] = inline_model
 
+        # If at this point we have not defined uuid, we define it as None.
+        kw.setdefault('uuid', None)
+
+        # Modified schema is saved to the model configuration.
+        cfg['schema'] = _ModelSchema(schema)
+
+        # Create the class and save it in our name -> class mapping.
         res = super().__new__(cls, name, bases, kw)
         lmdata.MODEL_NAME_TO_CLASS[name] = res
+
         return res

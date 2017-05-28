@@ -5,7 +5,7 @@ SLUG_CHARS_DISPLAY = '[a-z0-9-]'
 
 
 _SLUG_CHARS = string.ascii_lowercase + string.digits + '-'
-_SLUG_SIZE = 50
+_SLUG_SIZE = 80
 
 
 def slugify(text):

@@ -26,6 +26,10 @@ _ModelKeyInfo = namedtuple('_ModelKeyInfo', ['marker', 'T'])
 
 
 def _build_key_info(d):
+    # FIXME: This would be a good place to check if we are not embedding a
+    # model into another model which the embedded model is actually an in_file
+    # model.
+
     def _extract_key_info(full_path, key, val):
         if (
             is_model(val) or
