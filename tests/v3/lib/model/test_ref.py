@@ -2,6 +2,8 @@ import pytest
 
 import lpbm.v3.lib.model as mod
 
+from lpbm.v3.lib.model.owner_tracker import OwnerTracker
+
 
 def test_ref__needs_to_be_given_classes():
     with pytest.raises(mod.ModelRefDefinitionError) as exc:
@@ -24,21 +26,27 @@ def test_ref__invalid_load_and_dump(test_tempdir):
 
     class fooo:
         __name__ = 'fooo'
+        is_in_file_model = classmethod(lambda cls: False)
 
-    with pytest.raises(mod.ModelRefNoSessionError) as exc:
-        ref.load(None, [fooo()], {})
+    f = fooo()
 
-    with pytest.raises(mod.ModelRefNoSessionError) as exc:
-        ref.dump(None, [fooo()], {})
+    owners = OwnerTracker()
 
-    assert str(exc.value).endswith('no session provided when (de)referencing')
+    with owners.wrap(f):
+        with pytest.raises(mod.ModelRefNoSessionError) as exc:
+            ref.load(None, owners, {})
 
-    with mod.scoped_session_ro(rootdir=test_tempdir) as session:
-        with pytest.raises(mod.ModelRefInvalidClassError) as exc:
-            ref.load(session, [fooo()], {'clsname': 'fooo'})
+        with pytest.raises(mod.ModelRefNoSessionError) as exc:
+            ref.dump(None, owners, {})
 
-        exc_str = str(exc.value)
-        assert exc_str.endswith('object of type "fooo" is not in "foo"')
+        assert str(exc.value).endswith('no session provided when (de)referencing')
+
+        with mod.scoped_session_ro(rootdir=test_tempdir) as session:
+            with pytest.raises(mod.ModelRefInvalidClassError) as exc:
+                ref.load(session, owners, {'clsname': 'fooo'})
+
+            exc_str = str(exc.value)
+            assert exc_str.endswith('object of type "fooo" is not in "foo"')
 
 
 @pytest.fixture()

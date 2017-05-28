@@ -57,3 +57,7 @@ from lpbm.v3.lib.model.session import (
     scoped_session_ro,
     scoped_session_rw,
 )
+from lpbm.v3.lib.model.types.external_file import (
+    ExternalFile,
+    ExternalFileType,
+)

@@ -10,6 +10,7 @@ from lpbm.v3.lib.model.errors import (
     ModelSessionReadOnlyError,
 )
 from lpbm.v3.lib.model.query import Query
+from lpbm.v3.lib.model.session_actions import DeleteFileAction
 
 
 class _scoped_lock(object):
@@ -88,22 +89,28 @@ class ModelSession(object):
 
     def __init__(self):
         self.mode = ModelSession.MODE_RO
+
+        self.file_list = set()
         self.instances = dict()
+        self._commit_actions = []
 
     def initialize(self, rootdir):
         self.rootdir = rootdir
         self.begin()
 
     def begin(self):
+        self.file_list = set(lpath.listdir(self.rootdir))
         self.instances.clear()
-        self._file_list = lpath.listdir(self.rootdir)
-        self._to_delete_files = []
+        self._commit_actions = []
 
     def filter_filenames(self, filter_func):
         return [
-            filename for filename in self._file_list
+            filename for filename in self.file_list
             if filter_func(filename)
         ]
+
+    def add_commit_action(self, act):
+        self._commit_actions.append(act)
 
     def add(self, *instances):
         for instance in instances:
@@ -112,7 +119,9 @@ class ModelSession(object):
     def delete(self, *instances):
         for instance in instances:
             del self.instances[instance.uuid]
-            self._to_delete_files.extend(instance.filenames())
+            for filename in instance.filenames():
+                self.add_commit_action(DeleteFileAction(filename))
+                self.file_list.remove(filename)
 
     def query(self, model):
         return Query(model).with_session(self)
@@ -123,19 +132,17 @@ class ModelSession(object):
     def commit(self):
         if self.mode != ModelSession.MODE_RW:
             raise ModelSessionReadOnlyError()
-        # First we check that all instances are valid.
-        for inst in self.instances.values():
-            inst.validate(session=self)
-        # We can save all the instances now.
-        for inst in self.instances.values():
-            self._model_save(inst)
-        # Delete all the files to be deleted:
-        for filename in self._to_delete_files:
-            lpath.remove(self.in_blog_join(filename))
+        # We can save all the instances now, this function adds commit actions
+        # to the session. Instances may change (model ref checks), so we make a
+        # copy.
+        insts = list(self.instances.values())
+        for inst in insts:
+            inst.dump(self)
+        # Do all the actions from the commit actions.
+        for act in self._commit_actions:
+            act.do(self)
         # Clear all instances.
         self.instances.clear()
-        # Clear the lists.
-        self._to_delete_files = []
         return True
 
     def in_blog_join(self, *args):
@@ -143,21 +150,13 @@ class ModelSession(object):
 
     def is_in(self, *instances):
         for instance in instances:
-            if instance.uuid not in self.instances:
+            if instance.uuid in self.instances:
+                continue
+
+            inst = self.query(instance.__class__).get_or_none(instance.uuid)
+            if inst is None:
                 return False
         return True
-
-    def _model_save(self, inst):
-        filename = inst._model_filename()
-        dict_content = inst.as_dict(session=self)
-
-        contents = yaml.safe_dump(dict_content, default_flow_style=False)
-
-        path = self.in_blog_join(filename)
-        lpath.mkdir_p(os.path.dirname(path))
-
-        with open(path, 'w') as fd:
-            fd.write(contents)
 
 
 SESSION = ModelSession()

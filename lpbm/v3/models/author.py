@@ -1,4 +1,6 @@
-import lpbm.v3.lib.model as _mod
+import os
+
+from lpbm.v3.lib import model as _mod
 from lpbm.v3.lib.model import SESSION
 
 AUTHOR_EMAIL_LABELS = ('personal', 'business')
@@ -35,6 +37,11 @@ class Author(_mod.Model):
     name = _mod.ModelField('identity.name')
     handle = _mod.ModelField('identity.handles.current')
 
+    def display_name(self):
+        if self.name:
+            return self.name
+        return self.handle
+
     @property
     def email_accounts(self):
         return (  # noqa: E131
@@ -43,6 +50,24 @@ class Author(_mod.Model):
                 .order_by(AuthorEmail.email)
                 .all()
         )
+
+    def drafts(self):
+        drafts, drafts_dir = [], self.in_model_join('.drafts')
+        if os.path.exists(drafts_dir):
+            for draft_filename in os.listdir(drafts_dir):
+                drafts.append({
+                    'uuid': draft_filename.rsplit('.', 1)[0],
+                    'path': os.path.join(drafts_dir, draft_filename),
+                })
+        return drafts
+
+    def draft_from_uuid(self, uuid):
+        draft = None
+        for draft_tmp in self.drafts():
+            if draft_tmp['uuid'] == uuid:
+                draft = draft_tmp
+                break
+        return draft
 
 
 class AuthorEmail(_mod.Model):

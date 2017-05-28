@@ -71,6 +71,11 @@ class Query(object):
         self._filename_uuids.update(uuids)
         return self.one()
 
+    def get_or_none(self, uuid, **uuids):
+        uuids.update({'uuid': uuid})
+        self._filename_uuids.update(uuids)
+        return self.one_or_none()
+
     def all(self):
         full_pattern = self._model._filename_pattern('full_pattern')
         # First build the path with known uuids.
@@ -138,14 +143,10 @@ class Query(object):
         suffix_len = len(self._model._filename_pattern('suffix'))
         uuid = filename[:-suffix_len][:-1][-36:]
         assert UUID_RE.match(uuid) is not None
+
         try:
             return self._session.instances[uuid]
         except KeyError:
-            with open(self._session.in_blog_join(filename)) as fd:
-                data = yaml.safe_load(fd.read())
-
-            data = self._model._schema()(data)
-
-            obj = self._model(data=data, session=self._session, parent=self._parent)
+            obj = self._model.load(self._session, filename, parent=self._parent)
             self._session.instances[obj.uuid] = obj
             return obj

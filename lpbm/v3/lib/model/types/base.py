@@ -8,6 +8,9 @@ class BaseType(metaclass=abc.ABCMeta):
         BaseType.schema returns the schema for this type.
         """
 
+    def filenames(self, owners, value):
+        return []
+
     @abc.abstractmethod
     def load(self, session, owners, value):
         """

@@ -1,3 +1,4 @@
+import errno
 import os
 import warnings
 
@@ -15,11 +16,16 @@ def mkdir_p(path):
     """
     Emulates the behaviour of `mkdir -p` in shell (makes all the directories
     of the path specified).
+
+    :returns: True if directory was fully created, False otherwise.
     """
     try:
         os.makedirs(path)
-    except OSError:
-        pass
+        return True
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            return False
+        raise
 
 
 def remove(path):

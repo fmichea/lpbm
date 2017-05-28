@@ -20,6 +20,6 @@ def model_name(v):
 
 def model_name_id(v):
     res = model_name(v)
-    if hasattr(v, 'uuid'):
+    if v.is_in_file_model():
         res += '(uuid={uuid})'.format(uuid=v.uuid)
     return res

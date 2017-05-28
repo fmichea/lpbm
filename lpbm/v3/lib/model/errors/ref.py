@@ -1,4 +1,3 @@
-from lpbm.v3.lib.model.base import model_name_id
 from lpbm.v3.lib.model.base_ref import model_ref_name_id
 
 
@@ -15,7 +14,7 @@ class ModelRefError(Exception):
 
     def __str__(self):
         return '{owner}: error with reference {ref}'.format(
-            owner=' > '.join(model_name_id(owner) for owner in self._owners),
+            owner=self._owners.clean_repr(),
             ref=model_ref_name_id(self._ref),
         )
 
