@@ -1,0 +1,16 @@
+---
+layout: page
+---
+
+{{ content }}
+
+{% if site.authors %}
+<h2 class="post-list-heading">Members</h2>
+
+<ul>
+{% for author in site.authors %}
+    <li>{% include author_link.html author_id=author.nickname %}</li>
+{% endfor %}
+
+</ul>
+{% endif %}

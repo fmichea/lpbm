@@ -73,7 +73,6 @@ setup(
     entry_points={
         'console_scripts': [
             'lpbm = lpbm.main:main',
-            'lpbm-v3 = lpbm.v3.main:main',
         ],
     },
     cmdclass={

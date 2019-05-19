@@ -1,2 +1,0 @@
-class ModelFieldBoolOpError(Exception):
-    pass
