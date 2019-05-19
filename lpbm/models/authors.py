@@ -59,6 +59,9 @@ class Author(cm_module.Model):
         if self.nickname != old_nick:
             self.mod.cm.config.remove_section(old_nick)
 
+    def jekyll_markdown_filename(self):
+        return '%s.md' % self.nickname
+
     @property
     def section(self):
         '''Here for config manager.'''

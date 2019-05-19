@@ -1,0 +1,8 @@
+{% assign author = site.authors | where: 'nickname', author_id | first %}
+<span itemprop="author" itemscope itemtype="http://schema.org/Person">
+    {% if author.email %}<a href="{{ author.url }}">{% endif %}
+        <span class="p-author h-card" itemprop="name">
+            {{ author.name }}
+        </span>
+    {% if author.email %}</a>{% endif %}
+</span>

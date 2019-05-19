@@ -60,6 +60,13 @@ def move_content(src, dst):
             dirs.pop()
 
 
+def copy_content(src, dst):
+    tmpdst = join(dst, '.tmpcopy')
+    shutil.copytree(src, tmpdst)
+    move_content(tmpdst, dst)
+    os.rmdir(tmpdst)
+
+
 def copy(src, dst):
     '''Copies the file from src to dst.'''
     mkdir_p(os.path.dirname(dst))

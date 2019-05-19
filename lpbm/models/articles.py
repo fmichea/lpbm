@@ -210,6 +210,16 @@ class Article(cm_module.Model):
         filename = os.path.basename(self.filename)
         return '%d-%s.html' % (self.id, filename)
 
+    def jekyll_url(self):
+        dt = self.date.strftime('%Y/%m/%d')
+        filename = os.path.basename(self.filename)
+        return '%s/%s.html' % (dt, filename)
+
+    def jekyll_markdown_filename(self):
+        dt = self.date.strftime('%Y-%m-%d')
+        filename = os.path.basename(self.filename)
+        return '%s-%s.md' % (dt, filename)
+
     def url(self):
         '''The direct link to the article.'''
         return os.path.join('/', 'articles', self.html_filename())
@@ -220,3 +230,32 @@ class Article(cm_module.Model):
         '''
         self.published = True
         self.date = datetime.datetime.now()
+
+    @property
+    def jekyll_content(self):
+        lines, in_code = [], False
+
+        for line in self._content.splitlines():
+            line_stripped = line.lstrip()
+            if line_stripped.startswith(':::lpbm'):
+                continue
+            elif line_stripped.startswith(':::'):
+                line = '```' + line_stripped[3:]
+                in_code = True
+            elif in_code:
+                if line_stripped and not line.startswith(' '):
+                    popped = lines[-1] == ''
+                    if popped:
+                        lines.pop()
+
+                    lines.append('```')
+
+                    if popped:
+                        lines.append('')
+
+                    in_code = False
+                else:
+                    line = line[4:] if line.startswith('    ') else line
+
+            lines.append(line)
+        return '\n'.join(lines)
