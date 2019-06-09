@@ -44,7 +44,7 @@ def _check_test_blog_1(root):
         'title: "Second Post Best Post"',
         'This is a second post with multiple authors, yay!',
         '/articles/1-second-post-best-post.html',
-        'authors: [aiden,alex,]',
+        'authors: [alex,aiden,]',
         'categories: ["Main Category 1 > Sub Category 1"]',
     ])
 
