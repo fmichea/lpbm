@@ -15,6 +15,7 @@ import sys
 
 import lpbm.logging
 import lpbm.tools as ltools
+from lpbm.lib.deprecated_command import deprecated_command
 
 
 class Module(metaclass=abc.ABCMeta):
@@ -203,35 +204,16 @@ class ModelManagerModule(Module, metaclass=abc.ABCMeta):
 
     # Actions.
     def opt_list(self, short=False):
-        if not short:
-            print('All {object_name_plural}:'.format(
-                object_name_plural=self.object_name_plural()
-            ))
-        if self.objects:
-            for obj in sorted(self.objects):
-                print(' {id:2d} - {obj}{deleted}'.format(
-                    id=obj.id, obj=obj.list_verbose(),
-                    deleted=' [deleted]' if obj.deleted else '',
-                ))
-        else:
-            print(' + There is no {}.'.format(self.object_name()))
+        deprecated_command()
 
     def opt_new(self, *args, **kwargs):
-        obj = self.create_object(self.model_cls(), *args, **kwargs)
-        obj.interactive()
-        obj.save()
-        self._objects[obj.id] = obj
-        return obj
+        deprecated_command()
 
     def opt_edit(self, id):
-        obj = self[id]
-        obj.interactive()
-        obj.save()
+        deprecated_command()
 
     def opt_delete(self, id):
-        obj = self[id]
-        obj.delete()
-        obj.save()
+        deprecated_command()
 
     @abc.abstractmethod
     def object_name(self):

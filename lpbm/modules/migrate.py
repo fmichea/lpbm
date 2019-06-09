@@ -1,18 +1,15 @@
 import codecs
+import datetime
 import os
 import shutil
 import sys
 import tempfile
 
+import PyRSS2Gen
 import jinja2
 
 import lpbm
 import lpbm.tools as ltools
-from lpbm.lib.jinja2.filters import (
-    do_markdown,
-    do_slugify,
-    do_sorted,
-)
 
 _ENV = None
 
@@ -58,6 +55,7 @@ Among the things known to break:
    - Categories are flat in Jekyll, previous categories pages (up to 10 pages) will redirect to
      one shared page.
    - Disqus comments will require manual migration (see CSV printed below).
+   - RSS will be replaced with a link to new RSS feed.
 
 Before replacing the contents of your current blog with the jekyll contents, please go through the
 generation steps and check every article to ensure it is to your liking.
@@ -84,7 +82,6 @@ However, in exchange you get Jekyll's support, which is much better than this ab
                 print(base_url.rstrip('/') + article.url() + ':' + base_url + article.jekyll_url())
             print("----------------------")
 
-
         self.simplified_article_links = True  # FIXME: remove category from article links.
 
         self.root = ltools.join(ltools.ROOT, 'themes', 'jekyll')
@@ -94,11 +91,6 @@ However, in exchange you get Jekyll's support, which is much better than this ab
         _ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
             ltools.join(self.root, 'templates')
         ))
-        _ENV.filters.update({
-            'markdown': do_markdown,
-            'slugify': do_slugify,
-            'sorted': do_sorted,
-        })
         _ENV.globals.update({
             'authors_mod': self.modules['authors'],
             'categories_mod': self.modules['categories'],
@@ -113,6 +105,7 @@ However, in exchange you get Jekyll's support, which is much better than this ab
             self.render_articles()
             self.render_authors()
             self.render_categories()
+            self.render_rss()
 
             self.copy_media_files()
 
@@ -157,8 +150,43 @@ However, in exchange you get Jekyll's support, which is much better than this ab
                 'categories': categories,
             }))
 
+    def render_rss(self):
+        link = '{base_url}/feed.xml'.format(
+            base_url=self.modules['config']['general.url'].rstrip('/'),
+        )
+
+        contents = (
+           '<p>This blog has been migrated to Jekyll, please find the new RSS link here: ' +
+           '<a href="{l}">{l}</a></p>'
+        )
+
+        item = PyRSS2Gen.RSSItem(
+            title='RSS URI changed - migration to Jekyll',
+            link=link,
+            guid='6D9CAD12-86D5-46D4-93F4-71C342F4B929',
+            description=contents.format(l=link),
+        )
+
+        rss = PyRSS2Gen.RSS2(
+            title=self.modules['config']['general.title'],
+            link=self.modules['config']['general.url'],
+            description=self.modules['config']['general.subtitle'],
+            lastBuildDate=datetime.datetime.now(),
+            items=[item],
+        )
+
+        rss_path = ltools.join(self.build_dir, 'rssfeed.xml')
+        with codecs.open(rss_path, 'w', 'utf-8') as f:
+            rss.write_xml(f, encoding='utf-8')
+
     def copy_media_files(self):
-        ltools.copy_content(ltools.join(self.args.exec_path, 'medias'), ltools.join(self.build_dir, 'medias'))
+        source = ltools.join(self.args.exec_path, 'medias')
+        target = ltools.join(self.build_dir, 'medias')
+
+        if not os.path.exists(source):
+            return
+
+        ltools.copy_content(source, target)
 
     def render_config(self):
         path = self._build_path('_config.yml')
