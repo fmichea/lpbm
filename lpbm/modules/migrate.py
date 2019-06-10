@@ -43,7 +43,7 @@ class Migrate(lpbm.module_loader.Module):
 
         if not os.path.exists(self.output_dir):
             msg = 'I didn\'t find directory/symbolic link named `{path}`'
-            msg += ' where to put the blog.'
+            msg += ' where to put the blog\'s new sources. Please create it.'
             sys.exit(msg.format(path=self.output_dir))
 
         msg = '''\
@@ -64,6 +64,11 @@ More at: https://jekyllrb.com/docs/
 
 However, in exchange you get Jekyll's support, which is much better than this abandoned piece
 of software.
+
+After using this command, follow the instructions to install jekyll, then locally serve the
+blog using `bundle exec jekyll serve --port 4041`. Check your new jekyll blog thoroughly
+at http://localhost:4041/ . If everything is correct, replace your blog sources with the
+contents of the result directory. You now have a Jekyll blog!
 '''
 
         print(msg)
