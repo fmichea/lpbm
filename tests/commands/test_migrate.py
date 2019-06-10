@@ -56,6 +56,8 @@ def _check_test_blog_1(root):
         'This is some cool first post for my blog!',
     ])
 
+    _check_file_exists(root, 'medias/data/main.c')
+
 
 @pytest.mark.parametrize(('blog_name', 'check_function'), [
     ('test-blog-1', _check_test_blog_1),
