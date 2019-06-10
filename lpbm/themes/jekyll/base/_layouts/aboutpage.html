@@ -8,9 +8,9 @@ layout: page
 <h2 class="post-list-heading">Members</h2>
 
 <ul>
-{% for author in site.authors %}
+{% assign authors = site.authors|sort:"name" %}
+{% for author in authors %}
     <li>{% include author_link.html author_id=author.nickname %}</li>
 {% endfor %}
-
 </ul>
 {% endif %}

@@ -2,10 +2,12 @@
 layout: page
 ---
 
-{% for category in site.categories %}
+{% assign categories = site.categories|sort %}
+{% for category in categories %}
   <h3>{{ category[0] }}</h3>
   <ul>
-    {% for post in category[1] %}
+    {% assign posts = category[1]|sort %}
+    {% for post in posts %}
       <li><a href="{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
   </ul>
