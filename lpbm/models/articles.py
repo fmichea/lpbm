@@ -31,6 +31,35 @@ _TITLE_SEPARATOR = '=='
 _FRMT_DATE_CONF = '%Y-%m-%dT%H:%M:%S'
 
 
+def translate_to_jekyll_markdown(contents):
+    lines, in_code = [], False
+
+    for line in contents.splitlines():
+        line_stripped = line.lstrip()
+        if line_stripped.startswith(':::lpbm'):
+            continue
+        elif line_stripped.startswith(':::'):
+            line = '```' + line_stripped[3:]
+            in_code = True
+        elif in_code:
+            if line_stripped and not line.startswith(' '):
+                popped = lines[-1] == ''
+                if popped:
+                    lines.pop()
+
+                lines.append('```')
+
+                if popped:
+                    lines.append('')
+
+                in_code = False
+            else:
+                line = line[4:] if line.startswith('    ') else line
+
+        lines.append(line)
+    return '\n'.join(lines) + '\n'
+
+
 class Article(cm_module.Model):
     '''
     The actual model. Articles are devided in two files. The actual article
@@ -230,29 +259,4 @@ class Article(cm_module.Model):
 
     @property
     def jekyll_content(self):
-        lines, in_code = [], False
-
-        for line in self._content.splitlines():
-            line_stripped = line.lstrip()
-            if line_stripped.startswith(':::lpbm'):
-                continue
-            elif line_stripped.startswith(':::'):
-                line = '```' + line_stripped[3:]
-                in_code = True
-            elif in_code:
-                if line_stripped and not line.startswith(' '):
-                    popped = lines[-1] == ''
-                    if popped:
-                        lines.pop()
-
-                    lines.append('```')
-
-                    if popped:
-                        lines.append('')
-
-                    in_code = False
-                else:
-                    line = line[4:] if line.startswith('    ') else line
-
-            lines.append(line)
-        return '\n'.join(lines)
+        return translate_to_jekyll_markdown(self._content)
