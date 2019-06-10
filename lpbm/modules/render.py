@@ -2,11 +2,7 @@
 # Author: Franck Michea < franck.michea@gmail.com >
 # License: New BSD License (See LICENSE)
 
-import os
-
 import lpbm.module_loader
-import lpbm.tools as ltools
-
 from lpbm.lib.deprecated_command import deprecated_command
 
 

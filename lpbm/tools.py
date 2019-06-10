@@ -9,7 +9,6 @@ import re
 import shutil
 import sys
 
-
 ROOT = os.path.dirname(__file__)
 
 

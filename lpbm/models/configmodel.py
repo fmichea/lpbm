@@ -10,8 +10,8 @@ in ini files like normal attributes of an object.
 import codecs
 import configparser
 
-import lpbm.tools as ltools
 import lpbm.exceptions
+import lpbm.tools as ltools
 
 
 class BaseField:

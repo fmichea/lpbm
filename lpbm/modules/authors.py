@@ -12,7 +12,6 @@ import lpbm.logging
 import lpbm.models.configmodel as cm_module
 import lpbm.module_loader
 import lpbm.tools as ltools
-
 from lpbm.models.authors import Author
 
 

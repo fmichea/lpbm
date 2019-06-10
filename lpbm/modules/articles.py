@@ -11,10 +11,8 @@ import lpbm.exceptions
 import lpbm.logging
 import lpbm.module_loader
 import lpbm.tools as ltools
-
 from lpbm.lib.deprecated_command import deprecated_command
 from lpbm.models.articles import Article
-
 
 _LOGGER = lpbm.logging.get()
 

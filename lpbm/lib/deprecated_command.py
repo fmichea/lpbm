@@ -1,8 +1,7 @@
 import sys
 
-
 DEPRECATED_MESSAGE = (
-    'ERROR: Deprecated, please migrate to jekyll using the migrate command or\n'+
+    'ERROR: Deprecated, please migrate to jekyll using the migrate command or\n' +
     '  downgrade to the previous version.'
 )
 

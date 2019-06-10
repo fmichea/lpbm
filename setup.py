@@ -2,10 +2,8 @@ import os
 import shlex
 import sys
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
-
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 

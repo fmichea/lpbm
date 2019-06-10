@@ -11,7 +11,6 @@ import lpbm.models.configmodel as cm_module
 import lpbm.module_loader
 import lpbm.tools as ltools
 from lpbm.lib.deprecated_command import deprecated_command
-
 from lpbm.models.categories import Category
 
 

@@ -11,7 +11,6 @@ import os
 
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
-
 from lpbm.lib.slugify import slugify as _slugify
 
 

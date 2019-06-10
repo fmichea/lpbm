@@ -10,11 +10,8 @@ import os
 
 import lpbm.models.configmodel as cm_module
 import lpbm.tools as ltools
-
-from lpbm.lib.slugify import (
-    SLUG_CHARS_DISPLAY as _SLUG_CHARS_DISPLAY,
-    slugify as _slugify,
-)
+from lpbm.lib.slugify import SLUG_CHARS_DISPLAY as _SLUG_CHARS_DISPLAY
+from lpbm.lib.slugify import slugify as _slugify
 
 
 class ArticleSameIdError(Exception):

@@ -5,8 +5,8 @@ import shutil
 import sys
 import tempfile
 
-import PyRSS2Gen
 import jinja2
+import PyRSS2Gen
 
 import lpbm
 import lpbm.tools as ltools
@@ -62,7 +62,8 @@ generation steps and check every article to ensure it is to your liking.
 
 More at: https://jekyllrb.com/docs/
 
-However, in exchange you get Jekyll's support, which is much better than this abandoned piece of software.
+However, in exchange you get Jekyll's support, which is much better than this abandoned piece
+of software.
 '''
 
         print(msg)
