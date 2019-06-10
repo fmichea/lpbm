@@ -1,0 +1,5 @@
+-r command.in
+isort
+flake8
+pytest
+pytest-cov

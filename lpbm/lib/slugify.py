@@ -1,7 +1,6 @@
 import string
 import unicodedata
 
-
 SLUG_CHARS_DISPLAY = '[a-z0-9-]'
 
 

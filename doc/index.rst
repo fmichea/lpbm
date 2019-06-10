@@ -6,15 +6,12 @@
 Welcome to lpbm's documentation!
 ================================
 
-Contents:
+This project is deprecated, please see README for more information.
 
 .. toctree::
     :maxdepth: 2
 
-    introduction
     faq
-    quick_start
-    modules
 
 Indices and tables
 ==================

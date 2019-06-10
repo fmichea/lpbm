@@ -1,0 +1,50 @@
+title: {{ config_mod['general.title'] }}
+{%- if config_mod['general.footer'] %}
+description: >- # this means to ignore newlines until "baseurl:"
+  {{ config_mod['general.footer'] }}
+{%- endif %}
+
+# This will be used to link to posts. You can remove this configuration if you
+# would like to use the default behavior for Jekyll, which includes the category
+# name as first item before year.
+#
+# However, due to the way lpbm's categories map to Jekyll for migration, this could
+# create bad paths, so migrated blogs default to a path without tha category in it.
+permalink: /:year/:month/:day/:title:output_ext
+
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "{{ config_mod['general.url'] }}"
+
+# Rendering configuration for Jekyll.
+markdown: kramdown
+theme: minima
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-redirect-from
+
+# Ensure drafts will not be render on live site. Use --drafts to render them locally.
+show_drafts: false
+
+# Excerpt configuration.
+show_excerpts: true
+
+# Social configuration for whole site.
+twitter_username: {{ config_mod['social.twitter_id'] }}
+
+{%- if config_mod['social.disqus_id'] %}
+disqus:
+  shortname: {{ config_mod['social.disqus_id'] }}
+{%- endif %}
+
+collections:
+  authors:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+      type: "authors"
+    values:
+      layout: author

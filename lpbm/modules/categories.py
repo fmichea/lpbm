@@ -10,7 +10,7 @@ all the categories.
 import lpbm.models.configmodel as cm_module
 import lpbm.module_loader
 import lpbm.tools as ltools
-
+from lpbm.lib.deprecated_command import deprecated_command
 from lpbm.models.categories import Category
 
 
@@ -38,46 +38,9 @@ class Categories(lpbm.module_loader.ModelManagerModule):
         for section in self.cm.config.sections():
             self.register_object(Category, section)
 
-    # Manipulation function
-    def recursive_view(self):
-        res, cats, level = dict(), dict([(o.id, o) for o in self.objects]), 0
-        while cats:
-            _to_delete = []
-            for cat in cats.values():
-                if cat.level() == level:
-                    _parent_res = res
-                    for parent in cat.full_path()[:-1]:
-                        _parent_res = _parent_res[parent.name][1]
-                    _parent_res[cat.name] = (cat, dict())
-                    _to_delete.append(cat.id)
-            for it in _to_delete:
-                del cats[it]
-            level += 1
-        return res
-
     def opt_new(self):
         super().opt_new(None)
 
     def opt_delete(self, id):
         '''Deletes an existing category.'''
-        categories, to_delete = {id: self[id]}, [id]
-        categories_copy = self._objects.copy()
-        while to_delete:
-            to_delete = []
-            for cat_id, cat in categories_copy.items():
-                if cat.parent in categories:
-                    categories[cat.id] = cat
-                    to_delete.append(cat.id)
-            for cat_id in to_delete:
-                del categories_copy[cat_id]
-        print('All categories to be deleted:')
-        for cat in categories.values():
-            print('{level} - {name}'.format(
-                name=cat.name,
-                level=('  ' * (cat.level() - categories[id].level()))
-            ))
-        if ltools.ask_sure():
-            for cat in categories.values():
-                cat.deleted = True
-            self.cm.save()
-            print('Categories successfully deleted!')
+        deprecated_command()

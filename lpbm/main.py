@@ -17,14 +17,10 @@ import traceback
 import lpbm.logging
 import lpbm.module_loader
 
-
 _MODULES = dict()
 
 
-def main():
-    '''Initialization of logging module and parser. Calls module_loader.'''
-    lpbm.logging.init()
-
+def load_cmd_parser():
     # Command line arguments.
     parser = argparse.ArgumentParser(description='Lightweight Personal Blog Maker')
     parser.add_argument('-b', '--backtrace', action='store_true', default=False,
@@ -41,9 +37,16 @@ def main():
     # Tools are loaded dynamically, so argument parser isn't complete.
     lpbm.module_loader.load_modules(_MODULES, subparser)
 
-    # Every command , we can parse command line.
-    args = parser.parse_args(sys.argv[1:])
+    return parser
 
+
+def main(args=None):
+    '''Initialization of logging module and parser. Calls module_loader.'''
+    lpbm.logging.init()
+
+    parser = load_cmd_parser()
+
+    args = parser.parse_args(args=args)
     if hasattr(args, 'func'):
         try:
             args.func(_MODULES, args)

@@ -9,7 +9,6 @@ import re
 import shutil
 import sys
 
-
 ROOT = os.path.dirname(__file__)
 
 
@@ -58,6 +57,13 @@ def move_content(src, dst):
             shutil.move(join(root, f), dst)
         while dirs:
             dirs.pop()
+
+
+def copy_content(src, dst):
+    tmpdst = join(dst, '.tmpcopy')
+    shutil.copytree(src, tmpdst)
+    move_content(tmpdst, dst)
+    os.rmdir(tmpdst)
 
 
 def copy(src, dst):
